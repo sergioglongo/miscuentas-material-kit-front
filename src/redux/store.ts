@@ -1,0 +1,31 @@
+import { configureStore, combineReducers } from '@reduxjs/toolkit'
+import storage from "redux-persist/lib/storage";
+import { persistReducer, persistStore } from 'redux-persist'
+import { reducer as form } from 'redux-form';
+import userReducer from './slices/user.slice';
+
+const persistConfig = {
+    key: "root",
+    storage,
+    whitelist: ["user"]
+}
+
+const rootReducer = combineReducers({
+    user: userReducer,
+    form,
+})
+
+const persistedReducer = persistReducer(persistConfig, rootReducer)
+
+export const store = configureStore({
+    reducer: persistedReducer,
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
+    devTools: process.env.NODE_ENV !== 'production',
+})
+
+export const persistor = persistStore(store)
+
+// Infer the `RootState` and `AppDispatch` types from the store itself
+export type RootState = ReturnType<typeof store.getState>
+// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
+export type AppDispatch = typeof store.dispatch
