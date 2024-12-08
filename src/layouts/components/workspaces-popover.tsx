@@ -1,6 +1,6 @@
 import type { ButtonBaseProps } from '@mui/material/ButtonBase';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Popover from '@mui/material/Popover';
@@ -20,7 +20,7 @@ export type WorkspacesPopoverProps = ButtonBaseProps & {
     id: string;
     name: string;
     logo: string;
-    plan: string;
+    main: boolean;
   }[];
 };
 
@@ -52,7 +52,16 @@ export function WorkspacesPopover({ data = [], sx, ...other }: WorkspacesPopover
   const renderLabel = (plan: string) => (
     <Label color={plan === 'Free' ? 'default' : 'info'}>{plan}</Label>
   );
-
+  useEffect(() => {
+    if (data && data.length > 0) {
+      data.forEach((unit) => {
+        console.log("Buscando la principal", unit, unit?.main);
+        if (unit.main) {
+          setWorkspace(unit)
+        }
+      })
+    }
+  }, [data])
   return (
     <>
       <ButtonBase
@@ -82,7 +91,7 @@ export function WorkspacesPopover({ data = [], sx, ...other }: WorkspacesPopover
           sx={{ typography: 'body2', fontWeight: 'fontWeightSemiBold' }}
         >
           {workspace?.name}
-          {renderLabel(workspace?.plan)}
+          {/* {renderLabel(workspace?.plan)} */}
         </Box>
 
         <Iconify width={16} icon="carbon:chevron-sort" sx={{ color: 'text.disabled' }} />
@@ -120,7 +129,7 @@ export function WorkspacesPopover({ data = [], sx, ...other }: WorkspacesPopover
                 {option.name}
               </Box>
 
-              {renderLabel(option.plan)}
+              {/* {renderLabel(option.plan)} */}
             </MenuItem>
           ))}
         </MenuList>

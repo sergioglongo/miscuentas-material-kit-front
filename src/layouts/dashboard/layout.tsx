@@ -1,6 +1,6 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
@@ -10,6 +10,10 @@ import { _langs, _notifications } from 'src/_mock';
 
 import { Iconify } from 'src/components/iconify';
 
+import { IUnit } from 'src/config/types/types';
+import { bindActionCreators } from '@reduxjs/toolkit';
+import { setUnitActive, setUnits } from 'src/redux/slices/units.slice';
+import { connect } from 'react-redux';
 import { Main } from './main';
 import { layoutClasses } from '../classes';
 import { NavMobile, NavDesktop } from './nav';
@@ -31,10 +35,32 @@ export type DashboardLayoutProps = {
   header?: {
     sx?: SxProps<Theme>;
   };
+  units: IUnit[];
+  setUnitActiveData: any;
+  setUnitsData: any;
 };
 
-export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) {
+function DashboardLayoutReduxed({ sx, children, header, units, setUnitActiveData, setUnitsData }: DashboardLayoutProps) {
   const theme = useTheme();
+  const [unitsList, setUnitsList] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (units) {
+      const unitsFormatted:any = units?.map((unit: IUnit) => {
+        console.log("unit", unit, unit?.user_unit);
+        
+        return {
+          id: unit.id,
+          name: unit.name,
+          logo: unit.photo || '',
+          main: unit?.user_unit && unit?.user_unit.is_main_unit || false
+        }
+      })
+      console.log("unitsFormatted", unitsFormatted);
+      
+      setUnitsList(unitsFormatted);
+    }
+  }, [units])
 
   const [navOpen, setNavOpen] = useState(false);
 
@@ -74,7 +100,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   data={navData}
                   open={navOpen}
                   onClose={() => setNavOpen(false)}
-                  workspaces={_workspaces}
+                  workspaces={unitsList}
                 />
               </>
             ),
@@ -92,7 +118,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                     },
                     {
                       label: 'Profile',
-                      href: '#',
+                      href: '/profileEdit',
                       icon: <Iconify width={22} icon="solar:shield-keyhole-bold-duotone" />,
                     },
                     {
@@ -111,7 +137,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
        * Sidebar
        *************************************** */
       sidebarSection={
-        <NavDesktop data={navData} layoutQuery={layoutQuery} workspaces={_workspaces} />
+        <NavDesktop data={navData} layoutQuery={layoutQuery} workspaces={unitsList} />
       }
       /** **************************************
        * Footer
@@ -139,3 +165,16 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
     </LayoutSection>
   );
 }
+const mapDispatchToProps = (dispatch: any) => ({
+  setUnitsData: bindActionCreators(setUnits, dispatch),
+  setUnitActiveData: bindActionCreators(setUnitActive, dispatch),
+});
+
+const DashboardLayout = connect(
+  (state: any) => ({
+    units: state.units.unitsList,
+  }),
+  mapDispatchToProps
+)(DashboardLayoutReduxed);
+
+export default DashboardLayout;

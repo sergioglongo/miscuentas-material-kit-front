@@ -1,113 +1,91 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Divider from '@mui/material/Divider';
-import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import LoadingButton from '@mui/lab/LoadingButton';
-import InputAdornment from '@mui/material/InputAdornment';
-
 import { useRouter } from 'src/routes/hooks';
-
 import { Iconify } from 'src/components/iconify';
-import { Field, reduxForm } from 'redux-form';
+import { reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
-import { FormControl, Grid } from '@mui/material';
-import { TextFieldErrorRedux } from 'src/components/forms/fields/textFieldError';
+import { signUp } from 'src/services/api/apiClient';
+import { setUser } from 'src/redux/slices/user.slice';
+import { bindActionCreators } from '@reduxjs/toolkit';
+import SignUpForm from './sign-up-form';
 
 // ----------------------------------------------------------------------
 
-const SignUpView = () => {
+const SignUpView = ({ signUpForm, setUserData }: any) => {
     const router = useRouter();
 
-    const [showPassword, setShowPassword] = useState(false);
 
-    const handleSignIn = useCallback(() => {
-        router.push('/');
-    }, [router]);
+    const [alertMessage, setAlertMessage] = useState({
+        message: '',
+        show: false,
+        color: 'success'
+    });
 
-    const renderForm = (
-        <Grid container rowSpacing={1} columnSpacing={2} display='flex' flexDirection='column' alignItems='center'>
-            <Grid item xs={12} sm={12} >
-                <FormControl>
-                    <Field
-                        component={TextFieldErrorRedux}
-                        name="email"
-                        label="Email address"
-                        defaultValue="hello@gmail.com"
-                        InputLabelProps={{ shrink: true }}
-                        sx={{ mb: 3, width:'200px' }}
-                    // required
-                    // validate={[required]}
-                    // onChange={(event) => handleInputChange('marca', event.target.value)}
-                    // value={formData?.marca || ''}
-                    />
-                </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={12} alignItems='center'>
-                <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
-                    Forgot password?
-                </Link>
-            </Grid>
-            <Grid item xs={12} sm={12}>
-                <FormControl>
-                    <Field
-                        component={TextFieldErrorRedux}
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        defaultValue="@demo1234"
-                        InputLabelProps={{ shrink: true }}
-                        type={showPassword ? 'text' : 'password'}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                                        <Iconify icon={showPassword ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                        sx={{ mb: 3, width:'200px' }}
-                    />
-                </FormControl>
-            </Grid>
-            <LoadingButton
-                fullWidth
-                size="large"
-                type="submit"
-                color="inherit"
-                variant="contained"
-                sx={{ mb: 3, width:'200px' }}
-                onClick={handleSignIn}
-            >
-                Sign in
-            </LoadingButton>
-        </Grid>
-    );
+
+
+    const handleSignUp = useMemo(() => (e: any) => {
+        e.preventDefault();
+        console.log("formulario:", signUpForm?.values);
+
+        signUp(signUpForm?.values)
+            .then((res) => {
+                if (res?.success) {
+                    // setUserData({ userData: res?.user?.user, isAuthorized: true, accessToken: res?.user?.accessToken });
+                    setAlertMessage({
+                        message: "Registrado con exito",
+                        show: true,
+                        color: 'success'
+                    })
+                    setTimeout(() => {
+                        router.push('/sign-in');
+                    }, 3000);
+                } else {
+                    setAlertMessage({
+                        message: res?.message,
+                        show: true,
+                        color: 'error'
+                    })
+                    console.log("error else", res)
+                }
+            }
+            )
+            .catch((err: any) => {
+                setAlertMessage({
+                    message: err?.message,
+                    show: true,
+                    color: 'error'
+                })
+                console.log("error catch", err)
+            });
+
+    }, [signUpForm, router]);
+
 
     return (
         <>
             <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
-                <Typography variant="h5">Sign in</Typography>
+                <Typography variant="h5">Inicia sesión</Typography>
                 <Typography variant="body2" color="text.secondary">
-                    Don’t have an account?
-                    <Link variant="subtitle2" sx={{ ml: 0.5 }}>
-                        Get started
+                    auú no tienes cuenta?
+                    <Link href="/" variant="subtitle2" sx={{ ml: 0.5 }}>
+                        volver
                     </Link>
                 </Typography>
             </Box>
 
-            {renderForm}
+            <SignUpForm handleSignUp={handleSignUp} signUpForm={signUpForm} alertMessage={alertMessage} setAlertMessage={setAlertMessage} /> 
 
             <Divider sx={{ my: 3, '&::before, &::after': { borderTopStyle: 'dashed' } }}>
                 <Typography
                     variant="overline"
                     sx={{ color: 'text.secondary', fontWeight: 'fontWeightMedium' }}
                 >
-                    OR
+                    O inicia sesión con
                 </Typography>
             </Divider>
 
@@ -126,15 +104,20 @@ const SignUpView = () => {
     );
 }
 
-const ReduxFormMapped = reduxForm({
+const SingUpFormReduxed = reduxForm({
     form: 'signUpForm',
     enableReinitialize: true,
 })(SignUpView);
 
+const mapDispatchToProps = (dispatch: any) => ({
+    setUserData: bindActionCreators(setUser, dispatch),
+});
+
 const SignUpViewForm = connect(
-    // state => ({
-    //     formValues: state.form.signUpForm,
-    // }),
-)(ReduxFormMapped);
+    (state: any) => ({
+        signUpForm: state.form.signUpForm,
+    }),
+    mapDispatchToProps
+)(SingUpFormReduxed);
 
 export default SignUpViewForm;

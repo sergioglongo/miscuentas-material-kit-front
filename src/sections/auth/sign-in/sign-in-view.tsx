@@ -5,25 +5,21 @@ import Link from '@mui/material/Link';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import LoadingButton from '@mui/lab/LoadingButton';
-import InputAdornment from '@mui/material/InputAdornment';
 import { useRouter } from 'src/routes/hooks';
 import { Iconify } from 'src/components/iconify';
-import { Grid, FormControl, Snackbar } from '@mui/material';
-import { AlertSnack } from 'src/components/notifications/AlertSnack';
-import { Field, Form, reduxForm } from 'redux-form';
-import { TextFieldErrorRedux } from 'src/components/forms/fields/textFieldError';
+import { reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
+import { setUnits } from 'src/redux/slices/units.slice';
 import { signIn } from 'src/services/api/apiClient';
 import { setUser } from 'src/redux/slices/user.slice';
 import { bindActionCreators } from '@reduxjs/toolkit';
+import SignInForm from './sign-in-form';
 
-const SignInView = ({ signInForm, setUserData }: any) => {
+const SignInView = ({ signInForm, setUserData, setUnitsData }: any) => {
   const router = useRouter();
-
-  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [errorShow, setErrorShow] = useState<boolean>(false);
+
 
   const handleSignIn = useMemo(() => (e: any) => {
     e.preventDefault();
@@ -31,7 +27,10 @@ const SignInView = ({ signInForm, setUserData }: any) => {
     signIn({ email: signInForm?.values?.email, password: signInForm?.values?.password })
       .then((res) => {
         if (res?.success) {
-          setUserData({ userData: res?.user?.user, isAuthorized: true, accessToken: res?.user?.accessToken });
+          const user = res?.user?.user;
+          const { units, ...userWithoutUnits } = user;
+          setUserData({ userData: userWithoutUnits, isAuthorized: true, accessToken: res?.user?.accessToken });
+          setUnitsData(units);
           router.push('/');
         } else {
           setErrorMessage(res?.message);
@@ -46,81 +45,8 @@ const SignInView = ({ signInForm, setUserData }: any) => {
         console.log("error catch", err)
       });
 
-  }, [signInForm, router, setUserData]);
+  }, [setUnitsData, signInForm, router, setUserData]);
 
-  const renderForm = (
-    <Form onSubmit={handleSignIn}>
-      <Grid container rowSpacing={1} columnSpacing={2} display='flex' flexDirection='column' alignItems='center'>
-        <Grid item xs={12} sm={12} >
-          <FormControl>
-            <Field
-              component={TextFieldErrorRedux}
-              name="email"
-              label="Email address"
-              // defaultValue= "hello@gmail.com"
-              // InputProps={{  }}
-              InputLabelProps={{ shrink: true }}
-              sx={{ mb: 3, width: '200px' }}
-            />
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={12} alignItems='center'>
-          <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
-            Forgot password?
-          </Link>
-        </Grid>
-        <Grid item xs={12} sm={12}>
-          <FormControl>
-            <Field
-              component={TextFieldErrorRedux}
-              fullWidth
-              name="password"
-              label="Password"
-              // defaultValue="@demo1234"
-              InputLabelProps={{ shrink: true }}
-              type={showPassword ? 'text' : 'password'}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                      <Iconify icon={showPassword ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ mb: 3, width: '200px' }}
-            />
-          </FormControl>
-        </Grid>
-        <LoadingButton
-          fullWidth
-          size="large"
-          type="submit"
-          color="inherit"
-          variant="contained"
-          sx={{ mb: 3, width: '200px' }}
-        // onClick={handleSignIn}
-        >
-          Sign in
-        </LoadingButton>
-      </Grid>
-      <Snackbar
-        open={errorShow}
-        // message={errorMessage}
-        autoHideDuration={3000}
-        onClose={() => setErrorShow(false)}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-
-      >
-        <AlertSnack onClose={() => setErrorShow(false)} severity="error">
-          {errorMessage}
-        </AlertSnack>
-      </Snackbar>
-    </Form>
-  );
 
   return (
     <>
@@ -134,7 +60,7 @@ const SignInView = ({ signInForm, setUserData }: any) => {
         </Typography>
       </Box>
 
-      {renderForm}
+      <SignInForm handleSignIn={handleSignIn} errorMessage={errorMessage} errorShow={errorShow} setErrorShow={setErrorShow}/>
 
       <Divider sx={{ my: 3, '&::before, &::after': { borderTopStyle: 'dashed' } }}>
         <Typography
@@ -167,6 +93,7 @@ const SingInFormReduxed = reduxForm({
 
 const mapDispatchToProps = (dispatch: any) => ({
   setUserData: bindActionCreators(setUser, dispatch),
+  setUnitsData: bindActionCreators(setUnits, dispatch),
 });
 
 const SignInViewForm = connect(

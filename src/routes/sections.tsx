@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
@@ -6,7 +6,11 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 
 import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
-import { DashboardLayout } from 'src/layouts/dashboard';
+import DashboardLayout from 'src/layouts/dashboard/layout';
+import ProfileEditViewForm from 'src/sections/user/profile/profile-edit-view';
+import { connect } from 'react-redux';
+import UnitEditForm from 'src/sections/user/profile/unit-edit-form';
+import UnitEditViewForm from 'src/sections/user/profile/unit-edit-view';
 
 // ----------------------------------------------------------------------
 
@@ -33,7 +37,8 @@ const renderFallback = (
   </Box>
 );
 
-export function Router() {
+function RouterAutorized({user}:any) {
+
   return useRoutes([
     {
       element: (
@@ -48,6 +53,8 @@ export function Router() {
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
+        { path: 'profileEdit', element: <ProfileEditViewForm /> },
+        { path: 'unitEdit', element: <UnitEditViewForm /> },
       ],
     },
     {
@@ -76,3 +83,11 @@ export function Router() {
     },
   ]);
 }
+
+const Router = connect(
+  (state: any) => ({
+      user: state.user
+  }),
+)(RouterAutorized);
+
+export default Router;

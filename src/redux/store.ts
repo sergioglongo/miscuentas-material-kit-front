@@ -3,15 +3,17 @@ import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from 'redux-persist'
 import { reducer as form } from 'redux-form';
 import userReducer from './slices/user.slice';
+import unitsReducer from './slices/units.slice';
 
 const persistConfig = {
     key: "root",
     storage,
-    whitelist: ["user"]
+    whitelist: ["user","units"],
 }
 
 const rootReducer = combineReducers({
     user: userReducer,
+    units: unitsReducer,
     form,
 })
 

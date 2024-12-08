@@ -15,4 +15,20 @@ export interface IUser {
   permissions?: { [key: string]: any } | null;
   is_active?: boolean;
   is_premium?: boolean;
+  user_unit: any;
+}
+
+export interface IUnit {
+  id: number;
+  name: string;
+  description?: string | null;
+  photo?: string | null;
+  is_premium?: boolean;
+  last_change_date?: Date | null;
+  is_active?: boolean;
+  is_main_unit?: boolean;
+  deleted: boolean;
+  created_at?: Date | null;
+  updated_at?: Date | null;
+  user_unit?: any;
 }

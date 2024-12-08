@@ -1,0 +1,42 @@
+.cardSocmed {
+    min-width: '275px',
+}
+
+.avatar {
+    /* boxShadow: theme.shadows[7] */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+}
+
+.media {
+    /* width: '100%'; */
+    height: '300px';
+    object-fit: cover;
+    /* padding-top: '56.25%'; */
+    /* position: 'relative'; */
+}
+
+.actions {
+    display: 'flex',
+}
+
+.button {
+    margin-right: '8px';
+}
+
+.num {
+    font-size: 14;
+    margin-left: 5;
+}
+
+.liked {
+    color: pink;
+}
+.shared {
+    color: lightgreen;
+}
+
+.rightIcon {
+    margin-left: 'auto';
+    display: 'flex';
+    align-items: 'center';
+  }
