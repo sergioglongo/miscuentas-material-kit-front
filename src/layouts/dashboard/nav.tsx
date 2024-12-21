@@ -15,9 +15,10 @@ import { varAlpha } from 'src/theme/styles';
 
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
+import { Typography } from '@mui/material';
 
 import { NavUpgrade } from '../components/nav-upgrade';
-import { WorkspacesPopover } from '../components/workspaces-popover';
+import WorkspacesPopover from '../components/workspaces-popover';
 
 import type { WorkspacesPopoverProps } from '../components/workspaces-popover';
 
@@ -116,15 +117,17 @@ export function NavMobile({
 
 export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
   const pathname = usePathname();
-
   return (
     <>
-      <Logo />
+      <Box display="flex" flexDirection="row" alignItems="center" justifyContent="flex-start" gap={2}>
+        <Logo />
+        <Typography variant="h5">Mis Cuentas</Typography>
+      </Box>
 
       {slots?.topArea}
 
       <WorkspacesPopover data={workspaces} sx={{ my: 2 }} />
-    
+
       <Scrollbar fillContent>
         <Box component="nav" display="flex" flex="1 1 auto" flexDirection="column" sx={sx}>
           <Box component="ul" gap={0.5} display="flex" flexDirection="column">

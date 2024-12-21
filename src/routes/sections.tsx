@@ -9,17 +9,25 @@ import { AuthLayout } from 'src/layouts/auth';
 import DashboardLayout from 'src/layouts/dashboard/layout';
 import ProfileEditViewForm from 'src/sections/user/profile/profile-edit-view';
 import { connect } from 'react-redux';
-import UnitEditForm from 'src/sections/user/profile/unit-edit-form';
 import UnitEditViewForm from 'src/sections/user/profile/unit-edit-view';
 
 // ----------------------------------------------------------------------
 
 export const HomePage = lazy(() => import('src/pages/home'));
-export const BlogPage = lazy(() => import('src/pages/blog'));
+
+export const AreaPage = lazy(() => import('src/pages/area/AreaPage'));
+export const AreaEdit = lazy(() => import('src/sections/area/AreaCreateEditView'));
+
+export const CategoryPage = lazy(() => import('src/pages/category/CategoryPage'));
+export const CategoryEdit = lazy(() => import('src/sections/category/CategoryCreateEditView'));
+
 export const UserPage = lazy(() => import('src/pages/user'));
 export const SignInPage = lazy(() => import('src/pages/login/sign-in'));
 export const SignUpPage = lazy(() => import('src/pages/login/sign-up'));
+
 export const ProductsPage = lazy(() => import('src/pages/products'));
+export const BlogPage = lazy(() => import('src/pages/blog'));
+
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 // ----------------------------------------------------------------------
@@ -51,10 +59,14 @@ function RouterAutorized({user}:any) {
       children: [
         { element: <HomePage />, index: true },
         { path: 'user', element: <UserPage /> },
+        { path: 'area', element: <AreaPage /> },
+        { path: 'category', element: <CategoryPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
         { path: 'profileEdit', element: <ProfileEditViewForm /> },
         { path: 'unitEdit', element: <UnitEditViewForm /> },
+        { path: 'areaEdit', element: <AreaEdit /> },
+        { path: 'categoryEdit', element: <CategoryEdit /> },
       ],
     },
     {

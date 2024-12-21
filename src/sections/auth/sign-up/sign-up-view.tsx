@@ -9,7 +9,7 @@ import { useRouter } from 'src/routes/hooks';
 import { Iconify } from 'src/components/iconify';
 import { reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
-import { signUp } from 'src/services/api/apiClient';
+import { signUp } from 'src/services/api/modules/user.module';
 import { setUser } from 'src/redux/slices/user.slice';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import SignUpForm from './sign-up-form';

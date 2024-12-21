@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { CONFIG } from 'src/config-global';
 
 import { UserView } from 'src/sections/user/view';
-import { getAllUsers } from 'src/services/api/apiClient';
+import { getAllUsers } from 'src/services/api/modules/user.module';
 
 // ----------------------------------------------------------------------
 

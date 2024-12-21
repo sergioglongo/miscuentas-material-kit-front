@@ -5,12 +5,14 @@ import Typography from '@mui/material/Typography';
 import { useRouter } from 'src/routes/hooks';
 import { reduxForm, initialize } from 'redux-form';
 import { connect } from 'react-redux';
-import { createEditUnit, createEditUser, getUnitsById, getUnitsByUserId } from 'src/services/api/apiClient';
 import { setUser } from 'src/redux/slices/user.slice';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { useTheme, Theme, SxProps, Breakpoint } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
 import { layoutClasses } from 'src/layouts/classes';
+import { createEditUnit } from 'src/services/api/modules/unit.module';
+import { Iconify } from 'src/components/iconify';
+import { Button } from '@mui/material';
 import FormLayout from 'src/components/forms/formLayout';
 import BasicCard from 'src/components/cards/basicCard.tsx/basicCard';
 import PostCard from 'src/components/cards/postCard/postCard';
@@ -19,12 +21,13 @@ import ProfileEditForm from './profile-edit-form';
 import UnitEditForm from './unit-edit-form';
 import ProfileUnitList from './profile-unit-list';
 
-const ProfileEditView = ({ unitData, unitForm, init }: any) => {
+const ProfileEditView = ({ unitData, unitForm, init, userData }: any) => {
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
     const [errorShow, setErrorShow] = useState<boolean>(false);
     const location = useLocation();
-    const estado = location.state;
+    const estado = location?.state;
+    const [icon, setIcon] = useState(unitData?.photo || "Home");
 
     useEffect(() => {
         if (estado) {
@@ -38,10 +41,19 @@ const ProfileEditView = ({ unitData, unitForm, init }: any) => {
     const handleSave = useMemo(() => (e: any) => {
         e.preventDefault();
         console.log("formulario a guardar:", unitForm?.values);
+        
         createEditUnit({
             id: unitForm?.values?.id,
             name: unitForm?.values?.name,
             description: unitForm?.values?.description,
+            userid: userData?.id,
+            photo: icon || '',
+            type:'owner',
+            permissions: {
+                owner: true,
+                user: true,
+                guest: true
+            }
         })
             .then((res) => {
                 if (res?.success) {
@@ -59,7 +71,7 @@ const ProfileEditView = ({ unitData, unitForm, init }: any) => {
                 setErrorShow(true);
                 console.log("error catch", err)
             });
-    }, [router, unitForm?.values]);
+    }, [router, unitForm?.values, userData?.id, icon]);
 
     const theme = useTheme();
     const layoutQuery: Breakpoint = 'md';
@@ -81,6 +93,7 @@ const ProfileEditView = ({ unitData, unitForm, init }: any) => {
             rowGap={2}
         >
             {/* <FormLayout > */}
+
             <SectionCard
                 title="Edicion de Unidad"
                 subtitle=""
@@ -88,12 +101,7 @@ const ProfileEditView = ({ unitData, unitForm, init }: any) => {
                 iconSize={50}
                 iconColor={theme.palette.primary.main}
             >
-                {estado ?
-                    <UnitEditForm handleSave={handleSave} unitData={estado} />
-                    :
-                    <Typography variant="body1">Unit not found</Typography>
-                }
-                {/* <UnitEditForm units={units} /> */}
+                <UnitEditForm handleSave={handleSave} unitData={estado} icon={icon} setIcon={setIcon} />
             </SectionCard>
             {/* </FormLayout> */}
         </Box>
@@ -113,6 +121,7 @@ const mapDispatchToProps = (dispatch: any) => ({
 const UnitEditViewForm = connect(
     (state: any) => ({
         unitForm: state.form.unitForm,
+        userData: state.user.userData
     }),
     mapDispatchToProps
 )(UnitEditFormReduxed);

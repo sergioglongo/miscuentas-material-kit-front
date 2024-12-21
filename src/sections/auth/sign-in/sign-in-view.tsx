@@ -9,13 +9,13 @@ import { useRouter } from 'src/routes/hooks';
 import { Iconify } from 'src/components/iconify';
 import { reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
-import { setUnits } from 'src/redux/slices/units.slice';
-import { signIn } from 'src/services/api/apiClient';
+import { setUnitActive, setUnits } from 'src/redux/slices/units.slice';
+import { signIn } from 'src/services/api/modules/user.module';
 import { setUser } from 'src/redux/slices/user.slice';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import SignInForm from './sign-in-form';
 
-const SignInView = ({ signInForm, setUserData, setUnitsData }: any) => {
+const SignInView = ({ signInForm, setUserData, setUnitsData, setUnitActiveData }: any) => {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState('');
   const [errorShow, setErrorShow] = useState<boolean>(false);
@@ -28,9 +28,11 @@ const SignInView = ({ signInForm, setUserData, setUnitsData }: any) => {
       .then((res) => {
         if (res?.success) {
           const user = res?.user?.user;
+          const unitMain = res?.user?.unitMain
           const { units, ...userWithoutUnits } = user;
           setUserData({ userData: userWithoutUnits, isAuthorized: true, accessToken: res?.user?.accessToken });
           setUnitsData(units);
+          // setUnitActiveData(unitMain);
           router.push('/');
         } else {
           setErrorMessage(res?.message);
@@ -94,6 +96,7 @@ const SingInFormReduxed = reduxForm({
 const mapDispatchToProps = (dispatch: any) => ({
   setUserData: bindActionCreators(setUser, dispatch),
   setUnitsData: bindActionCreators(setUnits, dispatch),
+  setUnitActiveData: bindActionCreators(setUnitActive, dispatch),
 });
 
 const SignInViewForm = connect(

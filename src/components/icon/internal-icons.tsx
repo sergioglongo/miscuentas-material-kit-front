@@ -1,18 +1,19 @@
 import React from 'react';
 import Home from '@mui/icons-material/Home';
 import AirlineSeatReclineNormal from '@mui/icons-material/AirlineSeatReclineNormal';
-import LocalShipping from '@mui/icons-material/LocalShipping';
 import AssignmentTurnedIn from '@mui/icons-material/AssignmentTurnedIn';
 import People from '@mui/icons-material/People';
 import CurrencyExchange from '@mui/icons-material/CurrencyExchange';
-import Garage from '@mui/icons-material/Garage';
 import ExitToApp from '@mui/icons-material/ExitToApp';
 import Person from '@mui/icons-material/Person';
 import DonutSmallIcon from '@mui/icons-material/DonutSmall';
 import {
-  Assignment, AssignmentLate, Cancel, DataSaverOn, Domain, EventBusy, FileOpen,
+  ArrowCircleDown,
+  ArrowCircleUp,
+  Assignment, AssignmentLate, Cancel, DataSaverOn, DeleteForever, Domain, DownloadForOffline, Edit, EventBusy, FileOpen,
   Info,
-  SvgIconComponent,
+  Outbound,
+  Visibility,
   Warning
 } from '@mui/icons-material';
 import StackedBarChartIcon from '@mui/icons-material/StackedBarChart';
@@ -27,8 +28,11 @@ const InternalIcon = ({ iconName, styles }: any) => {
     case 'AirlineSeatReclineNormal':
       IconComponent = AirlineSeatReclineNormal;
       break;
-    case 'LocalShipping':
-      IconComponent = LocalShipping;
+    case 'View':
+      IconComponent = Visibility;
+      break;
+    case 'Edit':
+      IconComponent = Edit;
       break;
     case 'DocumentOk':
       IconComponent = AssignmentTurnedIn;
@@ -57,8 +61,8 @@ const InternalIcon = ({ iconName, styles }: any) => {
     case 'StackChart':
       IconComponent = StackedBarChartIcon;
       break;
-    case 'Garage':
-      IconComponent = Garage;
+    case 'Delete':
+      IconComponent = DeleteForever;
       break;
     case 'Bussines':
       IconComponent = Domain;
@@ -72,8 +76,17 @@ const InternalIcon = ({ iconName, styles }: any) => {
     case 'Cancel':
       IconComponent = Cancel;
       break;
-    case 'Vencido':
-      IconComponent = EventBusy;
+    case 'ArrowDown':
+      IconComponent = ArrowCircleDown;
+      break;
+    case 'ArrowUp':
+      IconComponent = ArrowCircleUp;
+      break;
+    case 'ArrowUpRight':
+      IconComponent = Outbound;
+      break;
+    case 'Download':
+      IconComponent = DownloadForOffline;
       break;
     case 'Person':
       IconComponent = Person;

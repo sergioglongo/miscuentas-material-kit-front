@@ -1,13 +1,14 @@
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import { Box, CardHeader, CardMedia, MenuItem, IconButton, Popover } from '@mui/material';
+import { Box, CardHeader, CardMedia, MenuItem, IconButton, Popover, Grid } from '@mui/material';
 import InternalIcon from 'src/components/icon/internal-icons';
 import { IUnit } from 'src/config/types/types';
 import { fDateSlash } from 'src/utils/format-time';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import { useState } from 'react';
+import UnitIcon from 'src/components/icon/unit-icons';
 
 interface UnitCardProps {
     unit: IUnit;
@@ -118,61 +119,83 @@ function UnitCard(props: UnitCardProps) {
                     <Typography variant='h4'>{unit?.name}</Typography>
                     <Typography variant="subtitle1">{fDateTime(unit?.last_change_date) || ''}</Typography>
                 </Box> */}
-                {unit?.photo && unit?.photo !== '' && (
-                    <CardMedia
-                        //   className={styles.media}
-                        component='img'
-                        sx={{ width: imageProps?.height, objectFit: 'contain', mt: 2 }}
-                        image={unit?.photo}
-                        title="Contemplative Reptile"
-                    />
-                )}
-            </Box>
-            <CardContent >
-                <Typography variant='h5'>Descripción</Typography>
-                <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    aria-owns={open ? 'mouse-over-popover' : undefined}
-                    aria-haspopup="true"
-                    onMouseEnter={handlePopoverOpen}
-                    onMouseLeave={handlePopoverClose}
-                >
-                    {unit?.description ?
-                        unit?.description?.length > 60 ? `${unit?.description?.slice(0, 60)} ...`
-                            : unit?.description
-                        : 'Sin descripción'
-                    }
-                </Typography>
-            </CardContent>
-            {unit?.description && unit?.description?.length > 60 &&
-                <Popover
-                    id="mouse-over-popover"
-                    sx={{ pointerEvents: 'none' }}
-                    open={open}
-                    anchorEl={anchorEl}
-                    anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'left',
-                    }}
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'left',
-                    }}
-                    onClose={handlePopoverClose}
-                    disableRestoreFocus
 
-                >
+            </Box>
+            <CardContent sx={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'space-arround',
+                rowGap: 2
+            }}
+            >
+                <Box sx={{ width: '100%', height: '70px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                    <Typography variant='h5'>Descripción</Typography>
                     <Typography
                         variant="body2"
                         color="text.secondary"
-                        sx={{ width, padding: 0 }}
+                        aria-owns={open ? 'mouse-over-popover' : undefined}
+                        aria-haspopup="true"
+                        onMouseEnter={handlePopoverOpen}
+                        onMouseLeave={handlePopoverClose}
                     >
-                        {unit?.description}
+                        {unit?.description ?
+                            unit?.description?.length > 60 ? `${unit?.description?.slice(0, 60)} ...`
+                                : unit?.description
+                            : 'Sin descripción'
+                        }
                     </Typography>
-                </Popover>
-            }
-        </Card>
+                    {unit?.description && unit?.description?.length > 60 &&
+                        <Popover
+                            id="mouse-over-popover"
+                            sx={{ pointerEvents: 'none' }}
+                            open={open}
+                            anchorEl={anchorEl}
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                            }}
+                            onClose={handlePopoverClose}
+                            disableRestoreFocus
+
+                        >
+                            <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ width, padding: 0 }}
+                            >
+                                {unit?.description}
+                            </Typography>
+                        </Popover>
+                    }
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    {unit?.photo && unit?.photo !== '' && (
+                        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                            {(!!unit?.photo) &&
+                                <UnitIcon
+                                    iconName={unit?.photo}
+                                    styles={{
+                                        fontSize: 100,
+                                        display: 'flex',
+                                        color: 'black',
+                                        borderRadius: '5px',
+                                        // border: '1px solid #ccc',
+                                        boxShadow: '0px 0px 5px rgba(0,0,0,0.2)',
+                                        padding: '5px'
+                                    }}
+                                />}
+                        </Box>
+                    )}
+                </Box>
+
+            </CardContent>
+        </Card >
     );
 }
 

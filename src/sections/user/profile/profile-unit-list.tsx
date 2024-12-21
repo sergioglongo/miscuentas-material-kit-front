@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux';
 import UnitCard from 'src/components/cards/unitCars.tsx/unitCard';
 import { IUnit } from 'src/config/types/types';
-import { getUnitsByUserId } from 'src/services/api/apiClient';
+import { getUnitsByUserId } from 'src/services/api/modules/unit.module';
 import { useRouter } from 'src/routes/hooks';
 
 const ProfileUnitListReduxed = ({ userData }: any) => {

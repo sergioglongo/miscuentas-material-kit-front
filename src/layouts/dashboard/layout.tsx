@@ -45,19 +45,15 @@ function DashboardLayoutReduxed({ sx, children, header, units, setUnitActiveData
   const [unitsList, setUnitsList] = useState<any[]>([]);
 
   useEffect(() => {
-    if (units) {
-      const unitsFormatted:any = units?.map((unit: IUnit) => {
-        console.log("unit", unit, unit?.user_unit);
-        
-        return {
+    if (units?.length !== 0) {
+      const unitsFormatted:any = units?.map((unit: IUnit) => (
+        {
           id: unit.id,
           name: unit.name,
           logo: unit.photo || '',
           main: unit?.user_unit && unit?.user_unit.is_main_unit || false
         }
-      })
-      console.log("unitsFormatted", unitsFormatted);
-      
+      ));
       setUnitsList(unitsFormatted);
     }
   }, [units])
@@ -112,17 +108,17 @@ function DashboardLayoutReduxed({ sx, children, header, units, setUnitActiveData
                 <AccountPopover
                   data={[
                     {
-                      label: 'Home',
+                      label: 'Inicio',
                       href: '/',
                       icon: <Iconify width={22} icon="solar:home-angle-bold-duotone" />,
                     },
                     {
-                      label: 'Profile',
+                      label: 'Perfile',
                       href: '/profileEdit',
                       icon: <Iconify width={22} icon="solar:shield-keyhole-bold-duotone" />,
                     },
                     {
-                      label: 'Settings',
+                      label: 'Configuración',
                       href: '#',
                       icon: <Iconify width={22} icon="solar:settings-bold-duotone" />,
                     },

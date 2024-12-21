@@ -1,12 +1,28 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { connect } from 'react-redux';
+import { useRouter } from 'src/routes/hooks';
 
 import { CONFIG } from 'src/config-global';
+import { IUserState } from 'src/config/types/types';
 
 import { OverviewAnalyticsView } from 'src/sections/overview/view';
 
 // ----------------------------------------------------------------------
 
-export default function Page() {
+function Page({user}:any) {
+  const router = useRouter();
+
+  useEffect(() => {
+    if(user?.isAuthorized){
+      console.log("autorizado", user?.isAuthorized);
+    } else {
+      console.log("no autorizado",user?.isAuthorized);
+      router.push('/sign-in');
+    }
+    
+  },[user?.isAuthorized, router])
+
   return (
     <>
       <Helmet>
@@ -22,3 +38,11 @@ export default function Page() {
     </>
   );
 }
+
+const PageRedux = connect(
+  (state: any) => ({
+      user: state.user
+  }),
+)(Page);
+
+export default PageRedux;

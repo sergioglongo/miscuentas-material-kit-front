@@ -32,3 +32,41 @@ export interface IUnit {
   updated_at?: Date | null;
   user_unit?: any;
 }
+
+export interface IUserState {
+  userData: IUser;
+  isAuthorized: boolean;
+  accessToken: string;
+}
+enum AreaType {
+  in = 'in',
+  out = 'out',
+}
+export interface IArea {
+  id: number;
+  name: string;
+  description?: string | null;
+  color?: string | null;
+  icon?: string | null;
+  type: AreaType;
+  default?: boolean;
+  deleted: boolean;
+  is_active?: boolean;
+  created_at?: Date | null;
+  updated_at?: Date | null;
+  unitId?: number;
+}
+export interface ICategory {
+  id: number;
+  name: string;
+  description?: string | null;
+  color?: string | null;
+  icon?: string | null;
+  default?: boolean;
+  deleted: boolean;
+  type?: string;
+  is_active?: boolean;
+  created_at?: Date | null;
+  updated_at?: Date | null;
+  areaId?: number;
+}

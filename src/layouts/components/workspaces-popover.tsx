@@ -12,10 +12,15 @@ import { varAlpha } from 'src/theme/styles';
 
 import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
+import { connect } from 'react-redux';
+import { bindActionCreators } from '@reduxjs/toolkit';
+import { setUnitActive } from 'src/redux/slices/units.slice';
+import UnitIcon from 'src/components/icon/unit-icons';
 
 // ----------------------------------------------------------------------
 
 export type WorkspacesPopoverProps = ButtonBaseProps & {
+  setUnitActiveData:any,
   data?: {
     id: string;
     name: string;
@@ -24,7 +29,8 @@ export type WorkspacesPopoverProps = ButtonBaseProps & {
   }[];
 };
 
-export function WorkspacesPopover({ data = [], sx, ...other }: WorkspacesPopoverProps) {
+function WorkspacesPopover({ data = [], sx, setUnitActiveData, ...other }: WorkspacesPopoverProps) {
+
   const [workspace, setWorkspace] = useState(data[0]);
 
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
@@ -40,9 +46,10 @@ export function WorkspacesPopover({ data = [], sx, ...other }: WorkspacesPopover
   const handleChangeWorkspace = useCallback(
     (newValue: (typeof data)[number]) => {
       setWorkspace(newValue);
+      setUnitActiveData(newValue)
       handleClosePopover();
     },
-    [handleClosePopover]
+    [handleClosePopover, setUnitActiveData]
   );
 
   const renderAvatar = (alt: string, src: string) => (
@@ -55,13 +62,13 @@ export function WorkspacesPopover({ data = [], sx, ...other }: WorkspacesPopover
   useEffect(() => {
     if (data && data.length > 0) {
       data.forEach((unit) => {
-        console.log("Buscando la principal", unit, unit?.main);
         if (unit.main) {
           setWorkspace(unit)
+          setUnitActiveData(unit)
         }
       })
     }
-  }, [data])
+  }, [data, setUnitActiveData])
   return (
     <>
       <ButtonBase
@@ -124,7 +131,7 @@ export function WorkspacesPopover({ data = [], sx, ...other }: WorkspacesPopover
               onClick={() => handleChangeWorkspace(option)}
             >
               {renderAvatar(option.name, option.logo)}
-
+              {/* <UnitIcon unit={option.photo} styles={{ fontSize: 40, color: 'black', borderRadius: '5px', boxShadow: '0px 0px 5px rgba(0,0,0,0.2)', padding: '5px' }} />  */}
               <Box component="span" sx={{ flexGrow: 1 }}>
                 {option.name}
               </Box>
@@ -137,3 +144,9 @@ export function WorkspacesPopover({ data = [], sx, ...other }: WorkspacesPopover
     </>
   );
 }
+
+const mapDispatchToProps = (dispatch: any) => ({
+  setUnitActiveData: bindActionCreators(setUnitActive, dispatch),
+});
+
+export default connect(null, mapDispatchToProps)(WorkspacesPopover);

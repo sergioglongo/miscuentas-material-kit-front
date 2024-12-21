@@ -4,47 +4,37 @@ import { useRouter } from 'src/routes/hooks';
 import { reduxForm, initialize } from 'redux-form';
 import { connect } from 'react-redux';
 import { createEditUser } from 'src/services/api/modules/user.module';
-import { Button } from '@mui/material';
-import { Iconify } from 'src/components/iconify';
-import { setUser } from 'src/redux/slices/user.slice';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { useTheme, Breakpoint } from '@mui/material/styles';
 import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
-import ProfileEditForm from './profile-edit-form';
-import ProfileUnitList from './profile-unit-list';
+import ProfileEditForm from '../user/profile/profile-edit-form';
+import AreaInitWizardForm from './AreaInitWizardForm';
+// import ProfileEditForm from '../user/profile/profile-edit-form'
 
-const ProfileEditView = ({ profileForm, user, userData, setUserData, init }: any) => {
+const AreaInitWizardView = ({ areaWizardForm,init }: any) => {
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
     const [errorShow, setErrorShow] = useState<boolean>(false);
-    const [units, setUnits] = useState<any>([]);
-
-    const onNewUnit = () => {
-        router.push('/unitEdit');
-    }
 
     useEffect(() => {
-        if (userData) {
-            init('profileForm', userData);
+        if (true) {
+            init('areaWizardForm', {});
             console.log("inicializacion de userData");
         }
 
-    }, [userData, init])
+    }, [init])
 
-    const handleSignIn = useMemo(() => (e: any) => {
+    const handleSave = useMemo(() => (e: any) => {
         e.preventDefault();
-        console.log("formulario a guardar:", profileForm?.values);
+        console.log("formulario a guardar:", areaWizardForm?.values);
         createEditUser({
-            id: profileForm?.values?.id,
-            firstname: profileForm?.values?.firstname,
-            lastname: profileForm?.values?.lastname,
-            email: profileForm?.values?.email
+            id: areaWizardForm?.values?.id,
+            firstname: areaWizardForm?.values?.firstname,
+            lastname: areaWizardForm?.values?.lastname,
+            email: areaWizardForm?.values?.email
         })
             .then((res) => {
                 if (res?.success) {
-                    const userUpdateState = { ...user, userData: res?.user };
-                    console.log("User to update state", userUpdateState);
-                    setUserData(userUpdateState);
                     router.back();
                 } else {
                     setErrorMessage(res?.message);
@@ -59,7 +49,7 @@ const ProfileEditView = ({ profileForm, user, userData, setUserData, init }: any
                 console.log("error catch", err)
             });
 
-    }, [router, user, setUserData, profileForm?.values]);
+    }, [router, areaWizardForm?.values]);
 
     const theme = useTheme();
     const layoutQuery: Breakpoint = 'md';
@@ -82,56 +72,35 @@ const ProfileEditView = ({ profileForm, user, userData, setUserData, init }: any
         >
             {/* <FormLayout > */}
             <SectionCard
-                title="Perfil de usuario"
+                title="Inicializacion de Areas"
                 subtitle=""
                 iconName="DocumentOk"
                 iconSize={50}
                 iconColor={theme.palette.primary.main}
             >
-                <ProfileEditForm handleEdit={handleSignIn} userData={userData} />
+                {/* <ProfileEditForm handleEdit={handleSave} userData={{}} /> */}
                 {/* <UnitEditForm units={units} /> */}
-            </SectionCard>
-            {/* </FormLayout> */}
-            <Box display="flex" width='100%' sx={{ justifyContent: 'flex-end', marginRight: 2 }}>
-                <Button
-                    variant="contained"
-                    color="inherit"
-                    startIcon={<Iconify icon="mingcute:add-line" />}
-                    onClick={onNewUnit}
-                >
-                    Nueva Unidad
-                </Button>
-            </Box>
-            <SectionCard
-                title="Unidades"
-                subtitle="Unidades a gestionar"
-                iconName="Document"
-                iconSize={50}
-                iconColor={theme.palette.primary.main}
-            >
-                <ProfileUnitList />
+                {/* <AreaInitWizardViewReduxed handleEdit={handleSave} /> */}
+                <AreaInitWizardForm handleEdit={handleSave} areaList={[]} />
             </SectionCard>
         </Box>
     );
 }
 
-const ProfileEditFormReduxed = reduxForm({
-    form: 'profileForm',
+const AreaInitWizardViewReduxed = reduxForm({
+    form: 'areaWizardForm',
     enableReinitialize: true,
-})(ProfileEditView);
+})(AreaInitWizardView);
 
 const mapDispatchToProps = (dispatch: any) => ({
-    setUserData: bindActionCreators(setUser, dispatch),
     init: bindActionCreators(initialize, dispatch),
 });
 
-const ProfileEditViewForm = connect(
+const AreaInitWizardViewEx = connect(
     (state: any) => ({
-        profileForm: state.form.profileForm,
-        userData: state.user.userData,
-        user: state.user
+        areaWizardForm: state.form.areaWizardForm,
     }),
     mapDispatchToProps
-)(ProfileEditFormReduxed);
+)(AreaInitWizardViewReduxed);
 
-export default ProfileEditViewForm;
+export default AreaInitWizardViewEx;

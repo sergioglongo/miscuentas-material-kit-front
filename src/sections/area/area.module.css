@@ -1,0 +1,16 @@
+.root {
+    width: '100%';
+}
+.button {
+    margin-right: 2;
+}
+.instructions {
+    margin-top: 2;
+    margin-bottom: 2;
+}
+.pickerSwatches {
+    display: flex;
+    flex-direction: row;
+    padding: 12px;
+    flex-wrap: wrap;
+  }

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { LoadingButton } from '@mui/lab'
 import { Avatar, Fab, FormControl, Grid } from '@mui/material'
 import { Field, Form } from 'redux-form'
-import { TextFieldErrorRedux } from 'src/components/forms/fields/textFieldError'
+import { TextFieldErrorRedux } from 'src/components/forms/fields/ReduxFields'
 import AddIcon from '@mui/icons-material/Add';
 import Dropzone from 'react-dropzone';
 import profileImage from 'src/assets/images/profile.svg';
