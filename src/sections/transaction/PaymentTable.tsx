@@ -1,33 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
-import { getAllAreas } from 'src/services/api/modules/area.module';
-import { Checkbox, Icon, IconButton, Tooltip } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { Checkbox,IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
-import { Iconify } from 'src/components/iconify';
 import InternalIcon from 'src/components/icon/internal-icons';
-import AreaIcon from 'src/components/icon/area-icons';
-import styles from './area.module.css';
+import { getAllTransactionsByUnitId } from 'src/services/api/modules/transaction.module';
+import PayMethodIcon from 'src/components/icon/paymethod-icons';
 
-const AreaTable = ({ unitActive }: any) => {
-    const [areas, setAreas] = useState([]);
+const PaymentsTable = ({ unitActive }: any) => {
+    const [transaction, setTransaction] = useState([]);
     const rowsPerPage = 10;
     const router = useRouter();
-    const onEdit = (areaData: any) => {
-        const areaInitialData = {
-            id: areaData[0],
-            name: areaData[2],
-            description: areaData[3],
-            type: areaData[4],
-            color: areaData[5],
-            icon: areaData[6],
-            is_active: areaData[7],
-            deleted: areaData[8],
-            unitId: areaData[9],
+    const onEdit = (payMethodData: any) => {
+        const payMethodInitialData = {
+            id: payMethodData[0],
+            name: payMethodData[2],
+            type: payMethodData[3],
+            method: payMethodData[4],
+            is_active: payMethodData[6],
+            deleted: payMethodData[7],
+            accountId: payMethodData[8],
         }
-        console.log("presionado editar desde ", areaInitialData);
-        router.navigateState('/areaEdit', areaInitialData);
+        console.log("presionado editar desde ", payMethodInitialData);
+        router.navigateState('/paymethodEdit', payMethodInitialData);
     };
     const getMuiTheme = () => createTheme({
         components: {
@@ -124,7 +120,7 @@ const AreaTable = ({ unitActive }: any) => {
             options: {
                 filter: false,
                 customBodyRender: (value: any, tableMeta: any) => (
-                    <div style={{ width: 120 }}>
+                    <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                         <Tooltip title="Ver detalle">
                             <IconButton aria-label="Ver" onClick={() => { }}>
                                 <InternalIcon color='gray' iconName="View" />
@@ -140,7 +136,7 @@ const AreaTable = ({ unitActive }: any) => {
                                 <InternalIcon color='gray' iconName="Delete" />
                             </IconButton>
                         </Tooltip>
-                    </div>
+                    </th>
                 ),
                 customHeadRender: (columnMeta: any) => (
                     <th style={{ width: '80px', padding: 0, height: '40px' }}>
@@ -150,30 +146,15 @@ const AreaTable = ({ unitActive }: any) => {
             },
         },
         {
-            name: 'name',
-            label: 'Nombre',
+            name: 'description',
+            label: 'Descripción',
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
+                    <th style={{ minWidth: '100px', textAlign:'left' }}>
                         {columnMeta.label}
                     </th>
                 )
-            }
-        },
-        {
-            name: 'description',
-            label: 'Descripción',
-            options: {
-                filter: false,
-                customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
-                        {columnMeta.label}
-                    </th>
-                ),
-                // customBodyRender: (value: any) => (
-                //     <div>{value}</div>
-                // ),
             }
         },
         {
@@ -205,40 +186,8 @@ const AreaTable = ({ unitActive }: any) => {
             }
         },
         {
-            name: 'color',
-            label: 'Icono',
-            options: {
-                filter: false,
-                sort: false,
-                customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
-                        {columnMeta.label}
-                    </th>
-                ), customBodyRender: (value: any, tableMeta: any) => () => (
-                    <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <AreaIcon iconName={tableMeta?.rowData[6]} styles={{ fontSize: '40', display: 'flex', color: value }} />
-                    </th>
-                    // <div
-                    //     key={value}
-                    //     className={styles.pickerSwatches}
-                    //     style={{ background: value, border: `3px solid ${value}`, borderRadius: '50%', width: '30px', height: '30px', marginRight: '20px' }}
-                    // />
-                ),
-            }
-        },
-
-        {
-            name: 'icon',
-            label: 'Icon',
-            options: {
-                filter: false,
-                sort: false,
-                display: 'excluded',
-            }
-        },
-        {
-            name: 'is_active',
-            label: 'Activo',
+            name: 'payMethodName',
+            label: 'Método',
             options: {
                 filter: true,
                 sort: false,
@@ -248,17 +197,34 @@ const AreaTable = ({ unitActive }: any) => {
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <Checkbox checked={value} />
+                        <PayMethodIcon iconName={value} styles={{ fontSize: '40', display: 'flex', color: 'black' }} />
                     </th>
                 ),
                 filterType: 'dropdown',
-
                 filterOptions: {
-                    names: ['Activo', 'Inactivo'],
-                    logic(is_active: any, filterVal: any) {
-                        return filterVal[0] !== 'Activo' ? is_active === true : is_active === false;
+                    names: ['Ingreso', 'Egreso'],
+                    logic(type: any, filterVal: any) {
+                        return filterVal[0] !== 'Ingreso' ? type === 'in' : type === 'out';
                     },
                 },
+            }
+        },
+        {
+            name: 'categoryName',
+            label: 'Categoria',
+            options: {
+                filter: false,
+                sort: false,
+                customHeadRender: (columnMeta: any) => (
+                    <th style={{ textAlign:'center' }}>
+                        {columnMeta.label}
+                    </th>
+                ),
+                customBodyRender: (value: any) => (
+                    <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        {value}
+                    </th>
+                ),
             }
         },
         {
@@ -271,17 +237,8 @@ const AreaTable = ({ unitActive }: any) => {
             }
         },
         {
-            name: 'is_active',
-            label: 'Is Active',
-            options: {
-                filter: false,
-                sort: false,
-                display: 'excluded',
-            }
-        },
-        {
-            name: 'unitId',
-            label: 'Unit Id',
+            name: 'accountId',
+            label: 'accountId',
             options: {
                 filter: false,
                 sort: false,
@@ -296,9 +253,9 @@ const AreaTable = ({ unitActive }: any) => {
         searchAlwaysOpen: true,
         searchPlaceholder: 'Busque por nombre o descripción',
         caseSensitive: false,
-        viewColumns: false,
         print: false,
         search: true,
+        viewColumns: false,
         download: false,
         pagination: true,
         rowsPerPageOptions: [10, 15, 50],
@@ -346,15 +303,19 @@ const AreaTable = ({ unitActive }: any) => {
     };
 
     useEffect(() => {
-        console.log("unitActive", unitActive);
-
-        getAllAreas(`?unitId=${unitActive?.id}`)
-            .then((areasResponse: any) => {
-                console.log("areasResponse", areasResponse);
-                if (areasResponse?.success) {
-                    setAreas(areasResponse.result);
+        getAllTransactionsByUnitId(unitActive?.id,'')
+            .then((transactionsResponse: any) => {
+                console.log("transactionsResponse", transactionsResponse);
+                if (transactionsResponse?.success) {
+                    const transactionWithCategoryPayMethod = transactionsResponse.result.map((transactionItem: any) => (
+                        { ...transactionItem, 
+                            categoryName: transactionItem.category.name,
+                            payMethodName: transactionItem.pay_method.method
+                        }
+                    ));
+                    setTransaction(transactionWithCategoryPayMethod);
                 } else {
-                    console.log("No se pudieron obtener las areas");
+                    console.log("No se pudieron obtener las transaction");
                 }
             })
             .catch((err: any) => console.log(err));
@@ -363,8 +324,8 @@ const AreaTable = ({ unitActive }: any) => {
     return (
         <ThemeProvider theme={getMuiTheme()}>
             <MUIDataTable
-                title='Areas'
-                data={areas}
+                title='Transacciones'
+                data={transaction}
                 columns={columns}
                 options={options}
             />
@@ -379,4 +340,4 @@ export default connect(
         unitActive: state.units.unitActive,
     }),
     mapDispatchToProps
-)(AreaTable);
+)(PaymentsTable);

@@ -10,9 +10,12 @@ import DonutSmallIcon from '@mui/icons-material/DonutSmall';
 import {
   ArrowCircleDown,
   ArrowCircleUp,
-  Assignment, AssignmentLate, Cancel, DataSaverOn, DeleteForever, Domain, DownloadForOffline, Edit, EventBusy, FileOpen,
+  Assignment, AssignmentLate, AutoAwesomeMosaic, AutoAwesomeMotion, Cancel, CreditCard, DataSaverOn, DeleteForever, Domain, DownloadForOffline, Edit, EventBusy, FileOpen,
   Info,
   Outbound,
+  Payments,
+  Receipt,
+  TableChart,
   Visibility,
   Warning
 } from '@mui/icons-material';
@@ -60,6 +63,21 @@ const InternalIcon = ({ iconName, styles }: any) => {
       break;
     case 'StackChart':
       IconComponent = StackedBarChartIcon;
+      break;
+    case 'Area':
+      IconComponent = AutoAwesomeMosaic;
+      break;
+    case 'Category':
+      IconComponent = TableChart;
+      break;
+    case 'Accounts':
+      IconComponent = Payments;
+      break;
+    case 'PayMethods':
+      IconComponent = CreditCard;
+      break;
+    case 'Transactions':
+      IconComponent = Receipt;
       break;
     case 'Delete':
       IconComponent = DeleteForever;

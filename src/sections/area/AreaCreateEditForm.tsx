@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Iconify } from 'src/components/iconify';
 import IconList from 'src/components/list/IconList';
 import { IArea } from 'src/config/types/types';
-import { CheckboxRedux, SwitchRedux, TextFieldErrorRedux } from 'src/components/forms/fields/ReduxFields'
+import { TextFieldErrorRedux } from 'src/components/forms/fields/ReduxFields'
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, FormControl, Grid, Typography, Switch} from '@mui/material'
+import { Box, Button, FormControl, Grid, Typography, Switch, Checkbox } from '@mui/material'
 import { useRouter } from 'src/routes/hooks';
 import { Field, Form } from 'redux-form'
+import AreaIcon, { AreaIconsList } from 'src/components/icon/AreaIcons';
 import ModalConfirm from 'src/components/modal/ModalConfirm';
-import AreaIcon, { AreaIconsList } from 'src/components/icon/area-icons';
+// import AreaIcon, { AreaIconsList } from 'src/components/icon/area-icons';
+
 import styles from './area.module.css';
 
 interface AreaEditProps {
@@ -20,7 +21,9 @@ interface AreaEditProps {
     setIcon: any;
     type: string;
     setType: any;
-    presetColors: string[]
+    presetColors: string[],
+    isActive: boolean,
+    setIsActive: any
 }
 
 // const iconNames = [
@@ -46,7 +49,7 @@ interface AreaEditProps {
 //     'eva:folder-fill',
 //   ];
 
-function AreaCreateEditForm({ handleEdit, areaData, color, setColor, icon, setIcon, type, setType, presetColors }: AreaEditProps) {
+function AreaCreateEditForm({ handleEdit, areaData, color, setColor, icon, setIcon, type, setType, presetColors, isActive, setIsActive }: AreaEditProps) {
 
     const [openmodal, setOpenmodal] = useState(false);
     // const [color, setColor] = useState("#b32aa9");
@@ -151,18 +154,11 @@ function AreaCreateEditForm({ handleEdit, areaData, color, setColor, icon, setIc
                 <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                     <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         <Typography variant="h6">Activado:</Typography>
-                        <FormControl fullWidth>
-                            <Field
-                                name="is_active"
-                                component={CheckboxRedux}
-                                label="Activado"
-                                size="large"
-                                style={{ width: '50px' }}
-                                
-                                onChange={(e: any) => console.log(e.target.value)}
-                                checked={areaData?.is_active || true}
-                            />
-                        </FormControl>
+                        <Checkbox
+                            size="large"
+                            onChange={(e: any) => setIsActive(e.target.checked)}
+                            checked={isActive}
+                        />
                     </Box>
 
                 </Grid>
@@ -171,7 +167,7 @@ function AreaCreateEditForm({ handleEdit, areaData, color, setColor, icon, setIc
                         <Typography variant="h6">Entrada</Typography>
                         <Switch
                             // defaultChecked
-                            onClick={(e: any) => setType(e.target.checked ? "out" : "in" )}
+                            onClick={(e: any) => setType(e.target.checked ? "out" : "in")}
                             checked={type === 'out'}
                         />
                         <Typography variant="h6" style={{ marginLeft: '8px' }}>Salida</Typography>

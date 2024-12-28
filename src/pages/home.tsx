@@ -7,6 +7,7 @@ import { CONFIG } from 'src/config-global';
 import { IUserState } from 'src/config/types/types';
 
 import { OverviewAnalyticsView } from 'src/sections/overview/view';
+import DashboardPage from './dashboard/DashboardPage';
 
 // ----------------------------------------------------------------------
 
@@ -33,8 +34,8 @@ function Page({user}:any) {
         />
         <meta name="keywords" content="react,material,kit,application,dashboard,admin,template" />
       </Helmet>
-
-      <OverviewAnalyticsView />
+      <DashboardPage />
+      {/* <OverviewAnalyticsView /> */}
     </>
   );
 }

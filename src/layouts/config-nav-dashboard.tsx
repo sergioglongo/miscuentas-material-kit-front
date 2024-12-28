@@ -1,3 +1,4 @@
+import InternalIcon from 'src/components/icon/internal-icons';
 import { Label } from 'src/components/label';
 import { SvgColor } from 'src/components/svg-color';
 
@@ -14,43 +15,57 @@ export const navData = [
     icon: icon('ic-analytics'),
   },
   {
-    title: 'Usuarios',
-    path: '/user',
-    icon: icon('ic-user'),
-  },
-  {
     title: 'Areas',
     path: '/area',
-    icon: icon('ic-user'),
+    icon: <InternalIcon color='gray' iconName="Area" />,
+
   },
   {
     title: 'Categorias',
     path: '/category',
-    icon: icon('ic-cart'),
+    icon: <InternalIcon color='gray' iconName="Category" />,
+
   },
   {
-    title: 'Productos',
-    path: '/products',
-    icon: icon('ic-cart'),
-    info: (
-      <Label color="error" variant="inverted">
-        +3
-      </Label>
-    ),
+    title: 'Cuentas',
+    path: '/account',
+    icon: <InternalIcon color='gray' iconName="Accounts" />,
+
   },
   {
-    title: 'Blog',
-    path: '/blog',
-    icon: icon('ic-blog'),
+    title: 'Medios Pago',
+    path: '/paymethod',
+    icon: <InternalIcon color='gray' iconName="PayMethods" />,
+
   },
   {
-    title: 'Iniciar sesión',
-    path: '/sign-in',
-    icon: icon('ic-lock'),
+    title: 'Transacciones',
+    path: '/transaction',
+    icon: <InternalIcon color='gray' iconName="Transactions" />,
   },
-  {
-    title: 'Not found',
-    path: '/404',
-    icon: icon('ic-disabled'),
-  },
+  // {
+  //   title: 'Productos',
+  //   path: '/products',
+  //   icon: icon('ic-cart'),
+  //   info: (
+  //     <Label color="error" variant="inverted">
+  //       +3
+  //     </Label>
+  //   ),
+  // },
+  // {
+  //   title: 'Blog',
+  //   path: '/blog',
+  //   icon: icon('ic-blog'),
+  // },
+  // {
+  //   title: 'Iniciar sesión',
+  //   path: '/sign-in',
+  //   icon: icon('ic-lock'),
+  // },
+  // {
+  //   title: 'Not found',
+  //   path: '/404',
+  //   icon: icon('ic-disabled'),
+  // },
 ];

@@ -11,23 +11,27 @@ import MenuList from '@mui/material/MenuList';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
+import profileImage from 'src/assets/images/profile.svg';
 
 import { useRouter, usePathname } from 'src/routes/hooks';
 
 import { _myAccount } from 'src/_mock';
+import { IUser } from 'src/config/types/types';
 
 // ----------------------------------------------------------------------
 
 export type AccountPopoverProps = IconButtonProps & {
-  data?: {
+  menuData?: {
     label: string;
     href: string;
     icon?: React.ReactNode;
     info?: React.ReactNode;
   }[];
+  userData?: IUser;
+  setUserData?: any
 };
 
-export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps) {
+export function AccountPopover({ menuData = [], userData,setUserData, sx, ...other }: AccountPopoverProps) {
   const router = useRouter();
 
   const pathname = usePathname();
@@ -49,7 +53,10 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
     },
     [handleClosePopover, router]
   );
-
+  const logout = () => { 
+    setUserData({ userData: null, isAuthorized: false, accessToken: null });
+    router.push('/');
+  };
   return (
     <>
       <IconButton
@@ -64,8 +71,8 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
         }}
         {...other}
       >
-        <Avatar src={_myAccount.photoURL} alt={_myAccount.displayName} sx={{ width: 1, height: 1 }}>
-          {_myAccount.displayName.charAt(0).toUpperCase()}
+        <Avatar src={userData?.photo || profileImage} alt="photo" sx={{ width: 1, height: 1 }}>
+          {userData?.firstname ? userData?.firstname.charAt(0).toUpperCase() : ''}
         </Avatar>
       </IconButton>
 
@@ -83,11 +90,10 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
       >
         <Box sx={{ p: 2, pb: 1.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {_myAccount?.displayName}
+            {`${userData?.firstname} ${userData?.lastname}`}
           </Typography>
-
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {_myAccount?.email}
+            {userData?.email}
           </Typography>
         </Box>
 
@@ -114,7 +120,7 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
             },
           }}
         >
-          {data.map((option) => (
+          {menuData.map((option) => (
             <MenuItem
               key={option.label}
               selected={option.href === pathname}
@@ -129,7 +135,7 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box sx={{ p: 1 }}>
-          <Button fullWidth color="error" size="medium" variant="text">
+          <Button fullWidth color="error" size="medium" variant="text" onClick={logout}>
             Logout
           </Button>
         </Box>

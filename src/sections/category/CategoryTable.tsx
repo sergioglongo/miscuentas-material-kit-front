@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
-import { getAllAreas } from 'src/services/api/modules/area.module';
-import { Checkbox, Icon, IconButton, Tooltip } from '@mui/material';
+import { Checkbox,IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
-import { Iconify } from 'src/components/iconify';
+import CategoryIcon from 'src/components/icon/category-icons';
 import InternalIcon from 'src/components/icon/internal-icons';
-import AreaIcon from 'src/components/icon/area-icons';
-import { getAllCategories, getAllCategoriesByUnitId } from 'src/services/api/modules/category.module';
-import styles from './category.module.css';
+import { getAllCategoriesByUnitId } from 'src/services/api/modules/category.module';
 
 const CategoryTable = ({ unitActive }: any) => {
     const [categories, setCategories] = useState([]);
@@ -218,7 +215,7 @@ const CategoryTable = ({ unitActive }: any) => {
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <AreaIcon iconName={tableMeta?.rowData[6]} styles={{ fontSize: '40', display: 'flex', color: value }} />
+                        <CategoryIcon iconName={tableMeta?.rowData[6]} styles={{ fontSize: '40', display: 'flex', color: value }} />
                     </th>
                     // <div
                     //     key={value}
@@ -319,6 +316,7 @@ const CategoryTable = ({ unitActive }: any) => {
         caseSensitive: false,
         print: false,
         search: true,
+        viewColumns: false,
         download: false,
         pagination: true,
         rowsPerPageOptions: [10, 15, 50],

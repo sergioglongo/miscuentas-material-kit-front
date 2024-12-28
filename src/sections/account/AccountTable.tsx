@@ -1,33 +1,34 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
-import { getAllAreas } from 'src/services/api/modules/area.module';
-import { Checkbox, Icon, IconButton, Tooltip } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { Checkbox, IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
-import { Iconify } from 'src/components/iconify';
 import InternalIcon from 'src/components/icon/internal-icons';
-import AreaIcon from 'src/components/icon/area-icons';
-import styles from './area.module.css';
+import { getAllAccountsByUnitId } from 'src/services/api/modules/account.module';
+import AccountIcon from 'src/components/icon/account-icons';
 
-const AreaTable = ({ unitActive }: any) => {
-    const [areas, setAreas] = useState([]);
+const iconToShow = (iconName: string) => {
+
+}
+
+const AccountTable = ({ unitActive }: any) => {
+    const [accounts, setAccounts] = useState([]);
     const rowsPerPage = 10;
     const router = useRouter();
-    const onEdit = (areaData: any) => {
-        const areaInitialData = {
-            id: areaData[0],
-            name: areaData[2],
-            description: areaData[3],
-            type: areaData[4],
-            color: areaData[5],
-            icon: areaData[6],
-            is_active: areaData[7],
-            deleted: areaData[8],
-            unitId: areaData[9],
+    const onEdit = (accountData: any) => {
+        const accountInitialData = {
+            id: accountData[0],
+            name: accountData[2],
+            balance: accountData[3],
+            currency: accountData[4],
+            type: accountData[5],
+            is_active: accountData[6],
+            deleted: accountData[7],
+            unitId: accountData[8],
         }
-        console.log("presionado editar desde ", areaInitialData);
-        router.navigateState('/areaEdit', areaInitialData);
+        console.log("presionado editar desde ", accountInitialData);
+        router.navigateState('/accountEdit', accountInitialData);
     };
     const getMuiTheme = () => createTheme({
         components: {
@@ -124,7 +125,7 @@ const AreaTable = ({ unitActive }: any) => {
             options: {
                 filter: false,
                 customBodyRender: (value: any, tableMeta: any) => (
-                    <div style={{ width: 120 }}>
+                    <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                         <Tooltip title="Ver detalle">
                             <IconButton aria-label="Ver" onClick={() => { }}>
                                 <InternalIcon color='gray' iconName="View" />
@@ -140,7 +141,7 @@ const AreaTable = ({ unitActive }: any) => {
                                 <InternalIcon color='gray' iconName="Delete" />
                             </IconButton>
                         </Tooltip>
-                    </div>
+                    </th>
                 ),
                 customHeadRender: (columnMeta: any) => (
                     <th style={{ width: '80px', padding: 0, height: '40px' }}>
@@ -162,8 +163,8 @@ const AreaTable = ({ unitActive }: any) => {
             }
         },
         {
-            name: 'description',
-            label: 'Descripción',
+            name: 'balance',
+            label: 'Balance',
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
@@ -174,6 +175,30 @@ const AreaTable = ({ unitActive }: any) => {
                 // customBodyRender: (value: any) => (
                 //     <div>{value}</div>
                 // ),
+            }
+        },
+        {
+            name: 'currency',
+            label: 'Moneda',
+            options: {
+                filter: true,
+                sort: false,
+                customHeadRender: (columnMeta: any) => (
+                    <th style={{}}>
+                        {columnMeta.label}
+                    </th>
+                ), customBodyRender: (value: any, tableMeta: any) => () => (
+                    <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        <AccountIcon iconName={value} styles={{ fontSize: '30', color: 'black' }} />
+                    </th>
+                ),
+                filterType: 'dropdown',
+                filterOptions: {
+                    names: ['Pesos', 'Dolar'],
+                    logic(type: any, filterVal: any) {
+                        return filterVal[0] !== 'Ingreso' ? type === 'in' : type === 'out';
+                    },
+                },
             }
         },
         {
@@ -188,52 +213,16 @@ const AreaTable = ({ unitActive }: any) => {
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        {value === 'out' ?
-                            <InternalIcon iconName='ArrowUpRight' styles={{ fontSize: '30', color: 'orange' }} />
-                            :
-                            <InternalIcon iconName='Download' styles={{ fontSize: '30', color: 'green' }} />
-                        }
+                        <AccountIcon iconName={value} styles={{ fontSize: '30', color: 'black' }} />
                     </th>
                 ),
                 filterType: 'dropdown',
                 filterOptions: {
-                    names: ['Ingreso', 'Egreso'],
+                    names: ['Pesos', 'Dolar'],
                     logic(type: any, filterVal: any) {
                         return filterVal[0] !== 'Ingreso' ? type === 'in' : type === 'out';
                     },
                 },
-            }
-        },
-        {
-            name: 'color',
-            label: 'Icono',
-            options: {
-                filter: false,
-                sort: false,
-                customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
-                        {columnMeta.label}
-                    </th>
-                ), customBodyRender: (value: any, tableMeta: any) => () => (
-                    <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <AreaIcon iconName={tableMeta?.rowData[6]} styles={{ fontSize: '40', display: 'flex', color: value }} />
-                    </th>
-                    // <div
-                    //     key={value}
-                    //     className={styles.pickerSwatches}
-                    //     style={{ background: value, border: `3px solid ${value}`, borderRadius: '50%', width: '30px', height: '30px', marginRight: '20px' }}
-                    // />
-                ),
-            }
-        },
-
-        {
-            name: 'icon',
-            label: 'Icon',
-            options: {
-                filter: false,
-                sort: false,
-                display: 'excluded',
             }
         },
         {
@@ -248,6 +237,7 @@ const AreaTable = ({ unitActive }: any) => {
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+
                         <Checkbox checked={value} />
                     </th>
                 ),
@@ -271,17 +261,8 @@ const AreaTable = ({ unitActive }: any) => {
             }
         },
         {
-            name: 'is_active',
-            label: 'Is Active',
-            options: {
-                filter: false,
-                sort: false,
-                display: 'excluded',
-            }
-        },
-        {
             name: 'unitId',
-            label: 'Unit Id',
+            label: 'Unit',
             options: {
                 filter: false,
                 sort: false,
@@ -294,11 +275,11 @@ const AreaTable = ({ unitActive }: any) => {
         responsive: 'vertical',
         selectableRows: 'none',
         searchAlwaysOpen: true,
-        searchPlaceholder: 'Busque por nombre o descripción',
+        searchPlaceholder: 'Busque por nombre o balance',
         caseSensitive: false,
-        viewColumns: false,
         print: false,
         search: true,
+        viewColumns: false,
         download: false,
         pagination: true,
         rowsPerPageOptions: [10, 15, 50],
@@ -346,15 +327,14 @@ const AreaTable = ({ unitActive }: any) => {
     };
 
     useEffect(() => {
-        console.log("unitActive", unitActive);
-
-        getAllAreas(`?unitId=${unitActive?.id}`)
-            .then((areasResponse: any) => {
-                console.log("areasResponse", areasResponse);
-                if (areasResponse?.success) {
-                    setAreas(areasResponse.result);
+        getAllAccountsByUnitId(unitActive?.id)
+            .then((accountResponse: any) => {
+                console.log("accountResponse", accountResponse);
+                if (accountResponse?.success) {
+                    const categoriesWithArea = accountResponse.result.map((account: any) => ({ ...account, account: account.unit.name, description: account.unit.description, accountPhoto: account.unit.photo }));
+                    setAccounts(categoriesWithArea);
                 } else {
-                    console.log("No se pudieron obtener las areas");
+                    console.log("No se pudieron obtener las accounts");
                 }
             })
             .catch((err: any) => console.log(err));
@@ -363,8 +343,8 @@ const AreaTable = ({ unitActive }: any) => {
     return (
         <ThemeProvider theme={getMuiTheme()}>
             <MUIDataTable
-                title='Areas'
-                data={areas}
+                title='Cuentas'
+                data={accounts}
                 columns={columns}
                 options={options}
             />
@@ -379,4 +359,4 @@ export default connect(
         unitActive: state.units.unitActive,
     }),
     mapDispatchToProps
-)(AreaTable);
+)(AccountTable);

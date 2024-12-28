@@ -1,7 +1,9 @@
 import { Button } from '@mui/material';
 import React from 'react';
 import { Iconify } from '../iconify';
-import AreaIcon from '../icon/area-icons';
+import AreaIcon from '../icon/AreaIcons';
+// import AreaIcon from '../icon/area-icons';
+
 
 const IconList = ({ icons, width, height, separation, onSelectIcon }:any) => {
   const styles:any = {

@@ -1,8 +1,8 @@
 import axiosClient from '../apiAxios';
 
-export async function getAllAreas(filter: string) {
+export async function getAllTransactions(filter: string) {
     return axiosClient
-        .get(`area/getAll/${filter}`)
+        .get(`transaction/getAll/${filter}`)
         .then((response: any) => {
             if (typeof response.data !== 'undefined' && response.data.success === true) {
                 return response.data;
@@ -11,9 +11,9 @@ export async function getAllAreas(filter: string) {
         })
         .catch((err: any) => console.log(err));
 }
-export async function getAllAreasByUnitId(unitId:number) {
+export async function getAllTransactionsByUnitId(unitId: number, type: string) {
     return axiosClient
-        .get(`area/getAllByUnitId/${unitId}`)
+        .get(`transaction/getAllByUnitId/${unitId}/${type}`)
         .then((response: any) => {
             if (typeof response.data !== 'undefined' && response.data.success === true) {
                 return response.data;
@@ -22,9 +22,9 @@ export async function getAllAreasByUnitId(unitId:number) {
         })
         .catch((err: any) => console.log(err));
 }
-export async function getAreaById(data: any) {
+export async function getTransactionById(data: any) {
     return axiosClient
-        .get(`area/getById/${data}`)
+        .get(`transaction/getById/${data}`)
         .then((response: any) => {
             if (typeof response.data !== 'undefined' && response.data.success === true) {
                 return response.data;
@@ -34,9 +34,9 @@ export async function getAreaById(data: any) {
         .catch((err: any) => console.log(err));
 }
 
-export async function createEditArea(data: any) {
+export async function createEditTransaction(data: any) {
     return axiosClient
-        .post(`area/createEdit`, data)
+        .post(`transaction/createEdit`, data)
         .then((response: any) => {
             if (typeof response.data !== 'undefined' && response.data.success === true) {
                 return response.data;

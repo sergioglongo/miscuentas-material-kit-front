@@ -33,15 +33,15 @@ export function fNumber(inputValue: InputNumberValue, options?: Options) {
 
 // ----------------------------------------------------------------------
 
-export function fCurrency(inputValue: InputNumberValue, options?: Options) {
-  const locale = DEFAULT_LOCALE;
+export function fCurrency(inputValue: InputNumberValue, currency: string = 'ARS', code: string = 'es-AR', options?: Options) {
 
   const number = processInput(inputValue);
   if (number === null) return '';
-
-  const fm = new Intl.NumberFormat(locale.code, {
+  console.log("code currency", code, currency);
+  
+  const fm = new Intl.NumberFormat(code, {
     style: 'currency',
-    currency: locale.currency,
+    currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
     ...options,

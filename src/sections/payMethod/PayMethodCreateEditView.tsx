@@ -8,60 +8,57 @@ import { bindActionCreators } from '@reduxjs/toolkit';
 import { useTheme, Breakpoint } from '@mui/material/styles';
 import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
 import { getAllAreas } from 'src/services/api/modules/area.module';
+import { InOutType, IPayMethod } from 'src/config/types/types';
 import { createEditCategory } from 'src/services/api/modules/category.module';
-import CategoryCreateEditForm from './CategoryCreateEditForm';
+import { createEditPayMethod, getAllPayMethods } from 'src/services/api/modules/payMethod.module';
+import { getAllAccounts } from 'src/services/api/modules/account.module';
+import PayMethodCreateEditForm from './PayMethodCreateEditForm';
 
-const CategoryCreateEditView = ({ categoryForm, init, unit }: any) => {
+const CategoryCreateEditView = ({ payMethodForm, init, unit }: any) => {
     const router = useRouter();
     const [isNew, setIsNew] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
     const [errorShow, setErrorShow] = useState<boolean>(false);
-    const [areas, setAreas] = useState([]);
+    const [accounts, setAccounts] = useState([]);
     const location = useLocation();
-    const categoryInitialData = location.state;
-    const [color, setColor] = useState(categoryInitialData?.color || categoryInitialData?.areaColor || "#b32aa9");
-    const [icon, setIcon] = useState(categoryInitialData?.icon || "Home");
-    const presetColors = ["#cd9323", "#1a53d8", "#9a2151", "#0d6416", "#8d2808"];
+    const payMethodInitialData = location.state;
+    const [type, setType] = useState<InOutType>(payMethodInitialData?.type || "out");
 
     useEffect(() => {
-
-        getAllAreas(`?unitId=${unit?.id}&is_active=1`)
-            .then((areasResponse: any) => {
-                console.log("areasResponse", areasResponse);
-                if (areasResponse?.success) {
-                    setAreas(areasResponse.result);
+        getAllAccounts(`?unitId=${unit?.id}&is_active=1`)
+            .then((accountsResponse: any) => {
+                console.log("accountsResponse", accountsResponse);
+                if (accountsResponse?.success) {
+                    setAccounts(accountsResponse.result);
                 } else {
-                    console.log("No se pudieron obtener las areas");
+                    console.log("No se pudieron obtener las cuentas");
                 }
             })
             .catch((err: any) => console.log(err));
-    }, [unit?.id, categoryInitialData]);
+    }, [unit?.id, payMethodInitialData]);
 
     useEffect(() => {
-        if (categoryInitialData) {
-            init('categoryForm', categoryInitialData);
-            setColor(categoryInitialData?.color);
-            console.log("inicializacion de userData", categoryInitialData);
+        if (payMethodInitialData) {
+            init('payMethodForm', payMethodInitialData);
+            console.log("inicializacion de paymethodData", payMethodInitialData);
             setIsNew(false);
         }
 
-    }, [init, categoryInitialData]);
+    }, [init, payMethodInitialData]);
 
     const handleSave = useMemo(() => (e: any) => {
         e.preventDefault();
-        const dataToSave = {
-            id: categoryForm?.values?.id,
-            name: categoryForm?.values?.name,
-            description: categoryForm?.values?.description,
-            type: 'out',
-            color,
-            icon,
-            deleted: categoryForm?.values?.deleted,
-            is_active: categoryForm?.values?.is_active,
-            areaId: categoryForm?.values?.areaId
+        const dataToSave:IPayMethod = {
+            id: payMethodForm?.values?.id,
+            name: payMethodForm?.values?.name,
+            method: payMethodForm?.values?.method,
+            type,
+            deleted: payMethodForm?.values?.deleted || false,
+            is_active: payMethodForm?.values?.is_active,
+            accountId: payMethodForm?.values?.accountId
         }
         console.log("formulario a guardar:", dataToSave);
-        createEditCategory(dataToSave)
+        createEditPayMethod(dataToSave)
             .then((res) => {
                 if (res?.success) {
                     router.back();
@@ -78,7 +75,7 @@ const CategoryCreateEditView = ({ categoryForm, init, unit }: any) => {
                 console.log("error catch", err)
             });
 
-    }, [router, categoryForm?.values, color, icon]);
+    }, [router, payMethodForm?.values, type]);
 
     const theme = useTheme();
     const layoutQuery: Breakpoint = 'md';
@@ -101,7 +98,7 @@ const CategoryCreateEditView = ({ categoryForm, init, unit }: any) => {
         >
             {/* <FormLayout > */}
             <SectionCard
-                title= {isNew ? "Nueva categoria" : "Editar categoria"}
+                title= {isNew ? "Nuevo Metodo de Pago" : "Editar Metodo de Pago"}
                 subtitle=""
                 iconName="DocumentOk"
                 iconSize={50}
@@ -109,23 +106,30 @@ const CategoryCreateEditView = ({ categoryForm, init, unit }: any) => {
             >
                 {/* <ProfileEditForm handleEdit={handleSave} userData={{}} /> */}
                 {/* <UnitEditForm units={units} /> */}
-                <CategoryCreateEditForm
+                {/* <CategoryCreateEditForm
                     handleEdit={handleSave}
-                    categoryData={categoryForm?.values}
+                    categoryData={payMethodForm?.values}
                     color={color}
                     setColor={setColor}
                     icon={icon}
                     setIcon={setIcon}
                     presetColors={presetColors}
                     areasList={areas}
+                /> */}
+                <PayMethodCreateEditForm
+                    handleEdit={handleSave}
+                    accountsList={accounts}
+                    payMethodData={payMethodForm?.values}
+                    type={type}
+                    setType={setType}
                 />
             </SectionCard>
         </Box>
     );
 }
 
-const CategoryCreateEditFormReduxed = reduxForm({
-    form: 'categoryForm',
+const PaymethodCreateEditFormReduxed = reduxForm({
+    form: 'payMethodForm',
     enableReinitialize: true,
 })(CategoryCreateEditView);
 
@@ -133,12 +137,12 @@ const mapDispatchToProps = (dispatch: any) => ({
     init: bindActionCreators(initialize, dispatch),
 });
 
-const CategoryCreateEditViewForm = connect(
+const PaymethodCreateEditViewForm = connect(
     (state: any) => ({
-        categoryForm: state.form.categoryForm,
+        payMethodForm: state.form.payMethodForm,
         unit: state.units.unitActive,
     }),
     mapDispatchToProps
-)(CategoryCreateEditFormReduxed);
+)(PaymethodCreateEditFormReduxed);
 
-export default CategoryCreateEditViewForm;
+export default PaymethodCreateEditViewForm;

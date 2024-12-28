@@ -22,6 +22,7 @@ const AreaCreateEditView = ({ areaForm, init, unit }: any) => {
     const [color, setColor] = useState(areaInitialData?.color ||"#b32aa9");
     const [icon, setIcon] = useState(areaInitialData?.icon ||"Home");
     const [type, setType] = useState(areaInitialData?.type || "out");
+    const [isActive, setIsActive] = useState(areaInitialData?.is_active || true);
 
     const presetColors = ["#cd9323", "#1a53d8", "#9a2151", "#0d6416", "#8d2808"];
 
@@ -30,6 +31,7 @@ const AreaCreateEditView = ({ areaForm, init, unit }: any) => {
             init('areaForm', areaInitialData);
             setColor(areaInitialData?.color);
             console.log("inicializacion de userData", areaInitialData);
+            setIsActive(areaInitialData?.is_active);
         }
 
     }, [init, areaInitialData]);
@@ -44,7 +46,7 @@ const AreaCreateEditView = ({ areaForm, init, unit }: any) => {
             color,
             icon,
             deleted: areaForm?.values?.deleted,
-            is_active: areaForm?.values?.is_active,
+            is_active: isActive,
             unitId: unit.id
         }
         console.log("formulario a guardar:", dataToSave);
@@ -65,11 +67,14 @@ const AreaCreateEditView = ({ areaForm, init, unit }: any) => {
                 console.log("error catch", err)
             });
 
-    }, [router, areaForm?.values, unit, color, icon, type]);
+    }, [router, areaForm?.values, unit, color, icon, type, isActive]);
 
     const theme = useTheme();
     const layoutQuery: Breakpoint = 'md';
-
+    useEffect(() => {
+        console.log("isActive change", isActive);
+        
+    },[isActive])
     return (
         <Box
             component="main"
@@ -106,6 +111,8 @@ const AreaCreateEditView = ({ areaForm, init, unit }: any) => {
                     type={type}
                     setType={setType}
                     presetColors={presetColors}
+                    isActive={isActive}
+                    setIsActive={setIsActive}
                 />
             </SectionCard>
         </Box>

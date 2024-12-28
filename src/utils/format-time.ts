@@ -3,6 +3,7 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import moment from 'moment';
 
 // ----------------------------------------------------------------------
 
@@ -112,4 +113,23 @@ export function fToNow(date: DatePickerFormat) {
   const isValid = dayjs(date).isValid();
 
   return isValid ? dayjs(date).toNow(true) : 'Invalid time value';
+}
+
+
+export function fDateDbToDatePicker(date: string) {
+
+  return moment(date).format('YYYY-MM-DD');
+}
+
+export function utcToLocal(date: string) {
+  const fechaLocal = moment(date).locale('es');
+  console.log("fechaUtc", date);
+  console.log("fechaLocal", fechaLocal.format('YYYY-MM-DD'));
+  
+  return fechaLocal.format('YYYY-MM-DD');
+}
+
+export function localToUtc(date:any) {
+  const fechaUtc = moment(date, 'YYYY-MM-DD').utc();
+  return fechaUtc.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 }

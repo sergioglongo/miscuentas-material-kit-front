@@ -53,12 +53,11 @@ function WorkspacesPopover({ data = [], sx, setUnitActiveData, ...other }: Works
   );
 
   const renderAvatar = (alt: string, src: string) => (
-    <Box component="img" alt={alt} src={src} sx={{ width: 24, height: 24, borderRadius: '50%' }} />
+    <UnitIcon iconName={src} styles={{ color: '#343434FF' }} />
+    // <Box component="img" alt={alt} src={src} sx={{ width: 24, height: 24, borderRadius: '50%' }} />
   );
 
-  const renderLabel = (plan: string) => (
-    <Label color={plan === 'Free' ? 'default' : 'info'}>{plan}</Label>
-  );
+
   useEffect(() => {
     if (data && data.length > 0) {
       data.forEach((unit) => {
@@ -69,6 +68,7 @@ function WorkspacesPopover({ data = [], sx, setUnitActiveData, ...other }: Works
       })
     }
   }, [data, setUnitActiveData])
+  
   return (
     <>
       <ButtonBase
@@ -76,7 +76,7 @@ function WorkspacesPopover({ data = [], sx, setUnitActiveData, ...other }: Works
         onClick={handleOpenPopover}
         sx={{
           pl: 2,
-          py: 3,
+          py: 2,
           gap: 1.5,
           pr: 1.5,
           width: 1,

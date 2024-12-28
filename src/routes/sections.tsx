@@ -14,12 +14,22 @@ import UnitEditViewForm from 'src/sections/user/profile/unit-edit-view';
 // ----------------------------------------------------------------------
 
 export const HomePage = lazy(() => import('src/pages/home'));
+export const DashboardPage = lazy(() => import('src/pages/dashboard/DashboardPage'));
 
 export const AreaPage = lazy(() => import('src/pages/area/AreaPage'));
 export const AreaEdit = lazy(() => import('src/sections/area/AreaCreateEditView'));
 
+export const AccountPage = lazy(() => import('src/pages/account/AccountPage'));
+export const AccountEdit = lazy(() => import('src/sections/account/AccountCreateEditView'));
+
+export const PayMethodPage = lazy(() => import('src/pages/payMethod/PayMethodPage'));
+export const PayMethodEdit = lazy(() => import('src/sections/payMethod/PayMethodCreateEditView'));
+
 export const CategoryPage = lazy(() => import('src/pages/category/CategoryPage'));
 export const CategoryEdit = lazy(() => import('src/sections/category/CategoryCreateEditView'));
+
+export const TransactionPage = lazy(() => import('src/pages/transaction/TransactionPage'));
+export const TransactionEdit = lazy(() => import('src/sections/transaction/TransactionCreateEditView'));
 
 export const UserPage = lazy(() => import('src/pages/user'));
 export const SignInPage = lazy(() => import('src/pages/login/sign-in'));
@@ -58,15 +68,22 @@ function RouterAutorized({user}:any) {
       ),
       children: [
         { element: <HomePage />, index: true },
+        { path: 'dashboard', element: <DashboardPage /> },
         { path: 'user', element: <UserPage /> },
         { path: 'area', element: <AreaPage /> },
         { path: 'category', element: <CategoryPage /> },
+        { path: 'account', element: <AccountPage /> },
+        { path: 'paymethod', element: <PayMethodPage /> },
+        { path: 'transaction', element: <TransactionPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
         { path: 'profileEdit', element: <ProfileEditViewForm /> },
         { path: 'unitEdit', element: <UnitEditViewForm /> },
         { path: 'areaEdit', element: <AreaEdit /> },
         { path: 'categoryEdit', element: <CategoryEdit /> },
+        { path: 'accountEdit', element: <AccountEdit /> },
+        { path: 'payMethodEdit', element: <PayMethodEdit /> },
+        { path: 'transactionEdit', element: <TransactionEdit /> },
       ],
     },
     {

@@ -5,6 +5,7 @@ import Alert from '@mui/material/Alert';
 
 import { RouterLink } from 'src/routes/components';
 
+import { Box, Typography} from '@mui/material';
 import { Logo } from 'src/components/logo';
 
 import { Main, CompactContent } from './main';
@@ -43,7 +44,12 @@ export function SimpleLayout({ sx, children, header, content }: SimpleLayoutProp
                 This is an info Alert.
               </Alert>
             ),
-            leftArea: <Logo />,
+            leftArea: (
+              <Box display="flex" flexDirection="row" alignItems="center" justifyContent="flex-start" gap={2}>
+                <Logo />
+                <Typography variant="h5">Mis Cuentas</Typography>
+              </Box>
+            ),
             rightArea: (
               <Link
                 href="#"

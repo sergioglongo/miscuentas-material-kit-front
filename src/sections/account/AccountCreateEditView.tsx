@@ -7,61 +7,50 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { useTheme, Breakpoint } from '@mui/material/styles';
 import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
+import { IAccount } from 'src/config/types/types';
 import { getAllAreas } from 'src/services/api/modules/area.module';
 import { createEditCategory } from 'src/services/api/modules/category.module';
-import CategoryCreateEditForm from './CategoryCreateEditForm';
+import { createEditAccount } from 'src/services/api/modules/account.module';
+import AccountCreateEditForm from './AccountCreateEditForm';
 
-const CategoryCreateEditView = ({ categoryForm, init, unit }: any) => {
+const accountInitialDataEmpty = {
+    currency: 'Pesos',
+    type: 'cash',
+}
+
+const AccountCreateEditView = ({ accountForm, init, unit }: any) => {
     const router = useRouter();
-    const [isNew, setIsNew] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
     const [errorShow, setErrorShow] = useState<boolean>(false);
     const [areas, setAreas] = useState([]);
     const location = useLocation();
-    const categoryInitialData = location.state;
-    const [color, setColor] = useState(categoryInitialData?.color || categoryInitialData?.areaColor || "#b32aa9");
-    const [icon, setIcon] = useState(categoryInitialData?.icon || "Home");
-    const presetColors = ["#cd9323", "#1a53d8", "#9a2151", "#0d6416", "#8d2808"];
+    const accountInitialData = location.state;
+    const [isNew, setIsNew] = useState(true);
 
+ 
     useEffect(() => {
-
-        getAllAreas(`?unitId=${unit?.id}&is_active=1`)
-            .then((areasResponse: any) => {
-                console.log("areasResponse", areasResponse);
-                if (areasResponse?.success) {
-                    setAreas(areasResponse.result);
-                } else {
-                    console.log("No se pudieron obtener las areas");
-                }
-            })
-            .catch((err: any) => console.log(err));
-    }, [unit?.id, categoryInitialData]);
-
-    useEffect(() => {
-        if (categoryInitialData) {
-            init('categoryForm', categoryInitialData);
-            setColor(categoryInitialData?.color);
-            console.log("inicializacion de userData", categoryInitialData);
+        if (accountInitialData) {
+            init('accountForm', accountInitialData);
+            console.log("inicializacion de accountData", accountInitialData);
             setIsNew(false);
         }
 
-    }, [init, categoryInitialData]);
+    }, [init, accountInitialData]);
 
     const handleSave = useMemo(() => (e: any) => {
         e.preventDefault();
-        const dataToSave = {
-            id: categoryForm?.values?.id,
-            name: categoryForm?.values?.name,
-            description: categoryForm?.values?.description,
-            type: 'out',
-            color,
-            icon,
-            deleted: categoryForm?.values?.deleted,
-            is_active: categoryForm?.values?.is_active,
-            areaId: categoryForm?.values?.areaId
+        const dataToSave:IAccount = {
+            id: accountForm?.values?.id,
+            name: accountForm?.values?.name,
+            balance: accountForm?.values?.balance,
+            currency: accountForm?.values?.currency,
+            type: accountForm?.values?.type,
+            deleted: accountForm?.values?.deleted,
+            is_active: accountForm?.values?.is_active,
+            unitId: accountForm?.values?.unitId || unit?.id
         }
         console.log("formulario a guardar:", dataToSave);
-        createEditCategory(dataToSave)
+        createEditAccount(dataToSave)
             .then((res) => {
                 if (res?.success) {
                     router.back();
@@ -78,7 +67,7 @@ const CategoryCreateEditView = ({ categoryForm, init, unit }: any) => {
                 console.log("error catch", err)
             });
 
-    }, [router, categoryForm?.values, color, icon]);
+    }, [router, accountForm?.values, unit?.id]);
 
     const theme = useTheme();
     const layoutQuery: Breakpoint = 'md';
@@ -101,44 +90,50 @@ const CategoryCreateEditView = ({ categoryForm, init, unit }: any) => {
         >
             {/* <FormLayout > */}
             <SectionCard
-                title= {isNew ? "Nueva categoria" : "Editar categoria"}
+                title={isNew ? "Nueva Cuenta" : "Editar Cuenta"}
+
                 subtitle=""
                 iconName="DocumentOk"
                 iconSize={50}
-                // iconColor={color}
+            // iconColor={color}
             >
                 {/* <ProfileEditForm handleEdit={handleSave} userData={{}} /> */}
                 {/* <UnitEditForm units={units} /> */}
-                <CategoryCreateEditForm
+                {/* <CategoryCreateEditForm
                     handleEdit={handleSave}
-                    categoryData={categoryForm?.values}
+                    categoryData={accountForm?.values}
                     color={color}
                     setColor={setColor}
                     icon={icon}
                     setIcon={setIcon}
                     presetColors={presetColors}
                     areasList={areas}
+                /> */}
+                <AccountCreateEditForm
+                    handleEdit={handleSave}
+                    accountData={accountForm?.values || accountInitialDataEmpty}
+                    isNew={isNew}
                 />
             </SectionCard>
         </Box>
     );
 }
 
-const CategoryCreateEditFormReduxed = reduxForm({
-    form: 'categoryForm',
+const AccountCreateEditFormReduxed = reduxForm({
+    form: 'accountForm',
     enableReinitialize: true,
-})(CategoryCreateEditView);
+})(AccountCreateEditView);
 
 const mapDispatchToProps = (dispatch: any) => ({
     init: bindActionCreators(initialize, dispatch),
 });
 
-const CategoryCreateEditViewForm = connect(
+const AccountCreateEditViewForm = connect(
     (state: any) => ({
-        categoryForm: state.form.categoryForm,
+        accountForm: state.form.accountForm,
         unit: state.units.unitActive,
     }),
     mapDispatchToProps
-)(CategoryCreateEditFormReduxed);
+)(AccountCreateEditFormReduxed);
 
-export default CategoryCreateEditViewForm;
+export default AccountCreateEditViewForm;

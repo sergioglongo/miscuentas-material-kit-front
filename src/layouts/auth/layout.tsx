@@ -6,6 +6,7 @@ import Alert from '@mui/material/Alert';
 import { RouterLink } from 'src/routes/components';
 
 import { stylesMode } from 'src/theme/styles';
+import { Box, Typography } from '@mui/material';
 
 import { Logo } from 'src/components/logo';
 
@@ -49,7 +50,12 @@ export function AuthLayout({ sx, children, header }: AuthLayoutProps) {
                 Esta es una alerta.
               </Alert>
             ),
-            leftArea: <Logo />,
+            leftArea:(
+              <Box display="flex" flexDirection="row" alignItems="center" justifyContent="flex-start" gap={2}>
+                <Logo />
+                <Typography variant="h5">Mis Cuentas</Typography>
+              </Box>
+            ),
             rightArea: (
               <Link
                 component={RouterLink}

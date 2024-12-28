@@ -38,7 +38,7 @@ export interface IUserState {
   isAuthorized: boolean;
   accessToken: string;
 }
-enum AreaType {
+export enum InOutType {
   in = 'in',
   out = 'out',
 }
@@ -48,7 +48,7 @@ export interface IArea {
   description?: string | null;
   color?: string | null;
   icon?: string | null;
-  type: AreaType;
+  type: InOutType;
   default?: boolean;
   deleted: boolean;
   is_active?: boolean;
@@ -69,4 +69,63 @@ export interface ICategory {
   created_at?: Date | null;
   updated_at?: Date | null;
   areaId?: number;
+}
+enum AccountType {
+  bank = 'bank',
+  electronic = 'electronic',
+  cash = 'cash',
+  debt = 'debt',
+  other = 'other',
+}
+enum AccountCurrency {
+  Pesos = 'Pesos',
+  Dolar = 'Dolar',
+  Euro = 'Euro',
+}
+export interface IAccount {
+  id: number;
+  name: string;
+  balance?: number;
+  currency: AccountCurrency;
+  type: AccountType;
+  deleted?: boolean;
+  is_active?: boolean;
+  created_at?: Date | null;
+  updated_at?: Date | null;
+  unitId?: number;
+}
+enum PayMethodMethods {
+  debit = 'debit',
+  credit = 'credit',
+  cash = 'cash',
+  transfer = 'transfer',
+  other = 'other',
+}
+export interface IPayMethod {
+  id: number;
+  name: string;
+  method?: PayMethodMethods;
+  type?: InOutType;
+  excluded?: boolean;
+  deleted?: boolean;
+  is_active?: boolean;
+  created_at?: Date | null;
+  updated_at?: Date | null;
+  accountId?: number;
+}
+
+export interface ITransaction {
+  id: number;
+  name: string;
+  description?: string | null;
+  amount: number;
+  discount?: number;
+  type?: InOutType;
+  date?: string;
+  deleted?: boolean;
+  created_at?: Date | null;
+  updated_at?: Date | null;
+  categoryId?: number;
+  unitId?: number;
+  payMethodId?: number;
 }

@@ -10,9 +10,10 @@ import { _langs, _notifications } from 'src/_mock';
 
 import { Iconify } from 'src/components/iconify';
 
-import { IUnit } from 'src/config/types/types';
+import { IUnit, IUser } from 'src/config/types/types';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { setUnitActive, setUnits } from 'src/redux/slices/units.slice';
+import { setUser } from 'src/redux/slices/user.slice';
 import { connect } from 'react-redux';
 import { Main } from './main';
 import { layoutClasses } from '../classes';
@@ -38,9 +39,11 @@ export type DashboardLayoutProps = {
   units: IUnit[];
   setUnitActiveData: any;
   setUnitsData: any;
+  userData: IUser;
+  setUserData: any
 };
 
-function DashboardLayoutReduxed({ sx, children, header, units, setUnitActiveData, setUnitsData }: DashboardLayoutProps) {
+function DashboardLayoutReduxed({ sx, children, header, units, setUnitActiveData, setUnitsData, userData, setUserData }: DashboardLayoutProps) {
   const theme = useTheme();
   const [unitsList, setUnitsList] = useState<any[]>([]);
 
@@ -106,14 +109,14 @@ function DashboardLayoutReduxed({ sx, children, header, units, setUnitActiveData
                 <LanguagePopover data={_langs} />
                 <NotificationsPopover data={_notifications} />
                 <AccountPopover
-                  data={[
+                  menuData={[
                     {
                       label: 'Inicio',
                       href: '/',
                       icon: <Iconify width={22} icon="solar:home-angle-bold-duotone" />,
                     },
                     {
-                      label: 'Perfile',
+                      label: 'Perfil',
                       href: '/profileEdit',
                       icon: <Iconify width={22} icon="solar:shield-keyhole-bold-duotone" />,
                     },
@@ -123,6 +126,8 @@ function DashboardLayoutReduxed({ sx, children, header, units, setUnitActiveData
                       icon: <Iconify width={22} icon="solar:settings-bold-duotone" />,
                     },
                   ]}
+                  userData={userData}
+                  setUserData={setUserData}
                 />
               </Box>
             ),
@@ -164,11 +169,13 @@ function DashboardLayoutReduxed({ sx, children, header, units, setUnitActiveData
 const mapDispatchToProps = (dispatch: any) => ({
   setUnitsData: bindActionCreators(setUnits, dispatch),
   setUnitActiveData: bindActionCreators(setUnitActive, dispatch),
+  setUserData: bindActionCreators(setUser, dispatch),
 });
 
 const DashboardLayout = connect(
   (state: any) => ({
     units: state.units.unitsList,
+    userData: state.user.userData
   }),
   mapDispatchToProps
 )(DashboardLayoutReduxed);
