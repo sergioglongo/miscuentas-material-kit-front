@@ -4,9 +4,9 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Checkbox,IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
-import InternalIcon from 'src/components/icon/internal-icons';
 import { getAllTransactionsByUnitId } from 'src/services/api/modules/transaction.module';
 import PayMethodIcon from 'src/components/icon/paymethod-icons';
+import CommonIcon from 'src/components/icon/CommonIcons';
 
 const PaymentsTable = ({ unitActive }: any) => {
     const [transaction, setTransaction] = useState([]);
@@ -123,17 +123,17 @@ const PaymentsTable = ({ unitActive }: any) => {
                     <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                         <Tooltip title="Ver detalle">
                             <IconButton aria-label="Ver" onClick={() => { }}>
-                                <InternalIcon color='gray' iconName="View" />
+                                <CommonIcon color='gray' iconName="View" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Editar">
                             <IconButton aria-label="Ver" onClick={() => onEdit(tableMeta?.rowData)}>
-                                <InternalIcon color='gray' iconName="Edit" />
+                                <CommonIcon color='gray' iconName="Edit" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Eliminar">
                             <IconButton aria-label="Ver" onClick={() => { }}>
-                                <InternalIcon color='gray' iconName="Delete" />
+                                <CommonIcon color='gray' iconName="Delete" />
                             </IconButton>
                         </Tooltip>
                     </th>
@@ -170,9 +170,9 @@ const PaymentsTable = ({ unitActive }: any) => {
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         {value === 'out' ?
-                            <InternalIcon iconName='ArrowUpRight' styles={{ fontSize: '30', color: 'orange' }} />
+                            <CommonIcon iconName='ArrowUpRight' styles={{ fontSize: '30', color: 'orange' }} />
                             :
-                            <InternalIcon iconName='Download' styles={{ fontSize: '30', color: 'green' }} />
+                            <CommonIcon iconName='Download' styles={{ fontSize: '30', color: 'green' }} />
                         }
                     </th>
                 ),

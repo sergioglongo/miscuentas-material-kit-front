@@ -28,7 +28,6 @@ function UnitEditForm({ handleSave, unitData, icon, setIcon }: any) {
     const router = useRouter();
     const [openmodal, setOpenmodal] = useState(false);
     const onSelectIcon = (iconSelected: string) => {
-        console.log("icono seleccionado", iconSelected);
         setOpenmodal(false);
         setIcon(iconSelected);
     }

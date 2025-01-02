@@ -15,23 +15,29 @@ import { Iconify } from 'src/components/iconify';
 import { connect } from 'react-redux';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { setUnitActive } from 'src/redux/slices/units.slice';
+import { updateParams } from 'src/redux/slices/user.slice';
 import UnitIcon from 'src/components/icon/unit-icons';
+import { IUnit, IUser } from 'src/config/types/types';
 
 // ----------------------------------------------------------------------
 
 export type WorkspacesPopoverProps = ButtonBaseProps & {
-  setUnitActiveData:any,
+  unitActive: any,
+  setUnitActiveData: any,
+  updateUnitActive: any,
+  user: any,
   data?: {
     id: string;
     name: string;
     logo: string;
     main: boolean;
+    is_main_unit: boolean;
   }[];
 };
 
-function WorkspacesPopover({ data = [], sx, setUnitActiveData, ...other }: WorkspacesPopoverProps) {
+function WorkspacesPopover({ data = [], sx, unitActive, setUnitActiveData, updateUnitActive, user, ...other }: WorkspacesPopoverProps) {
 
-  const [workspace, setWorkspace] = useState(data[0]);
+  const [workspace, setWorkspace] = useState(unitActive?.id ? unitActive : data[0]);
 
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
@@ -47,28 +53,51 @@ function WorkspacesPopover({ data = [], sx, setUnitActiveData, ...other }: Works
     (newValue: (typeof data)[number]) => {
       setWorkspace(newValue);
       setUnitActiveData(newValue)
+      updateUnitActive({ unitActive: newValue });
       handleClosePopover();
     },
-    [handleClosePopover, setUnitActiveData]
+    [handleClosePopover, setUnitActiveData, updateUnitActive]
   );
 
   const renderAvatar = (alt: string, src: string) => (
     <UnitIcon iconName={src} styles={{ color: '#343434FF' }} />
     // <Box component="img" alt={alt} src={src} sx={{ width: 24, height: 24, borderRadius: '50%' }} />
   );
-
-
   useEffect(() => {
-    if (data && data.length > 0) {
+    if (unitActive?.id) {
       data.forEach((unit) => {
-        if (unit.main) {
+        if (unit.id === unitActive.id.toString()) {
           setWorkspace(unit)
+          console.log("establecer unidad elegida", unit);
           setUnitActiveData(unit)
+          updateUnitActive({ unitActive: unit });
+          console.log("se establece la unidad activa", unitActive);
+          
         }
       })
-    }
-  }, [data, setUnitActiveData])
-  
+    } else if(user.isAuthorized){
+      const newValue = data.find(item => item.is_main_unit);
+      console.log("Se establece l a unidad principal", newValue);
+      setWorkspace(newValue)
+      setUnitActiveData(newValue)
+      updateUnitActive({ unitActive: newValue });
+    } 
+  }, [unitActive, data, setUnitActiveData, updateUnitActive, user.isAuthorized])
+
+  // useEffect(() => {
+  //   if (data && data.length > 0) {
+  //     data.forEach((unit) => {
+  //       if (unit.main) {
+  //         setWorkspace(unit)
+  //         setUnitActiveData(unit)
+  //         console.log("unit main", unit);
+
+
+  //       }
+  //     })
+  //   }
+  // }, [data, setUnitActiveData])
+
   return (
     <>
       <ButtonBase
@@ -127,6 +156,7 @@ function WorkspacesPopover({ data = [], sx, setUnitActiveData, ...other }: Works
           {data.map((option) => (
             <MenuItem
               key={option.id}
+              // selected={unitActive ? option.id === unitActive.id.toString() : option.id === workspace?.id}
               selected={option.id === workspace?.id}
               onClick={() => handleChangeWorkspace(option)}
             >
@@ -145,8 +175,13 @@ function WorkspacesPopover({ data = [], sx, setUnitActiveData, ...other }: Works
   );
 }
 
+const mapStateToProps = (state: any) => ({
+  unitActive: state.units.unitActive,
+  user: state.user
+})
 const mapDispatchToProps = (dispatch: any) => ({
   setUnitActiveData: bindActionCreators(setUnitActive, dispatch),
+  updateUnitActive: bindActionCreators(updateParams, dispatch),
 });
 
-export default connect(null, mapDispatchToProps)(WorkspacesPopover);
+export default connect(mapStateToProps, mapDispatchToProps)(WorkspacesPopover);

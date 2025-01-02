@@ -3,7 +3,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { fCurrency } from 'src/utils/format-number';
 import { varAlpha } from 'src/theme/styles';
-import AreaIcon from 'src/components/icon/area-icons';
 
 type Props = CardProps & {
   item: { iconName: string; color: string; label: string; total: number };
@@ -15,7 +14,7 @@ export function IconValueLabelCard({ item, children, sx, ...other }: Props) {
     <Box
       key={item.label}
       sx={(theme) => ({
-        py: 2.5,
+        p: 2,
         display: 'flex',
         borderRadius: 1.5,
         textAlign: 'center',

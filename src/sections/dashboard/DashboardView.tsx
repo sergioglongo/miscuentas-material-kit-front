@@ -31,13 +31,13 @@ function getFechas() {
 }
 
 function DashboardView() {
-  const isMdDown = useMediaQuery((theme:any) => theme.breakpoints.down('md'));
+  const isMdDown = useMediaQuery((theme: any) => theme.breakpoints.down('md'));
   const router = useRouter();
   const [periodo, setPeriodo] = useState('30');
   const [fechasLista, setFechasLista] = useState([]);
   const hoy = formatoFecha(new Date());
   const onNewTransaction = () => {
-    router.push('/transactionEdit');
+    router.push('/paymentEdit');
   }
   useEffect(() => {
     const fechas: any = getFechas();
@@ -72,14 +72,25 @@ function DashboardView() {
             {fechasLista.map((item: any, index: number) => <MenuItem value={item.value} key={index} >{item.label}</MenuItem>)}
           </Select>
         </Box>
-        <Button
-          variant="contained"
-          color="inherit"
-          startIcon={<Iconify icon="mingcute:add-line" />}
-          onClick={onNewTransaction}
-        >
-          Nueva Transacción
-        </Button>
+        <Box display='flex' flexDirection='row' gap={2}>
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<Iconify icon="mingcute:add-line" />}
+            onClick={() => router.push('/paymentEdit')}
+          >
+            Gasto
+          </Button>
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<Iconify icon="mingcute:add-line" />}
+            onClick={() => router.push('/incomeEdit')}
+          >
+            Ingreso
+          </Button>
+
+        </Box>
       </Box>
       {/* <AreaTable /> */}
       <DashboardReports periodo={periodo} hoy={hoy} />

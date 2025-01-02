@@ -15,8 +15,9 @@ import { getAllCategoriesByUnitId } from 'src/services/api/modules/category.modu
 import { getAllPayMethodsByUnitId } from 'src/services/api/modules/payMethod.module';
 import { getAllAreasByUnitId } from 'src/services/api/modules/area.module';
 import TransactionCreateEditForm from './TransactionCreateEditForm';
+import PaymentCreateEditForm from './PaymentCreateEditForm';
 
-const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
+const PaymentCreateEditView = ({ paymentForm, init, unit }: any) => {
     const router = useRouter();
     const [isNew, setIsNew] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
@@ -29,7 +30,7 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
     const [type, setType] = useState<InOutType>(TransactionInitialData?.type || "out");
 
     useEffect(() => {
-        getAllAreasByUnitId(unit?.id,'')
+        getAllAreasByUnitId(unit?.id, 'out')
             .then((areasResponse: any) => {
                 console.log("areasResponse", areasResponse);
                 if (areasResponse?.success) {
@@ -38,7 +39,7 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
                     console.log("No se pudieron obtener las areas");
                 }
             }).catch((err: any) => console.log(err));
-        getAllCategoriesByUnitId(unit?.id, '')
+        getAllCategoriesByUnitId(unit?.id, 'out')
             .then((categoriesResponse: any) => {
                 console.log("categoriesResponse", categoriesResponse);
                 if (categoriesResponse?.success) {
@@ -47,7 +48,7 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
                     console.log("No se pudieron obtener las categorias");
                 }
             }).catch((err: any) => console.log(err));
-        getAllPayMethodsByUnitId(unit?.id, '')
+        getAllPayMethodsByUnitId(unit?.id, 'out')
             .then((payMethodsResponse: any) => {
                 console.log("payMethodsResponse", payMethodsResponse);
                 if (payMethodsResponse?.success) {
@@ -65,7 +66,7 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
                 if (resultTransaction?.success) {
                     console.log("transaction by Id", resultTransaction.result);
                     const dataToInit = {...resultTransaction.result, date : utcToLocal(resultTransaction.result?.date)};
-                    init('transactionForm', dataToInit);
+                    init('paymentForm', dataToInit);
                     setIsNew(false);
                     // setType(res.result.type);
                 }
@@ -77,17 +78,17 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
     const handleSave = useMemo(() => (e: any) => {
         e.preventDefault();
         const dataToSave: ITransaction = {
-            id: transactionForm?.values?.id,
-            name: transactionForm?.values?.name,
-            description: transactionForm?.values?.description,
-            amount: transactionForm?.values?.amount,
-            discount: transactionForm?.values?.discount,
-            date: localToUtc(transactionForm?.values?.date),
+            id: paymentForm?.values?.id,
+            name: paymentForm?.values?.name,
+            description: paymentForm?.values?.description,
+            amount: paymentForm?.values?.amount,
+            discount: paymentForm?.values?.discount,
+            date: localToUtc(paymentForm?.values?.date),
             type,
-            deleted: transactionForm?.values?.deleted || false,
-            categoryId: transactionForm?.values?.categoryId,
-            payMethodId: transactionForm?.values?.payMethodId,
-            unitId: transactionForm?.values?.unitId || unit?.id
+            deleted: paymentForm?.values?.deleted || false,
+            categoryId: paymentForm?.values?.categoryId,
+            payMethodId: paymentForm?.values?.payMethodId,
+            unitId: paymentForm?.values?.unitId || unit?.id
         }
         console.log("formulario a guardar:", dataToSave);
         createEditTransaction(dataToSave)
@@ -107,7 +108,7 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
                 console.log("error catch", err)
             });
 
-    }, [router, transactionForm?.values, unit?.id, type]);
+    }, [router, paymentForm?.values, unit?.id, type]);
 
     const theme = useTheme();
     const layoutQuery: Breakpoint = 'md';
@@ -139,14 +140,14 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
                 {/* <PayMethodCreateEditForm
                     handleEdit={handleSave}
                     accountsList={accounts}
-                    payMethodData={transactionForm?.values}
+                    payMethodData={paymentForm?.values}
                 /> */}
-                <TransactionCreateEditForm
+                <PaymentCreateEditForm
                     handleEdit={handleSave}
                     areasList={areasList}
                     categoriesList={categoriesList}
                     payMethodList={payMethodsList}
-                    transactionData={transactionForm?.values}
+                    transactionData={paymentForm?.values}
                     type={type}
                     setType={setType}
                     // areaId={TransactionInitialData?.areaId}
@@ -156,21 +157,21 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
     );
 }
 
-const TransactionCreateEditFormReduxed = reduxForm({
-    form: 'transactionForm',
+const PaymentCreateEditFormReduxed = reduxForm({
+    form: 'paymentForm',
     enableReinitialize: true,
-})(TransactionCreateEditView);
+})(PaymentCreateEditView);
 
 const mapDispatchToProps = (dispatch: any) => ({
     init: bindActionCreators(initialize, dispatch),
 });
 
-const TransactionCreateEditViewForm = connect(
+const PaymentCreateEditViewForm = connect(
     (state: any) => ({
-        transactionForm: state.form.transactionForm,
+        paymentForm: state.form.paymentForm,
         unit: state.units.unitActive,
     }),
     mapDispatchToProps
-)(TransactionCreateEditFormReduxed);
+)(PaymentCreateEditFormReduxed);
 
-export default TransactionCreateEditViewForm;
+export default PaymentCreateEditViewForm;

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
 import { useRouter } from 'src/routes/hooks';
 import { reduxForm, initialize } from 'redux-form';
@@ -8,12 +8,13 @@ import { createEditUser } from 'src/services/api/modules/user.module';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { useTheme, Breakpoint } from '@mui/material/styles';
 import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
+import { setAreasList } from 'src/redux/slices/lists.slice';
 // import ProfileEditForm from '../user/profile/profile-edit-form';
 import { createEditArea } from 'src/services/api/modules/area.module';
 import AreaCreateEditForm from './AreaCreateEditForm';
 // import ProfileEditForm from '../user/profile/profile-edit-form'
 
-const AreaCreateEditView = ({ areaForm, init, unit }: any) => {
+const AreaCreateEditView = ({ areaForm, init, unit, setAreasListState }: any) => {
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
     const [errorShow, setErrorShow] = useState<boolean>(false);
@@ -25,15 +26,13 @@ const AreaCreateEditView = ({ areaForm, init, unit }: any) => {
     const [isActive, setIsActive] = useState(areaInitialData?.is_active || true);
 
     const presetColors = ["#cd9323", "#1a53d8", "#9a2151", "#0d6416", "#8d2808"];
-
+    
     useEffect(() => {
         if (areaInitialData) {
             init('areaForm', areaInitialData);
             setColor(areaInitialData?.color);
-            console.log("inicializacion de userData", areaInitialData);
             setIsActive(areaInitialData?.is_active);
         }
-
     }, [init, areaInitialData]);
 
     const handleSave = useMemo(() => (e: any) => {
@@ -53,6 +52,8 @@ const AreaCreateEditView = ({ areaForm, init, unit }: any) => {
         createEditArea(dataToSave)
             .then((res) => {
                 if (res?.success) {
+                    setAreasListState([]);
+
                     router.back();
                 } else {
                     setErrorMessage(res?.message);
@@ -67,14 +68,11 @@ const AreaCreateEditView = ({ areaForm, init, unit }: any) => {
                 console.log("error catch", err)
             });
 
-    }, [router, areaForm?.values, unit, color, icon, type, isActive]);
+    }, [router, areaForm?.values, unit, color, icon, type, isActive, setAreasListState]);
 
     const theme = useTheme();
     const layoutQuery: Breakpoint = 'md';
-    useEffect(() => {
-        console.log("isActive change", isActive);
-        
-    },[isActive])
+
     return (
         <Box
             component="main"
@@ -126,6 +124,7 @@ const AreaCreateEditFormReduxed = reduxForm({
 
 const mapDispatchToProps = (dispatch: any) => ({
     init: bindActionCreators(initialize, dispatch),
+    setAreasListState: bindActionCreators(setAreasList, dispatch),
 });
 
 const AreaCreateEditViewForm = connect(

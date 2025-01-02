@@ -4,12 +4,12 @@ import IconList from 'src/components/list/IconList';
 import { IArea, ICategory } from 'src/config/types/types';
 import { AutocompleteRedux, CheckboxRedux, SelectRedux, TextFieldErrorRedux } from 'src/components/forms/fields/ReduxFields'
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, FormControl, Grid, ListItemIcon, MenuItem, Switch, Typography } from '@mui/material'
+import { Box, Button, Checkbox, FormControl, Grid, ListItemIcon, MenuItem, Switch, Typography } from '@mui/material'
 import { useRouter } from 'src/routes/hooks';
 import { Field, Form } from 'redux-form'
 import ModalConfirm from 'src/components/modal/ModalConfirm';
-import CategoryIcon, { CategoryIconsList } from 'src/components/icon/category-icons';
-import AreaIcon from 'src/components/icon/area-icons';
+import CategoryIcon, { CategoryIconsList } from 'src/components/icon/CategoryIcon';
+import AreaIcon from 'src/components/icon/AreaIcons';
 
 interface CategoryEditProps {
     handleEdit: any;
@@ -19,22 +19,24 @@ interface CategoryEditProps {
     icon: string;
     setIcon: any;
     presetColors: string[],
-    areasList: IArea[]
+    areasList: IArea[],
+    isActive: boolean;
+    setIsActive: any;
 }
 
-function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, icon, setIcon, presetColors, areasList }: CategoryEditProps) {
+function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, icon, setIcon, presetColors, areasList, isActive, setIsActive }: CategoryEditProps) {
 
     const [openmodal, setOpenmodal] = useState(false);
     const [type, setType] = useState(categoryData?.type || 'out');
     const [areasListToShow, setAreasListToShow] = useState<IArea[]>([]);
     const router = useRouter();
-    const styles:any = {
+    const styles: any = {
         container: {
-          display: 'flex',
-          flexWrap: 'wrap',
-          width: '300px',
-          height: 'auto',
-          justifyContent: 'space-around',
+            display: 'flex',
+            flexWrap: 'wrap',
+            width: '300px',
+            height: 'auto',
+            justifyContent: 'space-around',
         },
         icon: {
             width: 'auto',
@@ -42,17 +44,12 @@ function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, ico
             margin: '4px',
             boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.1)',
         },
-      };
+    };
 
     const onSelectIcon = (iconSelected: string) => {
-        console.log("icono seleccionado", iconSelected);
         setOpenmodal(false);
         setIcon(iconSelected);
     }
-    // useEffect(() => {
-    //    console.log("categoryData al inicio", categoryData);
-
-    // },[])
     const areasFilter = useCallback(
         () => areasList.filter((area: IArea) => area.type === type),
         [areasList, type]
@@ -63,23 +60,9 @@ function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, ico
     }, [categoryData?.type])
 
     useEffect(() => {
-        console.log("limitadas areas", type, areasFilter());
-
         setAreasListToShow(areasFilter());
     }, [type, areasFilter])
 
-    useEffect(() => {
-        if (categoryData) {
-            console.log(categoryData);
-        }
-    }, [categoryData])
-
-    useEffect(() => {
-        console.log("color", color);
-    }, [color])
-    useEffect(() => {
-        console.log("icon", icon);
-    }, [icon])
     return (
         <Form onSubmit={handleEdit} style={{ margin: '10px' }}>
             <Grid container rowSpacing={1} rowGap={2} columnSpacing={2} display='flex' flexDirection='column' alignItems='center'>
@@ -90,8 +73,6 @@ function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, ico
                             component={TextFieldErrorRedux}
                             placeholder='Ingrese el nombre'
                             label="Nombre"
-                            // InputLabelProps={{ shrink: true }}
-                            onChange={(e: any) => console.log(e.target.value)}
                             value={categoryData?.name || ''}
                         />
                     </FormControl>
@@ -103,10 +84,7 @@ function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, ico
                             component={TextFieldErrorRedux}
                             label="Descripción"
                             placeholder='Ingrese la descripción'
-                            // defaultValue= "hello@gmail.com"
-                            // InputProps={{  }}
                             InputLabelProps={{ shrink: true }}
-                            onChange={(e: any) => console.log(e.target.value)}
                             value={categoryData?.description || ''}
                         />
                     </FormControl>
@@ -116,9 +94,9 @@ function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, ico
                         <Grid item xs={12} sm={12} style={{ width: '100%', flexDirection: 'row', justifyContent: 'flex-start' }} >
                             <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', flexWrap: 'wrap', display: 'flex', flexDirection: 'row', justifyContent: 'space-arround' }}>
                                 <Typography variant="h6">Elija un color:</Typography>
-                                {presetColors.map((presetColor) => (
+                                {presetColors.map((presetColor, index) => (
                                     <Button
-                                        key={presetColor}
+                                        key={index}
                                         className={styles.pickerSwatches}
                                         style={{
                                             background: presetColor,
@@ -153,18 +131,14 @@ function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, ico
                     </Box>
                 </Grid>
                 <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                    <Typography variant="h6">Activado:</Typography>
-                    <FormControl fullWidth>
-                        <Field
-                            name="is_active"
-                            component={CheckboxRedux}
-                            label="Activado"
+                   <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        <Typography variant="h6">Activado:</Typography>
+                        <Checkbox
                             size="large"
-                            style={{ width: '50px' }}
-                            onChange={(e: any) => console.log(e.target.value)}
-                            value={categoryData?.is_active || true}
+                            onChange={(e: any) => setIsActive(e.target.checked)}
+                            checked={isActive}
                         />
-                    </FormControl>
+                    </Box>
                 </Grid>
                 <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                     <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
@@ -181,21 +155,18 @@ function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, ico
                         <Field
                             name="areaId"
                             component={SelectRedux}
-                            // label="Area"
                             style={{ minWidth: '200px', marginLeft: '10px' }}
-                            // placeholder='Ingrese area'
-                            // defaultValue= "hello@gmail.com"
-                            // InputProps={{  }}
-                            // InputLabelProps={{ shrink: true }}
                             variant="outlined"
                             size='small'
-                            // onChange={(e: any) => console.log(e.target.id)}
-                            value={categoryData?.areaId || ''}
+                            defaultValue={!categoryData?.areaId ? '' : categoryData?.areaId}
                         >
+                            <MenuItem value='' key='' >
+                                Seleccione un area
+                            </MenuItem>
                             {areasListToShow.map((item, index) => (
                                 <MenuItem
                                     value={item.id} key={index}
-                                    defaultValue={categoryData?.areaId === item?.id ? categoryData?.areaId : ''}
+                                    // defaultValue={categoryData?.areaId === item?.id ? categoryData?.areaId : ''}
                                 // style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
                                 >
                                     <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
@@ -233,23 +204,21 @@ function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, ico
                 setOpenmodal={setOpenmodal}
                 titulo="Elija un icono"
                 children={
-                    // <IconList
-                    //     icons={CategoryIconsList}
-                    //     width="300px"
-                    //     height="auto"
-                    //     separation="4px"
-                    //     onSelectIcon={onSelectIcon}
-                    // >
-                    //     <CategoryIcon iconName={icon} />
-                    // </IconList>
-                        <div style={styles.container}>
-                        {CategoryIconsList.map((iconCategory:any, index:any) => (
-                          <Button key={index} style={styles.icon} onClick={() => onSelectIcon(iconCategory)}>
-                            {/* <Iconify icon={icon} /> */}
-                            <CategoryIcon iconName={iconCategory} styles={{ color: '#343434FF'}} />
-                          </Button>
-                        ))}
-                      </div>
+                    <Box width="300px" display="grid" gap={1} gridTemplateColumns="repeat(4, 1fr)" sx={{ p: 1 }}>
+                        {
+                            CategoryIconsList.map((iconItem, index) => (
+                                <IconList
+                                    key={index}
+                                    icon={iconItem}
+                                    index={index}
+                                    onSelectIcon={onSelectIcon}
+                                    separation='1px'
+                                >
+                                    <CategoryIcon iconName={iconItem} styles={{ fontSize: 20 }} />
+                                </IconList>
+                            ))
+                        }
+                    </Box>
                 }
                 buttonPrimaryAction={() => setOpenmodal(false)}
                 buttonSecondaryAction={() => setOpenmodal(false)}

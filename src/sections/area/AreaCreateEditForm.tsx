@@ -26,58 +26,16 @@ interface AreaEditProps {
     setIsActive: any
 }
 
-// const iconNames = [
-//     'eva:shopping-bag-fill',
-//     'eva:color-palette-fill',
-//     'eva:book-fill',
-//     'eva:home-fill',
-//     'eva:shopping-cart-fill',
-//     'eva:car-fill',
-//     'eva:music-fill',
-//     'eva:phone-fill',
-//     'eva:tv-fill',
-//     'eva:wifi-fill',
-//     'eva:gift-fill',
-//     'eva:file-fill',
-//     'eva:credit-card-fill',
-//     'eva:gift-fill',
-//     'eva:clock-fill',
-//     'eva:at-fill',
-//     'eva:activity-fill',
-//     'eva:cube-fill',
-//     'eva:droplet-fill',
-//     'eva:folder-fill',
-//   ];
-
 function AreaCreateEditForm({ handleEdit, areaData, color, setColor, icon, setIcon, type, setType, presetColors, isActive, setIsActive }: AreaEditProps) {
 
     const [openmodal, setOpenmodal] = useState(false);
     // const [color, setColor] = useState("#b32aa9");
     const router = useRouter();
-    console.log("areaData", areaData, areaData ? areaData?.is_active : true)
     const onSelectIcon = (iconSelected: string) => {
-        console.log("icono seleccionado", iconSelected);
         setOpenmodal(false);
         setIcon(iconSelected);
     }
 
-    useEffect(() => {
-        if (areaData) {
-            console.log(areaData);
-        }
-    }, [areaData])
-    useEffect(() => {
-        console.log("color", color);
-
-    }, [color])
-    useEffect(() => {
-        console.log("icon", icon);
-
-    }, [icon])
-    useEffect(() => {
-        console.log("type", type);
-
-    }, [type])
     return (
         <Form onSubmit={handleEdit} style={{ margin: '10px' }}>
             <Grid container rowSpacing={1} rowGap={2} columnSpacing={2} display='flex' flexDirection='column' alignItems='center'>
@@ -88,8 +46,6 @@ function AreaCreateEditForm({ handleEdit, areaData, color, setColor, icon, setIc
                             component={TextFieldErrorRedux}
                             placeholder='Ingrese el nombre'
                             label="Nombre"
-                            // InputLabelProps={{ shrink: true }}
-                            onChange={(e: any) => console.log(e.target.value)}
                             value={areaData?.name || ''}
                         />
                     </FormControl>
@@ -101,10 +57,7 @@ function AreaCreateEditForm({ handleEdit, areaData, color, setColor, icon, setIc
                             component={TextFieldErrorRedux}
                             label="Descripción"
                             placeholder='Ingrese la descripción'
-                            // defaultValue= "hello@gmail.com"
-                            // InputProps={{  }}
                             InputLabelProps={{ shrink: true }}
-                            onChange={(e: any) => console.log(e.target.value)}
                             value={areaData?.description || ''}
                         />
                     </FormControl>
@@ -114,9 +67,9 @@ function AreaCreateEditForm({ handleEdit, areaData, color, setColor, icon, setIc
                         <Grid item xs={12} sm={12} style={{ width: '100%', flexDirection: 'row', justifyContent: 'flex-start' }} >
                             <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', flexWrap: 'wrap', display: 'flex', flexDirection: 'row', justifyContent: 'space-arround' }}>
                                 <Typography variant="h6">Elija un color:</Typography>
-                                {presetColors.map((presetColor) => (
+                                {presetColors.map((presetColor, index) => (
                                     <Button
-                                        key={presetColor}
+                                        key={index}
                                         className={styles.pickerSwatches}
                                         style={{
                                             background: presetColor,
@@ -198,13 +151,21 @@ function AreaCreateEditForm({ handleEdit, areaData, color, setColor, icon, setIc
                 setOpenmodal={setOpenmodal}
                 titulo="Elija un icono"
                 children={
-                    <IconList
-                        icons={AreaIconsList}
-                        width="300px"
-                        height="auto"
-                        separation="4px"
-                        onSelectIcon={onSelectIcon}
-                    />
+                    <Box width="300px" display="grid" gap={1} gridTemplateColumns="repeat(4, 1fr)" sx={{ p: 1 }}>
+                        {
+                            AreaIconsList.map((iconItem, index) => (
+                                <IconList
+                                    key={index}
+                                    icon={iconItem}
+                                    index={index}
+                                    onSelectIcon={onSelectIcon}
+                                    separation='1px'
+                                >
+                                    <AreaIcon iconName={iconItem} styles={{ fontSize: 20 }} />
+                                </IconList>
+                            ))
+                        }
+                    </Box>
                 }
                 buttonPrimaryAction={() => setOpenmodal(false)}
                 buttonSecondaryAction={() => setOpenmodal(false)}

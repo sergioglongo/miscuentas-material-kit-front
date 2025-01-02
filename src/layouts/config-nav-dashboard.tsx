@@ -1,4 +1,5 @@
-import InternalIcon from 'src/components/icon/internal-icons';
+import path from 'path';
+import CommonIcon from 'src/components/icon/CommonIcons';
 import { Label } from 'src/components/label';
 import { SvgColor } from 'src/components/svg-color';
 
@@ -10,39 +11,66 @@ const icon = (name: string) => (
 
 export const navData = [
   {
+    key: 'home',
     title: 'Inicio',
     path: '/',
     icon: icon('ic-analytics'),
+    isMenu: false
   },
   {
-    title: 'Areas',
-    path: '/area',
-    icon: <InternalIcon color='gray' iconName="Area" />,
-
-  },
-  {
-    title: 'Categorias',
-    path: '/category',
-    icon: <InternalIcon color='gray' iconName="Category" />,
-
-  },
-  {
-    title: 'Cuentas',
-    path: '/account',
-    icon: <InternalIcon color='gray' iconName="Accounts" />,
-
-  },
-  {
-    title: 'Medios Pago',
-    path: '/paymethod',
-    icon: <InternalIcon color='gray' iconName="PayMethods" />,
-
-  },
-  {
+    key: 'transactions',
     title: 'Transacciones',
     path: '/transaction',
-    icon: <InternalIcon color='gray' iconName="Transactions" />,
+    icon: <CommonIcon color='gray' iconName="Transaction" styles={{ fontSize: '25', }} />,
+    isMenu: false
   },
+  {
+    key: 'paramsMenu',
+    title: 'Parametros',
+    path: '',
+    icon: <CommonIcon color='gray' iconName="Home" styles={{ fontSize: '25', }} />,
+    isMenu: true,
+    submenu: [
+      {
+        key: 'areas',
+        title: 'Areas',
+        path: '/area',
+        icon: <CommonIcon color='gray' iconName="Area" styles={{ fontSize: '25', }} />,
+
+      },
+      {
+        key: 'categories',
+        title: 'Categorias',
+        path: '/category',
+        icon: <CommonIcon color='gray' iconName="Category" styles={{ fontSize: '25', }} />,
+
+      },
+    ]
+  },
+  {
+    key: 'accountsMenu',
+    title: 'Cuentas',
+    path: '',
+    icon: <CommonIcon color='gray' iconName="Home" styles={{ fontSize: '25', }} />,
+    isMenu: true,
+    submenu: [
+      {
+        key: 'accounts',
+        title: 'Cuentas',
+        path: '/account',
+        icon: <CommonIcon color='gray' iconName="Accounts" styles={{ fontSize: '25', }} />,
+
+      },
+      {
+        key: 'payMethods',
+        title: 'Medios Pago',
+        path: '/paymethod',
+        icon: <CommonIcon color='gray' iconName="PayMethods" styles={{ fontSize: '25', }} />,
+
+      },
+    ]
+  },
+
   // {
   //   title: 'Productos',
   //   path: '/products',

@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Checkbox,IconButton, Tooltip } from '@mui/material';
+import { Checkbox, IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
-import InternalIcon from 'src/components/icon/internal-icons';
 import { getAllPayMethodsByUnitId } from 'src/services/api/modules/payMethod.module';
-import PayMethodIcon from 'src/components/icon/paymethod-icons';
+import PayMethodIcon from 'src/components/icon/PayMethodIcons';
+import CommonIcon from 'src/components/icon/CommonIcons';
+import { grey } from 'src/theme/core';
+import { bindActionCreators } from '@reduxjs/toolkit';
+import { setAccountsList, setPayMethodsList } from 'src/redux/slices/lists.slice';
 
-const PayMethodTable = ({ unitActive }: any) => {
+const PayMethodTable = ({ unitActive, lists, setPayMethodsListState }: any) => {
     const [payMethod, setPayMethod] = useState([]);
     const rowsPerPage = 10;
     const router = useRouter();
@@ -123,17 +126,17 @@ const PayMethodTable = ({ unitActive }: any) => {
                     <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                         <Tooltip title="Ver detalle">
                             <IconButton aria-label="Ver" onClick={() => { }}>
-                                <InternalIcon color='gray' iconName="View" />
+                                <CommonIcon color='gray' iconName="View" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Editar">
                             <IconButton aria-label="Ver" onClick={() => onEdit(tableMeta?.rowData)}>
-                                <InternalIcon color='gray' iconName="Edit" />
+                                <CommonIcon color='gray' iconName="Edit" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Eliminar">
                             <IconButton aria-label="Ver" onClick={() => { }}>
-                                <InternalIcon color='gray' iconName="Delete" />
+                                <CommonIcon color='gray' iconName="Delete" />
                             </IconButton>
                         </Tooltip>
                     </th>
@@ -151,7 +154,7 @@ const PayMethodTable = ({ unitActive }: any) => {
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign:'left' }}>
+                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
                         {columnMeta.label}
                     </th>
                 )
@@ -170,9 +173,9 @@ const PayMethodTable = ({ unitActive }: any) => {
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         {value === 'out' ?
-                            <InternalIcon iconName='ArrowUpRight' styles={{ fontSize: '30', color: 'orange' }} />
+                            <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
                             :
-                            <InternalIcon iconName='Download' styles={{ fontSize: '30', color: 'green' }} />
+                            <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
                         }
                     </th>
                 ),
@@ -197,7 +200,7 @@ const PayMethodTable = ({ unitActive }: any) => {
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <PayMethodIcon iconName={value} styles={{ fontSize: '40', display: 'flex', color: 'black' }} />
+                        <PayMethodIcon iconName={value} styles={{ fontSize: '40', display: 'flex', color: grey[700] }} />
                     </th>
                 ),
                 filterType: 'dropdown',
@@ -216,7 +219,7 @@ const PayMethodTable = ({ unitActive }: any) => {
                 filter: false,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ textAlign:'center' }}>
+                    <th style={{ textAlign: 'center' }}>
                         {columnMeta.label}
                     </th>
                 ),
@@ -327,26 +330,29 @@ const PayMethodTable = ({ unitActive }: any) => {
         //   filterChoferes(searchText);
         // },
     };
+    const loadingRef = useRef(false);
 
     useEffect(() => {
-        getAllPayMethodsByUnitId(unitActive?.id)
-            .then((peyMethodsResponse: any) => {
-                console.log("peyMethodsResponse", peyMethodsResponse);
-                if (peyMethodsResponse?.success) {
-                    const payMethodWithArea = peyMethodsResponse.result.map((category: any) => ({ ...category, accountName: category.account.name}));
-                    setPayMethod(payMethodWithArea);
-                } else {
-                    console.log("No se pudieron obtener las payMethod");
-                }
-            })
-            .catch((err: any) => console.log(err));
-    }, [unitActive]);
+        if (lists.payMethodsList.length === 0 && !loadingRef.current) {
+            getAllPayMethodsByUnitId(unitActive?.id, '')
+                .then((peyMethodsResponse: any) => {
+                    console.log("peyMethodsResponse", peyMethodsResponse);
+                    if (peyMethodsResponse?.success) {
+                        const payMethodWithArea = peyMethodsResponse.result.map((category: any) => ({ ...category, accountName: category.account.name }));
+                        setPayMethodsListState(payMethodWithArea);
+                    } else {
+                        console.log("No se pudieron obtener las payMethod");
+                    }
+                })
+                .catch((err: any) => console.log(err));
+        }
+    }, [unitActive, lists.accountsList, lists.payMethodsList, setPayMethodsListState]);
 
     return (
         <ThemeProvider theme={getMuiTheme()}>
             <MUIDataTable
                 title='Métodos de pago'
-                data={payMethod}
+                data={lists.payMethodsList}
                 columns={columns}
                 options={options}
             />
@@ -354,11 +360,14 @@ const PayMethodTable = ({ unitActive }: any) => {
     )
 }
 
-const mapDispatchToProps = {}
+const mapDispatchToProps = (dispatch: any) => ({
+    setPayMethodsListState: bindActionCreators(setPayMethodsList, dispatch),
+})
 
 export default connect(
     (state: any) => ({
         unitActive: state.units.unitActive,
+        lists: state.lists
     }),
     mapDispatchToProps
 )(PayMethodTable);

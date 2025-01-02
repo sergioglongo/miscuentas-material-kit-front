@@ -11,9 +11,9 @@ export async function getAllPayMethods(filter: string) {
         })
         .catch((err: any) => console.log(err));
 }
-export async function getAllPayMethodsByUnitId(unitId:number) {
+export async function getAllPayMethodsByUnitId(unitId:number, type:string) {
     return axiosClient
-        .get(`paymethod/getAllByUnitId/${unitId}`)
+        .get(`paymethod/getAllByUnitId/${unitId}${type ? `/${type}` : ''}`)
         .then((response: any) => {
             if (typeof response.data !== 'undefined' && response.data.success === true) {
                 return response.data;

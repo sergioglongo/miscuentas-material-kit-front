@@ -11,7 +11,8 @@ import { varAlpha } from 'src/theme/styles';
 
 import { Iconify } from 'src/components/iconify';
 import { IconValueLabelCard } from 'src/components/cards/IconValueLabelCard/IconValueLabelCard';
-import AreaIcon from 'src/components/icon/area-icons';
+import { CardContent } from '@mui/material';
+import AreaIcon from 'src/components/icon/AreaIcons';
 
 // ----------------------------------------------------------------------
 
@@ -26,13 +27,23 @@ export function AreasTotalCards({ title, subheader, list, sx, ...other }: Props)
   return (
     <Card sx={sx} {...other}>
       <CardHeader title={title} subheader={subheader} />
-      <Box display="grid" gap={2} gridTemplateColumns="repeat(2, 1fr)" sx={{ p: 3 }}>
-        {list.map((item) => (
-          <IconValueLabelCard key={item.label} item={item} children={
-            <AreaIcon iconName={item.iconName} styles={{ fontSize: '40', display: 'flex', color: item.color }} />
-          } />
-        ))}
-      </Box>
+      {list.length > 0 ?
+        <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center' }}>
+          <Box display="grid" gap={2} gridTemplateColumns="repeat(2, 1fr)" sx={{ p: 3 }}>
+            {list.map((item) => (
+              <IconValueLabelCard key={item.label} item={item} children={
+                <AreaIcon iconName={item.iconName} styles={{ fontSize: '40', display: 'flex', color: item.color }} />
+              } />
+            ))}
+          </Box>
+        </CardContent>
+        :
+        <CardContent sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Typography variant="body2" sx={{ p: 3, textAlign: 'center' }}>
+            Sin datos en el periodo seleccionado
+          </Typography>
+        </CardContent>
+      }
     </Card>
   );
 }

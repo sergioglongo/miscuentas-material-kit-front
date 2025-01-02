@@ -2,7 +2,7 @@ import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { Box, Divider } from '@mui/material';
-import InternalIcon from 'src/components/icon/internal-icons';
+import CommonIcon from 'src/components/icon/CommonIcons';
 
 function SectionCard(props: any) {
     //   const { classes } = useStyles();
@@ -24,7 +24,7 @@ function SectionCard(props: any) {
                 <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 2, position: 'relative' }}>
                     {iconName &&
                         <Box style={{ filter: 'drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.2))', position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)' }}>
-                            <InternalIcon iconName={iconName} styles={{ fontSize: iconSize, display: 'flex', color: iconColor }} />
+                            <CommonIcon iconName={iconName} styles={{ fontSize: iconSize, display: 'flex', color: iconColor }} />
                         </Box>
                     }
                     <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>

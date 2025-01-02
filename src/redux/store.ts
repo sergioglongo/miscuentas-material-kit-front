@@ -1,9 +1,10 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import storage from "redux-persist/lib/storage";
-import { persistReducer, persistStore } from 'redux-persist'
+import { persistReducer, FLUSH, PAUSE, PERSIST, persistStore, PURGE, REGISTER, REHYDRATE } from 'redux-persist'
 import { reducer as form } from 'redux-form';
 import userReducer from './slices/user.slice';
 import unitsReducer from './slices/units.slice';
+import listsReducer from './slices/lists.slice';
 
 const persistConfig = {
     key: "root",
@@ -14,6 +15,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
     user: userReducer,
     units: unitsReducer,
+    lists: listsReducer,
     form,
 })
 
@@ -21,7 +23,12 @@ const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 export const store = configureStore({
     reducer: persistedReducer,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+        serializableCheck: {
+          ignoredPaths: ['pwa.event'],
+          ignoredActions: ['pwa/addDeferredPrompt', FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+      }),
     devTools: process.env.NODE_ENV !== 'production',
 })
 

@@ -37,7 +37,6 @@ export function fCurrency(inputValue: InputNumberValue, currency: string = 'ARS'
 
   const number = processInput(inputValue);
   if (number === null) return '';
-  console.log("code currency", code, currency);
   
   const fm = new Intl.NumberFormat(code, {
     style: 'currency',

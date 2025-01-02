@@ -1,6 +1,6 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import Box from '@mui/material/Box';
 import ListItem from '@mui/material/ListItem';
@@ -15,21 +15,33 @@ import { varAlpha } from 'src/theme/styles';
 
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
-import { Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Collapse, Typography } from '@mui/material';
+import { ExpandMore } from '@mui/icons-material';
 
 import { NavUpgrade } from '../components/nav-upgrade';
 import WorkspacesPopover from '../components/workspaces-popover';
 
 import type { WorkspacesPopoverProps } from '../components/workspaces-popover';
+import listNavItem from './listNavItem';
 
 // ----------------------------------------------------------------------
 
+
 export type NavContentProps = {
   data: {
+    key: string;
     path: string;
     title: string;
     icon: React.ReactNode;
     info?: React.ReactNode;
+    isMenu?: boolean;
+    submenu?: {
+      key: string;
+      path: string;
+      title: string;
+      icon: React.ReactNode;
+      info?: React.ReactNode;
+    }[]
   }[];
   slots?: {
     topArea?: React.ReactNode;
@@ -117,6 +129,7 @@ export function NavMobile({
 
 export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
   const pathname = usePathname();
+  const [open, setOpen] = useState<boolean[]>([false, false, false]);
   return (
     <>
       <Box display="flex" flexDirection="row" alignItems="center" justifyContent="flex-start" gap={2}>
@@ -130,52 +143,34 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
           Cuenta a gestionar
         </Typography>
       </Box>
-      <WorkspacesPopover data={workspaces} sx={{ my: 2, mb:4 }} />
+      <WorkspacesPopover data={workspaces} sx={{ my: 2, mb: 4 }} />
 
       <Scrollbar fillContent>
         <Box component="nav" display="flex" flex="1 1 auto" flexDirection="column" sx={sx}>
-          <Box component="ul" gap={0.5} display="flex" flexDirection="column">
+          <Box component="ul" gap={0} display="flex" flexDirection="column">
             {data.map((item) => {
-              const isActived = item.path === pathname;
-
-              return (
-                <ListItem disableGutters disablePadding key={item.title}>
-                  <ListItemButton
-                    disableGutters
-                    component={RouterLink}
-                    href={item.path}
-                    sx={{
-                      pl: 2,
-                      py: 1,
-                      gap: 2,
-                      pr: 1.5,
-                      borderRadius: 0.75,
-                      typography: 'body2',
-                      fontWeight: 'fontWeightMedium',
-                      color: 'var(--layout-nav-item-color)',
-                      minHeight: 'var(--layout-nav-item-height)',
-                      ...(isActived && {
-                        fontWeight: 'fontWeightSemiBold',
-                        bgcolor: 'var(--layout-nav-item-active-bg)',
-                        color: 'var(--layout-nav-item-active-color)',
-                        '&:hover': {
-                          bgcolor: 'var(--layout-nav-item-hover-bg)',
-                        },
-                      }),
-                    }}
-                  >
-                    <Box component="span" sx={{ width: 24, height: 24 }}>
-                      {item.icon}
-                    </Box>
-
-                    <Box component="span" flexGrow={1}>
-                      {item.title}
-                    </Box>
-
-                    {item.info && item.info}
-                  </ListItemButton>
-                </ListItem>
-              );
+              let isActived = item.path === pathname;
+              if (item.isMenu) {
+                return (
+                  <Accordion key={item.title}>
+                    <AccordionSummary
+                      expandIcon={<ExpandMore />}
+                    // aria-controls="panel1a-content"
+                    >
+                      <Typography variant="subtitle1">{item.title}</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails >
+                      {item.submenu?.map((subItem) => {
+                        isActived = subItem.path === pathname;
+                        return listNavItem(subItem, isActived);
+                      }
+                      )
+                      }
+                    </AccordionDetails>
+                  </Accordion>
+                )
+              }
+              return listNavItem(item, isActived);
             })}
           </Box>
         </Box>

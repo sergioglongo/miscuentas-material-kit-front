@@ -83,7 +83,7 @@ export const AreaIconsList = [
   'Building',
   'Healt',
   'Entertainment',
-  'Trasport',
+  'Transport',
   'Truck',
   'Flight',
   'Market',

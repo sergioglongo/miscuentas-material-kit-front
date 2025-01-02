@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
-import { IAccount, IArea } from 'src/config/types/types';
+import { useEffect, useState } from 'react';
+import { IAccount } from 'src/config/types/types';
 import { CheckboxRedux, SelectRedux, TextFieldErrorRedux } from 'src/components/forms/fields/ReduxFields'
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, FormControl, Grid, ListItemIcon, MenuItem, Switch, Typography } from '@mui/material'
+import { Button, FormControl, Grid, ListItemIcon, MenuItem, Typography } from '@mui/material'
 import { useRouter } from 'src/routes/hooks';
 import { Field, Form } from 'redux-form'
-import ModalConfirm from 'src/components/modal/ModalConfirm';
-import CategoryIcon, { CategoryIconsList } from 'src/components/icon/category-icons';
-import AreaIcon from 'src/components/icon/area-icons';
+import AccountIcon from 'src/components/icon/AccountIcon';
+import { grey } from '../../theme/core/palette';
 
 const currencyLista = [
     'Pesos',
@@ -57,6 +56,7 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew }: CategoryEditP
             console.log("inicializacion de accountData", accountData);
         }
     }, [accountData, isNew])
+    
     return (
         <Form onSubmit={handleEdit} style={{ margin: '10px' }}>
             <Grid container rowSpacing={1} rowGap={2} columnSpacing={2} display='flex' flexDirection='column' alignItems='center'>
@@ -121,12 +121,15 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew }: CategoryEditP
                         >
                             {currencyLista.map((item, index) => (
                                 <MenuItem
-                                    value={item} 
-                                    key={index}
-                                // style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
-                                >
+                                value={item} key={index}
+                                defaultValue={accountData?.currency === item ? accountData?.currency : ''}
+                            // style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                            >
+                                <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                                    <AccountIcon iconName={item} styles={{ fontSize: '20', display: 'flex', color: grey[700] }} />
                                     {item}
-                                </MenuItem>
+                                </ListItemIcon>
+                            </MenuItem>
                             ))}
                         </Field>
                     </FormControl>
@@ -149,13 +152,14 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew }: CategoryEditP
                         >
                             {typesLista.map((item, index) => (
                                 <MenuItem
-                                    value={item.id}
-                                    key={index}
-                                    // defaultValue='cash'
-                                    // defaultValue={accountData?.type === item.id ?? accountData?.type}
+                                    value={item.id} key={index}
+                                    defaultValue={accountData?.type === item.id ? accountData?.type : ''}
                                 // style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
                                 >
-                                    {item.name}
+                                    <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                                        <AccountIcon iconName={item?.id} styles={{ fontSize: '25', display: 'flex', color: grey[700] }} />
+                                        {item?.name}
+                                    </ListItemIcon>
                                 </MenuItem>
                             ))}
                         </Field>

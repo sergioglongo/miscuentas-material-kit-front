@@ -8,23 +8,27 @@ import TransactionTable from './TransactionTable';
 function TransactionView() {
   const router = useRouter();
 
-  const onNewTransaction = () => { 
-    router.push('/transactionEdit');
-  }
-
   return (
     <DashboardContent>
-      <Box display="flex" alignItems="center" mb={5}>
+      <Box display="flex" alignItems="center" mb={5} gap={2}>
         <Typography variant="h4" flexGrow={1}>
           Gestión de Transacciones
         </Typography>
         <Button
           variant="contained"
-          color="inherit"
+          color="error"
           startIcon={<Iconify icon="mingcute:add-line" />}
-          onClick={onNewTransaction}
+          onClick={() => router.push('/paymentEdit')}
         >
-          Nueva transacción
+          Gasto
+        </Button>
+        <Button
+          variant="contained"
+          color="success"
+          startIcon={<Iconify icon="mingcute:add-line" />}
+          onClick={() => router.push('/incomeEdit')}
+        >
+          Ingreso
         </Button>
       </Box>
       {/* <AreaTable /> */}

@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Checkbox, IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
-import InternalIcon from 'src/components/icon/internal-icons';
 import { getAllAccountsByUnitId } from 'src/services/api/modules/account.module';
-import AccountIcon from 'src/components/icon/account-icons';
+import { fCurrency } from 'src/utils/format-number';
+import AccountIcon from 'src/components/icon/AccountIcon';
+import CommonIcon from 'src/components/icon/CommonIcons';
+import { bindActionCreators } from '@reduxjs/toolkit';
+import { setAccountsList } from 'src/redux/slices/lists.slice';
 
 const iconToShow = (iconName: string) => {
 
 }
 
-const AccountTable = ({ unitActive }: any) => {
+const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
     const [accounts, setAccounts] = useState([]);
     const rowsPerPage = 10;
     const router = useRouter();
@@ -128,17 +131,17 @@ const AccountTable = ({ unitActive }: any) => {
                     <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                         <Tooltip title="Ver detalle">
                             <IconButton aria-label="Ver" onClick={() => { }}>
-                                <InternalIcon color='gray' iconName="View" />
+                                <CommonIcon color='gray' iconName="View" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Editar">
                             <IconButton aria-label="Ver" onClick={() => onEdit(tableMeta?.rowData)}>
-                                <InternalIcon color='gray' iconName="Edit" />
+                                <CommonIcon color='gray' iconName="Edit" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Eliminar">
                             <IconButton aria-label="Ver" onClick={() => { }}>
-                                <InternalIcon color='gray' iconName="Delete" />
+                                <CommonIcon color='gray' iconName="Delete" />
                             </IconButton>
                         </Tooltip>
                     </th>
@@ -172,9 +175,9 @@ const AccountTable = ({ unitActive }: any) => {
                         {columnMeta.label}
                     </th>
                 ),
-                // customBodyRender: (value: any) => (
-                //     <div>{value}</div>
-                // ),
+                customBodyRender: (value: any) => (
+                    <div>{fCurrency(value)}</div>
+                ),
             }
         },
         {
@@ -194,9 +197,9 @@ const AccountTable = ({ unitActive }: any) => {
                 ),
                 filterType: 'dropdown',
                 filterOptions: {
-                    names: ['Pesos', 'Dolar'],
+                    names: ['Pesos', 'Dolar', 'Euro'],
                     logic(type: any, filterVal: any) {
-                        return filterVal[0] !== 'Ingreso' ? type === 'in' : type === 'out';
+                        return filterVal[0] === 'Pesos' ? type === 'Pesos' : filterVal[0] === 'Dolar' ? type === 'Dolar' : type === 'Euro';
                     },
                 },
             }
@@ -325,26 +328,29 @@ const AccountTable = ({ unitActive }: any) => {
         //   filterChoferes(searchText);
         // },
     };
+    const loadingRef = useRef(false);
 
     useEffect(() => {
-        getAllAccountsByUnitId(unitActive?.id)
-            .then((accountResponse: any) => {
-                console.log("accountResponse", accountResponse);
-                if (accountResponse?.success) {
-                    const categoriesWithArea = accountResponse.result.map((account: any) => ({ ...account, account: account.unit.name, description: account.unit.description, accountPhoto: account.unit.photo }));
-                    setAccounts(categoriesWithArea);
-                } else {
-                    console.log("No se pudieron obtener las accounts");
-                }
-            })
-            .catch((err: any) => console.log(err));
-    }, [unitActive]);
+        if (lists.accountsList.length === 0 && !loadingRef.current) {
+            getAllAccountsByUnitId(unitActive?.id)
+                .then((accountResponse: any) => {
+                    console.log("accountResponse", accountResponse);
+                    if (accountResponse?.success) {
+                        const categoriesWithArea = accountResponse.result.map((account: any) => ({ ...account, account: account.unit.name, description: account.unit.description, accountPhoto: account.unit.photo }));
+                        setAccountsListState(categoriesWithArea);
+                    } else {
+                        console.log("No se pudieron obtener las accounts");
+                    }
+                })
+                .catch((err: any) => console.log(err));
+        }
+    }, [unitActive, lists.areasList, setAccountsListState, lists.accountsList]);
 
     return (
         <ThemeProvider theme={getMuiTheme()}>
             <MUIDataTable
                 title='Cuentas'
-                data={accounts}
+                data={lists.accountsList}
                 columns={columns}
                 options={options}
             />
@@ -352,11 +358,14 @@ const AccountTable = ({ unitActive }: any) => {
     )
 }
 
-const mapDispatchToProps = {}
+const mapDispatchToProps = (dispatch: any) => ({
+    setAccountsListState: bindActionCreators(setAccountsList, dispatch),
+})
 
 export default connect(
     (state: any) => ({
         unitActive: state.units.unitActive,
+        lists: state.lists
     }),
     mapDispatchToProps
 )(AccountTable);

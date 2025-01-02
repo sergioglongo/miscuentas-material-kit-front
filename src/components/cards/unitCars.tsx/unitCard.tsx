@@ -2,13 +2,13 @@ import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { Box, CardHeader, CardMedia, MenuItem, IconButton, Popover, Grid } from '@mui/material';
-import InternalIcon from 'src/components/icon/internal-icons';
 import { IUnit } from 'src/config/types/types';
 import { fDateSlash } from 'src/utils/format-time';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import { useState } from 'react';
 import UnitIcon from 'src/components/icon/unit-icons';
+import CommonIcon from 'src/components/icon/CommonIcons';
 
 interface UnitCardProps {
     unit: IUnit;
@@ -112,7 +112,7 @@ function UnitCard(props: UnitCardProps) {
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 2, position: 'relative' }}>
                 {iconProps?.name &&
                     <Box style={{ filter: 'drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.2))', position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)' }}>
-                        <InternalIcon iconName={iconProps.name} styles={{ fontSize: iconProps.size, display: 'flex', color: iconProps.color }} />
+                        <CommonIcon iconName={iconProps.name} styles={{ fontSize: iconProps.size, display: 'flex', color: iconProps.color }} />
                     </Box>
                 }
                 {/* <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>

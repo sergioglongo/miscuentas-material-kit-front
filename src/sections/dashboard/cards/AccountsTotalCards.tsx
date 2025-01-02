@@ -11,7 +11,7 @@ import { varAlpha } from 'src/theme/styles';
 
 import { Iconify } from 'src/components/iconify';
 import { IconValueLabelCard } from 'src/components/cards/IconValueLabelCard/IconValueLabelCard';
-import AccountIcon from 'src/components/icon/account-icons';
+import AccountIcon from 'src/components/icon/AccountIcon';
 
 // ----------------------------------------------------------------------
 

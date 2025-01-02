@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
+import { bindActionCreators } from '@reduxjs/toolkit';
 import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 import { getAllAreas } from 'src/services/api/modules/area.module';
 import { Checkbox, Icon, IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
+import AreaIcon from 'src/components/icon/AreaIcons';
+import CommonIcon from 'src/components/icon/CommonIcons';
 import MUIDataTable from 'mui-datatables';
-import { Iconify } from 'src/components/iconify';
-import InternalIcon from 'src/components/icon/internal-icons';
-import AreaIcon from 'src/components/icon/area-icons';
-import styles from './area.module.css';
+import { setAreasList } from 'src/redux/slices/lists.slice';
 
-const AreaTable = ({ unitActive }: any) => {
-    const [areas, setAreas] = useState([]);
+const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
+    const [areaQueryLoad, setAreaQueryLoad] = useState(false);
     const rowsPerPage = 10;
     const router = useRouter();
     const onEdit = (areaData: any) => {
@@ -114,7 +114,7 @@ const AreaTable = ({ unitActive }: any) => {
             name: 'id',
             label: 'id',
             options: {
-                filter: false,
+                filter: false,                
                 display: 'excluded',
             }
         },
@@ -124,26 +124,26 @@ const AreaTable = ({ unitActive }: any) => {
             options: {
                 filter: false,
                 customBodyRender: (value: any, tableMeta: any) => (
-                    <div style={{ width: 120 }}>
+                    <th style={{ width: '120px', display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                         <Tooltip title="Ver detalle">
                             <IconButton aria-label="Ver" onClick={() => { }}>
-                                <InternalIcon color='gray' iconName="View" />
+                                <CommonIcon color='gray' iconName="View" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Editar">
                             <IconButton aria-label="Ver" onClick={() => onEdit(tableMeta?.rowData)}>
-                                <InternalIcon color='gray' iconName="Edit" />
+                                <CommonIcon color='gray' iconName="Edit" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Eliminar">
                             <IconButton aria-label="Ver" onClick={() => { }}>
-                                <InternalIcon color='gray' iconName="Delete" />
+                                <CommonIcon color='gray' iconName="Delete" />
                             </IconButton>
                         </Tooltip>
-                    </div>
+                    </th>
                 ),
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ width: '80px', padding: 0, height: '40px' }}>
+                    <th key={1} style={{ width: '80px', padding: 0, height: '40px' }}>
                         {columnMeta.label}
                     </th>
                 )
@@ -155,10 +155,13 @@ const AreaTable = ({ unitActive }: any) => {
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
+                    <th key={2} style={{ minWidth: '100px', textAlign: 'left' }}>
                         {columnMeta.label}
                     </th>
-                )
+                ),
+                //  customBodyRender: (value: any) => (
+                //     <th >{value}</th>
+                // ),
             }
         },
         {
@@ -167,7 +170,7 @@ const AreaTable = ({ unitActive }: any) => {
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
+                    <th key={3} style={{ minWidth: '100px', textAlign: 'left' }}>
                         {columnMeta.label}
                     </th>
                 ),
@@ -183,15 +186,14 @@ const AreaTable = ({ unitActive }: any) => {
                 filter: true,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
-                        {columnMeta.label}
-                    </th>
+                    <th key={4} style={{}}>{columnMeta.label}</th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        {value === 'out' ?
-                            <InternalIcon iconName='ArrowUpRight' styles={{ fontSize: '30', color: 'orange' }} />
+                        {value === 'out' 
+                        ?
+                            <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
                             :
-                            <InternalIcon iconName='Download' styles={{ fontSize: '30', color: 'green' }} />
+                            <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
                         }
                     </th>
                 ),
@@ -211,12 +213,10 @@ const AreaTable = ({ unitActive }: any) => {
                 filter: false,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
-                        {columnMeta.label}
-                    </th>
+                    <th key={5}  style={{}}>{columnMeta.label}</th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <AreaIcon iconName={tableMeta?.rowData[6]} styles={{ fontSize: '40', display: 'flex', color: value }} />
+                        <AreaIcon iconName={tableMeta?.rowData[6]} styles={{ fontSize: '36', display: 'flex', color: value }} />
                     </th>
                     // <div
                     //     key={value}
@@ -226,7 +226,6 @@ const AreaTable = ({ unitActive }: any) => {
                 ),
             }
         },
-
         {
             name: 'icon',
             label: 'Icon',
@@ -243,9 +242,7 @@ const AreaTable = ({ unitActive }: any) => {
                 filter: true,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
-                        {columnMeta.label}
-                    </th>
+                    <th key={7} style={{}}>{columnMeta.label}</th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         <Checkbox checked={value} />
@@ -345,26 +342,31 @@ const AreaTable = ({ unitActive }: any) => {
         // },
     };
 
+    const loadingRef = useRef(false);
     useEffect(() => {
-        console.log("unitActive", unitActive);
+        if (lists.areasList.length === 0 && !loadingRef.current) {
+            // setAreaQueryLoad(true);
+            loadingRef.current = true;
+            console.log("Obtengo areas del backend");
+            getAllAreas(`?unitId=${unitActive?.id}`)
+                .then((areasResponse: any) => {
+                    if (areasResponse?.success) {
+                        setAreasListState(areasResponse.result);
+                    } else {
+                        console.log("No se pudieron obtener las areas");
+                    }
+                })
+                .catch((err: any) => console.log(err))
+                .finally(() => {loadingRef.current = false});
+        }
+    }, [unitActive, setAreasListState, lists.areasList, areaQueryLoad]);
 
-        getAllAreas(`?unitId=${unitActive?.id}`)
-            .then((areasResponse: any) => {
-                console.log("areasResponse", areasResponse);
-                if (areasResponse?.success) {
-                    setAreas(areasResponse.result);
-                } else {
-                    console.log("No se pudieron obtener las areas");
-                }
-            })
-            .catch((err: any) => console.log(err));
-    }, [unitActive]);
 
     return (
         <ThemeProvider theme={getMuiTheme()}>
             <MUIDataTable
                 title='Areas'
-                data={areas}
+                data={lists.areasList}
                 columns={columns}
                 options={options}
             />
@@ -372,11 +374,14 @@ const AreaTable = ({ unitActive }: any) => {
     )
 }
 
-const mapDispatchToProps = {}
+const mapDispatchToProps = (dispatch: any) => ({
+    setAreasListState: bindActionCreators(setAreasList, dispatch),
+})
 
 export default connect(
     (state: any) => ({
         unitActive: state.units.unitActive,
+        lists: state.lists
     }),
     mapDispatchToProps
 )(AreaTable);

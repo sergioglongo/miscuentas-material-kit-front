@@ -54,7 +54,8 @@ function DashboardLayoutReduxed({ sx, children, header, units, setUnitActiveData
           id: unit.id,
           name: unit.name,
           logo: unit.photo || '',
-          main: unit?.user_unit && unit?.user_unit.is_main_unit || false
+          main: unit?.user_unit && unit?.user_unit.is_main_unit || false,
+          is_main_unit: unit?.user_unit && unit?.user_unit.is_main_unit || false
         }
       ));
       setUnitsList(unitsFormatted);

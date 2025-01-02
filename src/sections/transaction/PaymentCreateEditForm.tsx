@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
-import { IAccount, IArea, ICategory, IPayMethod, ITransaction } from 'src/config/types/types';
-import { CheckboxRedux, SelectRedux, TextFieldErrorRedux } from 'src/components/forms/fields/ReduxFields'
+import { IArea, ICategory, IPayMethod } from 'src/config/types/types';
+import { SelectRedux, TextFieldErrorRedux } from 'src/components/forms/fields/ReduxFields'
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, FormControl, Grid, ListItemIcon, MenuItem, Select, Switch, Typography } from '@mui/material'
 import { useRouter } from 'src/routes/hooks';
 import { Field, Form } from 'redux-form'
 import CategoryIcon from 'src/components/icon/CategoryIcon';
 import PayMethodIcon from 'src/components/icon/PayMethodIcons';
+import AreaIcon from 'src/components/icon/AreaIcons';
 
 const methodsList = [
     { id: 'debit', name: 'Debito' },
@@ -15,7 +16,7 @@ const methodsList = [
     { id: 'transfer', name: 'Transferencia' },
     { id: 'other', name: 'Otro' },
 ]
-interface TransactionEditProps {
+interface PaymentEditProps {
     handleEdit: any;
     transactionData: any;
     areasList: IArea[];
@@ -25,7 +26,7 @@ interface TransactionEditProps {
     setType: any;
 }
 
-function TransactionCreateEditForm({ handleEdit, transactionData, areasList, categoriesList, payMethodList, type, setType }: TransactionEditProps) {
+function PaymentCreateEditForm({ handleEdit, transactionData, areasList, categoriesList, payMethodList, type, setType }: PaymentEditProps) {
 
     const [openmodal, setOpenmodal] = useState(false);
     const [areaSelected, setAreaSelected] = useState<number | ''>('');
@@ -50,12 +51,8 @@ function TransactionCreateEditForm({ handleEdit, transactionData, areasList, cat
         },
     };
     const categoriesFilter = useCallback(
-        () => categoriesList.filter((categoryItem: any) => categoryItem.area.type === type),
-        [categoriesList, type]
-    );
-    const payMethodsFilter = useCallback(
-        () => payMethodList.filter((payMethodItem: any) => payMethodItem.type === type),
-        [type, payMethodList]
+        () => categoriesList.filter((categoryItem: any) => categoryItem.areaId === areaSelected),
+        [categoriesList, areaSelected]
     );
     const onChangePayMethod = (e: any) => {
         setPaymethodSelected(e.target.value);
@@ -77,11 +74,14 @@ function TransactionCreateEditForm({ handleEdit, transactionData, areasList, cat
         }
     }, [transactionData])
 
+    // useEffect(() => {
+    //     setCategoriesListToShow(categoriesFilter());
+    //     // setPayMethodsListToShow(payMethodsFilter());
+    // }, [type, categoriesFilter, payMethodsFilter]);
     useEffect(() => {
         setCategoriesListToShow(categoriesFilter());
-        setPayMethodsListToShow(payMethodsFilter());
-    }, [type, categoriesFilter, payMethodsFilter]);
-
+        
+    },[areaSelected, categoriesFilter])
     return (
         <Form onSubmit={handleEdit} style={{ margin: '10px' }}>
             <Grid container rowSpacing={1} rowGap={2} columnSpacing={2} display='flex' flexDirection='column' alignItems='center'>
@@ -126,41 +126,31 @@ function TransactionCreateEditForm({ handleEdit, transactionData, areasList, cat
                         />
                     </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <Typography variant="h6">Entrada</Typography>
-                        <Switch
-                            // defaultChecked
-                            onClick={(e: any) => setType(e.target.checked ? "out" : "in")}
-                            checked={type === 'out'}
-                        />
-                        <Typography variant="h6" style={{ marginLeft: '8px' }}>Salida</Typography>
-                    </Box>
-                </Grid>
                 <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                     <Typography variant="h6" >Areas:</Typography>
-                    {/* <FormControl >
+                    <FormControl >
                         <Select
                             name="areaId"
                             style={{ minWidth: '200px', marginLeft: '10px' }}
                             variant="outlined"
                             size='small'
                             value={areaSelected || ''}
+                            // onChange={onChangeArea}
                             onChange={(e: any) => setAreaSelected(e.target.value)}
                         >
                             <MenuItem value='' key='' >
                                 Seleccione un area
                             </MenuItem>
                             {areasList.map((item, index) => (
-                                <MenuItem value={item.id} key={index} onChange={onChangeArea} >
+                                <MenuItem value={item.id} key={index}  >
                                     <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                                        <AreaIcon iconName={item?.type} styles={{ fontSize: '30', display: 'flex', color: 'black' }} />
+                                        <AreaIcon iconName={item?.icon} styles={{ fontSize: '20', display: 'flex', color: 'black' }} />
                                         {item?.name}
                                     </ListItemIcon>
                                 </MenuItem>
                             ))}
                         </Select>
-                    </FormControl> */}
+                    </FormControl>
                     <Typography variant="h6" >Categoria:</Typography>
                     <FormControl >
                         <Field
@@ -211,7 +201,7 @@ function TransactionCreateEditForm({ handleEdit, transactionData, areasList, cat
                             <MenuItem value='' key='' >
                                 Seleccione un método
                             </MenuItem>
-                            {payMethodsListToShow.map((item, index) => (
+                            {payMethodList.map((item, index) => (
                                 <MenuItem value={item.id} key={index} onChange={onChangePayMethod}>
                                     <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                                         <PayMethodIcon iconName={item?.method} styles={{ fontSize: '20', display: 'flex', color: 'black' }} />
@@ -246,4 +236,4 @@ function TransactionCreateEditForm({ handleEdit, transactionData, areasList, cat
     )
 }
 
-export default TransactionCreateEditForm;
+export default PaymentCreateEditForm;

@@ -10,11 +10,12 @@ import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
 import { getAllAreas } from 'src/services/api/modules/area.module';
 import { InOutType, IPayMethod } from 'src/config/types/types';
 import { createEditCategory } from 'src/services/api/modules/category.module';
+import { setAccountsList } from 'src/redux/slices/lists.slice';
 import { createEditPayMethod, getAllPayMethods } from 'src/services/api/modules/payMethod.module';
 import { getAllAccounts } from 'src/services/api/modules/account.module';
 import PayMethodCreateEditForm from './PayMethodCreateEditForm';
 
-const CategoryCreateEditView = ({ payMethodForm, init, unit }: any) => {
+const CategoryCreateEditView = ({ payMethodForm, init, unit, lists, setAccountsListState }: any) => {
     const router = useRouter();
     const [isNew, setIsNew] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
@@ -23,32 +24,37 @@ const CategoryCreateEditView = ({ payMethodForm, init, unit }: any) => {
     const location = useLocation();
     const payMethodInitialData = location.state;
     const [type, setType] = useState<InOutType>(payMethodInitialData?.type || "out");
+    const [isActive, setIsActive] = useState<boolean>(payMethodInitialData?.is_active || true);
 
     useEffect(() => {
-        getAllAccounts(`?unitId=${unit?.id}&is_active=1`)
-            .then((accountsResponse: any) => {
-                console.log("accountsResponse", accountsResponse);
-                if (accountsResponse?.success) {
-                    setAccounts(accountsResponse.result);
-                } else {
-                    console.log("No se pudieron obtener las cuentas");
-                }
-            })
-            .catch((err: any) => console.log(err));
-    }, [unit?.id, payMethodInitialData]);
+        if (lists.accountsList.length === 0) {
+            getAllAccounts(`?unitId=${unit?.id}&is_active=1`)
+                .then((accountsResponse: any) => {
+                    console.log("accountsResponse", accountsResponse);
+                    if (accountsResponse?.success) {
+                        setAccountsListState(accountsResponse.result);
+
+                    } else {
+                        console.log("No se pudieron obtener las cuentas");
+                    }
+                })
+                .catch((err: any) => console.log(err));
+        }
+    }, [unit?.id, payMethodInitialData, setAccountsListState, lists.accountsList]);
 
     useEffect(() => {
         if (payMethodInitialData) {
             init('payMethodForm', payMethodInitialData);
             console.log("inicializacion de paymethodData", payMethodInitialData);
             setIsNew(false);
+            setIsActive(payMethodInitialData?.is_active);
         }
 
     }, [init, payMethodInitialData]);
 
     const handleSave = useMemo(() => (e: any) => {
         e.preventDefault();
-        const dataToSave:IPayMethod = {
+        const dataToSave: IPayMethod = {
             id: payMethodForm?.values?.id,
             name: payMethodForm?.values?.name,
             method: payMethodForm?.values?.method,
@@ -98,30 +104,20 @@ const CategoryCreateEditView = ({ payMethodForm, init, unit }: any) => {
         >
             {/* <FormLayout > */}
             <SectionCard
-                title= {isNew ? "Nuevo Metodo de Pago" : "Editar Metodo de Pago"}
+                title={isNew ? "Nuevo Metodo de Pago" : "Editar Metodo de Pago"}
                 subtitle=""
                 iconName="DocumentOk"
                 iconSize={50}
-                // iconColor={color}
+            // iconColor={color}
             >
-                {/* <ProfileEditForm handleEdit={handleSave} userData={{}} /> */}
-                {/* <UnitEditForm units={units} /> */}
-                {/* <CategoryCreateEditForm
-                    handleEdit={handleSave}
-                    categoryData={payMethodForm?.values}
-                    color={color}
-                    setColor={setColor}
-                    icon={icon}
-                    setIcon={setIcon}
-                    presetColors={presetColors}
-                    areasList={areas}
-                /> */}
                 <PayMethodCreateEditForm
                     handleEdit={handleSave}
-                    accountsList={accounts}
+                    accountsList={lists.accountsList}
                     payMethodData={payMethodForm?.values}
                     type={type}
                     setType={setType}
+                    isActive={isActive}
+                    setIsActive={setIsActive}
                 />
             </SectionCard>
         </Box>
@@ -135,12 +131,14 @@ const PaymethodCreateEditFormReduxed = reduxForm({
 
 const mapDispatchToProps = (dispatch: any) => ({
     init: bindActionCreators(initialize, dispatch),
+    setAccountsListState: bindActionCreators(setAccountsList, dispatch),
 });
 
 const PaymethodCreateEditViewForm = connect(
     (state: any) => ({
         payMethodForm: state.form.payMethodForm,
         unit: state.units.unitActive,
+        lists: state.lists
     }),
     mapDispatchToProps
 )(PaymethodCreateEditFormReduxed);

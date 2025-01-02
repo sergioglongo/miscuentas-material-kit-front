@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IAccount, IPayMethod } from 'src/config/types/types';
-import { CheckboxRedux, SelectRedux, TextFieldErrorRedux } from 'src/components/forms/fields/ReduxFields'
+import { SelectRedux, TextFieldErrorRedux } from 'src/components/forms/fields/ReduxFields'
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, FormControl, Grid, ListItemIcon, MenuItem, Switch, Typography } from '@mui/material'
-import PayMethodIcon from 'src/components/icon/paymethod-icons';
+import { Box, Button, Checkbox, FormControl, Grid, ListItemIcon, MenuItem, Switch, Typography } from '@mui/material'
 import { useRouter } from 'src/routes/hooks';
 import { Field, Form } from 'redux-form'
+import PayMethodIcon from 'src/components/icon/PayMethodIcons';
+import AccountIcon from 'src/components/icon/AccountIcon';
+import { grey } from 'src/theme/core';
 
 const methodsList = [
     { id: 'debit', name: 'Debito' },
@@ -20,9 +22,11 @@ interface PayMethodEditProps {
     accountsList: IAccount[];
     type: any;
     setType: any;
+    isActive: boolean
+    setIsActive: any
 }
 
-function PayMethodCreateEditForm({ handleEdit, payMethodData, accountsList, type, setType }: PayMethodEditProps) {
+function PayMethodCreateEditForm({ handleEdit, payMethodData, accountsList, type, setType, isActive, setIsActive }: PayMethodEditProps) {
 
     const [openmodal, setOpenmodal] = useState(false);
     const router = useRouter();
@@ -42,17 +46,9 @@ function PayMethodCreateEditForm({ handleEdit, payMethodData, accountsList, type
         },
     };
 
-
     useEffect(() => {
         setType(payMethodData?.type || 'out');
     }, [payMethodData?.type, setType])
-
-
-    useEffect(() => {
-        if (payMethodData) {
-            console.log(payMethodData);
-        }
-    }, [payMethodData])
 
     return (
         <Form onSubmit={handleEdit} style={{ margin: '10px' }}>
@@ -83,19 +79,13 @@ function PayMethodCreateEditForm({ handleEdit, payMethodData, accountsList, type
                 </Grid>
                 <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                     <Typography variant="h6">Activado:</Typography>
-                    <FormControl fullWidth>
-                        <Field
-                            name="is_active"
-                            component={CheckboxRedux}
-                            label="Activado"
+                        <Checkbox
                             size="large"
-                            style={{ width: '50px' }}
-                            onChange={(e: any) => console.log(e.target.value)}
-                            value={payMethodData?.is_active || true}
+                            onChange={(e: any) => setIsActive(e.target.checked)}
+                            checked={isActive}
                         />
-                    </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                     <Typography variant="h6" >Cuenta:</Typography>
                     <FormControl >
                         <Field
@@ -117,7 +107,7 @@ function PayMethodCreateEditForm({ handleEdit, payMethodData, accountsList, type
                                 // style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
                                 >
                                     <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                                        <PayMethodIcon iconName={item?.type} styles={{ fontSize: '30', display: 'flex', color: 'black' }} />
+                                        <AccountIcon iconName={item?.type} styles={{ fontSize: '30', display: 'flex', color: grey[700]  }} />
                                         {item?.name}
                                     </ListItemIcon>
                                 </MenuItem>
@@ -145,7 +135,7 @@ function PayMethodCreateEditForm({ handleEdit, payMethodData, accountsList, type
                                 // style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
                                 >
                                     <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                                        <PayMethodIcon iconName={item?.id} styles={{ fontSize: '30', display: 'flex', color: 'black' }} />
+                                        <PayMethodIcon iconName={item?.id} styles={{ fontSize: '30', display: 'flex', color: grey[700] }} />
                                         {item?.name}
                                     </ListItemIcon>
                                 </MenuItem>

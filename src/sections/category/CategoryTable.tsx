@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 import { Checkbox,IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
-import CategoryIcon from 'src/components/icon/category-icons';
-import InternalIcon from 'src/components/icon/internal-icons';
 import { getAllCategoriesByUnitId } from 'src/services/api/modules/category.module';
+import CategoryIcon from 'src/components/icon/CategoryIcon';
+import CommonIcon from 'src/components/icon/CommonIcons';
+import { bindActionCreators } from '@reduxjs/toolkit';
+import { setAreasList, setCategoriesList } from 'src/redux/slices/lists.slice';
 
-const CategoryTable = ({ unitActive }: any) => {
+const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
     const [categories, setCategories] = useState([]);
     const rowsPerPage = 10;
     const router = useRouter();
@@ -126,23 +128,23 @@ const CategoryTable = ({ unitActive }: any) => {
                     <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                         <Tooltip title="Ver detalle">
                             <IconButton aria-label="Ver" onClick={() => { }}>
-                                <InternalIcon color='gray' iconName="View" />
+                                <CommonIcon color='gray' iconName="View" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Editar">
                             <IconButton aria-label="Ver" onClick={() => onEdit(tableMeta?.rowData)}>
-                                <InternalIcon color='gray' iconName="Edit" />
+                                <CommonIcon color='gray' iconName="Edit" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Eliminar">
                             <IconButton aria-label="Ver" onClick={() => { }}>
-                                <InternalIcon color='gray' iconName="Delete" />
+                                <CommonIcon color='gray' iconName="Delete" />
                             </IconButton>
                         </Tooltip>
                     </th>
                 ),
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ width: '80px', padding: 0, height: '40px' }}>
+                    <th key={1} style={{ width: '80px', padding: 0, height: '40px' }}>
                         {columnMeta.label}
                     </th>
                 )
@@ -154,7 +156,7 @@ const CategoryTable = ({ unitActive }: any) => {
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign:'left' }}>
+                    <th key={2} style={{ minWidth: '100px', textAlign:'left' }}>
                         {columnMeta.label}
                     </th>
                 )
@@ -166,7 +168,7 @@ const CategoryTable = ({ unitActive }: any) => {
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign:'left' }}>
+                    <th key={3} style={{ minWidth: '100px', textAlign:'left' }}>
                         {columnMeta.label}
                     </th>
                 ),
@@ -182,15 +184,15 @@ const CategoryTable = ({ unitActive }: any) => {
                 filter: true,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
+                    <th key={4} style={{}}>
                         {columnMeta.label}
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         {value === 'out' ?
-                            <InternalIcon iconName='ArrowUpRight' styles={{ fontSize: '30', color: 'orange' }} />
-                            :
-                            <InternalIcon iconName='Download' styles={{ fontSize: '30', color: 'green' }} />
+                          <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
+                          :
+                          <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
                         }
                     </th>
                 ),
@@ -210,12 +212,12 @@ const CategoryTable = ({ unitActive }: any) => {
                 filter: false,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{  }}>
+                    <th key={5} style={{  }}>
                         {columnMeta.label}
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <CategoryIcon iconName={tableMeta?.rowData[6]} styles={{ fontSize: '40', display: 'flex', color: value }} />
+                        <CategoryIcon iconName={tableMeta?.rowData[6]} styles={{ fontSize: '30', display: 'flex', color: value }} />
                     </th>
                     // <div
                     //     key={value}
@@ -242,7 +244,7 @@ const CategoryTable = ({ unitActive }: any) => {
                 filter: true,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
+                    <th key={7} style={{}}>
                         {columnMeta.label}
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
@@ -277,7 +279,7 @@ const CategoryTable = ({ unitActive }: any) => {
                 filter: false,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ textAlign:'center' }}>
+                    <th key={9} style={{ textAlign:'center' }}>
                         {columnMeta.label}
                     </th>
                 ),
@@ -362,26 +364,29 @@ const CategoryTable = ({ unitActive }: any) => {
         //   filterChoferes(searchText);
         // },
     };
+ 
+    const loadingRef = useRef(false);
 
     useEffect(() => {
-        getAllCategoriesByUnitId(unitActive?.id)
-            .then((areasResponse: any) => {
-                console.log("areasResponse", areasResponse);
-                if (areasResponse?.success) {
-                    const categoriesWithArea = areasResponse.result.map((category: any) => ({ ...category, area: category.area.name, type: category.area.type, areaColor: category.area.color}));
-                    setCategories(categoriesWithArea);
+        if (lists.categoriesList.length === 0 && !loadingRef.current) {
+            getAllCategoriesByUnitId(unitActive?.id, '')
+            .then((categoriesResponse: any) => {
+                if (categoriesResponse?.success) {
+                    const categoriesWithArea = categoriesResponse.result.map((category: any) => ({ ...category, area: category.area.name, type: category.area.type, areaColor: category.area.color}));
+                    setCategoriesListState(categoriesWithArea);
                 } else {
                     console.log("No se pudieron obtener las categories");
                 }
             })
             .catch((err: any) => console.log(err));
-    }, [unitActive]);
+        }
+    }, [unitActive, lists.categoriesList, setCategoriesListState]);
 
     return (
         <ThemeProvider theme={getMuiTheme()}>
             <MUIDataTable
                 title='Categorias'
-                data={categories}
+                data={lists.categoriesList}
                 columns={columns}
                 options={options}
             />
@@ -389,11 +394,14 @@ const CategoryTable = ({ unitActive }: any) => {
     )
 }
 
-const mapDispatchToProps = {}
+const mapDispatchToProps = (dispatch: any) => ({
+    setCategoriesListState: bindActionCreators(setCategoriesList, dispatch),
+})
 
 export default connect(
     (state: any) => ({
         unitActive: state.units.unitActive,
+        lists: state.lists
     }),
     mapDispatchToProps
 )(CategoryTable);

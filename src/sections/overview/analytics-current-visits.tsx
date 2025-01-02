@@ -9,6 +9,7 @@ import CardHeader from '@mui/material/CardHeader';
 import { fNumber } from 'src/utils/format-number';
 
 import { Chart, useChart, ChartLegends } from 'src/components/chart';
+import { CardContent, Typography } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -56,23 +57,33 @@ export function AnalyticsCurrentVisits({ title, subheader, chart, ...other }: Pr
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
+      {chartSeries.length === 0 &&
+        <CardContent sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            Sin datos en el periodo seleccionado
+          </Typography>
+        </CardContent>
+      }
+      {chartSeries.length > 0 &&
+        <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <Chart
+            type="pie"
+            series={chartSeries}
+            options={chartOptions}
+            width={{ xs: 240, xl: 260 }}
+            height={{ xs: 240, xl: 260 }}
+            sx={{ my: 6, mx: 'auto' }}
+          />
 
-      <Chart
-        type="pie"
-        series={chartSeries}
-        options={chartOptions}
-        width={{ xs: 240, xl: 260 }}
-        height={{ xs: 240, xl: 260 }}
-        sx={{ my: 6, mx: 'auto' }}
-      />
+          <Divider sx={{ borderStyle: 'dashed' }} />
 
-      <Divider sx={{ borderStyle: 'dashed' }} />
-
-      <ChartLegends
-        labels={chartOptions?.labels}
-        colors={chartOptions?.colors}
-        sx={{ p: 3, justifyContent: 'center' }}
-      />
+          <ChartLegends
+            labels={chartOptions?.labels}
+            colors={chartOptions?.colors}
+            sx={{ p: 3, justifyContent: 'center' }}
+          />
+        </CardContent>
+      }
     </Card>
   );
 }
