@@ -1,21 +1,10 @@
-import type { CardProps } from '@mui/material/Card';
-import type { ChartOptions } from 'src/components/chart';
-
-import Card from '@mui/material/Card';
-import Divider from '@mui/material/Divider';
+import React from 'react'
+import { Box, CardContent, CardHeader, CardProps, Divider, Typography } from '@mui/material';
+import { Chart, ChartLegends, ChartOptions, useChart } from 'src/components/chart';
 import { useTheme } from '@mui/material/styles';
-import CardHeader from '@mui/material/CardHeader';
-
 import { fNumber } from 'src/utils/format-number';
 
-import { Chart, useChart, ChartLegends } from 'src/components/chart';
-import { CardContent, Typography } from '@mui/material';
-
-// ----------------------------------------------------------------------
-
 type Props = CardProps & {
-    title?: string;
-    subheader?: string;
     chart: {
         colors?: string[];
         series: {
@@ -25,8 +14,7 @@ type Props = CardProps & {
         options?: ChartOptions;
     };
 };
-
-export function AreasPorcentualCircleGraph({ title, subheader, chart, ...other }: Props) {
+const AreasCircleGraph = ({ chart }: Props) => {
     const theme = useTheme();
 
     const chartSeries = chart.series.map((item) => item.value);
@@ -42,39 +30,38 @@ export function AreasPorcentualCircleGraph({ title, subheader, chart, ...other }
         chart: { sparkline: { enabled: true } },
         colors: chartColors,
         labels: chart.series.map((item) => item.label),
+        // series: chart.series.map((item) => ({ name: item.label, data: [item.value], icon: { name: item.icon } })), 
         stroke: { width: 0 },
         dataLabels: {
             enabled: true,
-            // dropShadow: {
-            //     enabled: true,
-            //     left: 2,
-            //     top: 2,
-            //     opacity: 0.5
-            // },
             textAnchor: 'end',
-            // formatter:  (val:any, opt) => `${opt?.w?.config?.labels?.[opt?.seriesIndex]}: ${fNumber(val)}%`,
+            // formatter: (value: number, opts: any) => {
+            //     console.log("opts", opts);
+                
+            //     return `${fNumber(value)}%`
+            // }
         },
         tooltip: {
-            y: {
-                formatter: (value: number) => fNumber(value),
-                title: { formatter: (seriesName: string) => `${seriesName}` },
-            },
+            enabled: true,
+            // y: {
+            //     formatter: (value: number) => fNumber(value),
+            //     title: { formatter: (seriesName: string) => `${seriesName}` },
+            // },
         },
         plotOptions: { pie: { donut: { labels: { show: false } } } },
         ...chart.options,
     });
 
     return (
-        <Card {...other}>
-            <CardHeader title={title} subheader={subheader} />
+        <Box >
             {chartSeries.length === 0 ?
-                <CardContent sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                         Sin datos en el periodo seleccionado
                     </Typography>
-                </CardContent>
+                </Box>
                 :
-                <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 0 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 0 }}>
                     <Chart
                         type="pie"
                         series={chartSeries}
@@ -91,8 +78,10 @@ export function AreasPorcentualCircleGraph({ title, subheader, chart, ...other }
                         colors={chartOptions?.colors}
                         sx={{ p: 3, justifyContent: 'center' }}
                     />
-                </CardContent>
+                </Box>
             }
-        </Card>
+        </Box>
     );
 }
+
+export default AreasCircleGraph
