@@ -53,7 +53,6 @@ const AreaCreateEditView = ({ areaForm, init, unit, setAreasListState }: any) =>
             .then((res) => {
                 if (res?.success) {
                     setAreasListState([]);
-
                     router.back();
                 } else {
                     setErrorMessage(res?.message);

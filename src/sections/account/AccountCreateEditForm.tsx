@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { IAccount } from 'src/config/types/types';
 import { CheckboxRedux, SelectRedux, TextFieldErrorRedux } from 'src/components/forms/fields/ReduxFields'
 import { LoadingButton } from '@mui/lab'
-import { Button, FormControl, Grid, ListItemIcon, MenuItem, Typography } from '@mui/material'
+import { Box, Button, Checkbox, FormControl, Grid, ListItemIcon, MenuItem, Typography } from '@mui/material'
 import { useRouter } from 'src/routes/hooks';
 import { Field, Form } from 'redux-form'
 import AccountIcon from 'src/components/icon/AccountIcon';
@@ -24,13 +24,14 @@ const typesLista = [
 interface CategoryEditProps {
     handleEdit: any;
     accountData: IAccount;
-    isNew: boolean
+    isNew: boolean;
+    is_active: boolean;
+    setIsActive: any
 }
 
-function AccountCreateEditForm({ handleEdit, accountData, isNew }: CategoryEditProps) {
+function AccountCreateEditForm({ handleEdit, accountData, isNew, is_active, setIsActive }: CategoryEditProps) {
 
     const [openmodal, setOpenmodal] = useState(false);
-    const [is_active, setIsActive] = useState(accountData?.is_active || true);
     const [currencySelected, setCurrencySelected] = useState('Pesos');
     const [typeSelected, setTypeSelected] = useState('cash');
 
@@ -56,7 +57,7 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew }: CategoryEditP
             console.log("inicializacion de accountData", accountData);
         }
     }, [accountData, isNew])
-    
+
     return (
         <Form onSubmit={handleEdit} style={{ margin: '10px' }}>
             <Grid container rowSpacing={1} rowGap={2} columnSpacing={2} display='flex' flexDirection='column' alignItems='center'>
@@ -90,17 +91,11 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew }: CategoryEditP
                 </Grid>
                 <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                     <Typography variant="h6">Activado:</Typography>
-                    <FormControl fullWidth>
-                        <Field
-                            name="is_active"
-                            component={CheckboxRedux}
-                            label="Activado"
-                            size="large"
-                            style={{ width: '50px' }}
-                            onChange={(e: any) => console.log(e.target.value)}
-                            value={accountData?.is_active || true}
-                        />
-                    </FormControl>
+                    <Checkbox
+                        size="large"
+                        onChange={(e: any) => setIsActive(e.target.checked)}
+                        checked={is_active}
+                    />
                 </Grid>
                 <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                     <Typography variant="h6" style={{ marginLeft: '16px' }}>Moneda:</Typography>
@@ -121,15 +116,15 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew }: CategoryEditP
                         >
                             {currencyLista.map((item, index) => (
                                 <MenuItem
-                                value={item} key={index}
-                                defaultValue={accountData?.currency === item ? accountData?.currency : ''}
-                            // style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
-                            >
-                                <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                                    <AccountIcon iconName={item} styles={{ fontSize: '20', display: 'flex', color: grey[700] }} />
-                                    {item}
-                                </ListItemIcon>
-                            </MenuItem>
+                                    value={item} key={index}
+                                    defaultValue={accountData?.currency === item ? accountData?.currency : ''}
+                                // style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                                >
+                                    <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                                        <AccountIcon iconName={item} styles={{ fontSize: '20', display: 'flex', color: grey[700] }} />
+                                        {item}
+                                    </ListItemIcon>
+                                </MenuItem>
                             ))}
                         </Field>
                     </FormControl>
@@ -146,8 +141,8 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew }: CategoryEditP
                             // InputLabelProps={{ shrink: true }}
                             variant="outlined"
                             size='small'
-                        // onChange={(e: any) => console.log(e.target.id)}
-                        defaultValue='Efectivo'
+                            // onChange={(e: any) => console.log(e.target.id)}
+                            defaultValue='Efectivo'
                         // value={typeSelected}
                         >
                             {typesLista.map((item, index) => (

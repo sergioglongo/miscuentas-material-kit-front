@@ -8,8 +8,7 @@ import { bindActionCreators } from '@reduxjs/toolkit';
 import { useTheme, Breakpoint } from '@mui/material/styles';
 import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
 import { IAccount } from 'src/config/types/types';
-import { getAllAreas } from 'src/services/api/modules/area.module';
-import { createEditCategory } from 'src/services/api/modules/category.module';
+import { setAccountsList } from 'src/redux/slices/lists.slice';
 import { createEditAccount } from 'src/services/api/modules/account.module';
 import AccountCreateEditForm from './AccountCreateEditForm';
 
@@ -18,7 +17,7 @@ const accountInitialDataEmpty = {
     type: 'cash',
 }
 
-const AccountCreateEditView = ({ accountForm, init, unit }: any) => {
+const AccountCreateEditView = ({ accountForm, init, unit, setAccountsListState }: any) => {
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
     const [errorShow, setErrorShow] = useState<boolean>(false);
@@ -26,15 +25,15 @@ const AccountCreateEditView = ({ accountForm, init, unit }: any) => {
     const location = useLocation();
     const accountInitialData = location.state;
     const [isNew, setIsNew] = useState(true);
+    const [is_active, setIsActive] = useState(accountForm?.is_active || true);
 
- 
     useEffect(() => {
         if (accountInitialData) {
             init('accountForm', accountInitialData);
             console.log("inicializacion de accountData", accountInitialData);
             setIsNew(false);
+            setIsActive(accountInitialData?.is_active);
         }
-
     }, [init, accountInitialData]);
 
     const handleSave = useMemo(() => (e: any) => {
@@ -46,13 +45,14 @@ const AccountCreateEditView = ({ accountForm, init, unit }: any) => {
             currency: accountForm?.values?.currency,
             type: accountForm?.values?.type,
             deleted: accountForm?.values?.deleted,
-            is_active: accountForm?.values?.is_active,
+            is_active,
             unitId: accountForm?.values?.unitId || unit?.id
         }
         console.log("formulario a guardar:", dataToSave);
         createEditAccount(dataToSave)
             .then((res) => {
                 if (res?.success) {
+                    setAccountsListState([]);
                     router.back();
                 } else {
                     setErrorMessage(res?.message);
@@ -67,7 +67,7 @@ const AccountCreateEditView = ({ accountForm, init, unit }: any) => {
                 console.log("error catch", err)
             });
 
-    }, [router, accountForm?.values, unit?.id]);
+    }, [router, accountForm?.values, unit?.id, is_active, setAccountsListState]);
 
     const theme = useTheme();
     const layoutQuery: Breakpoint = 'md';
@@ -113,6 +113,8 @@ const AccountCreateEditView = ({ accountForm, init, unit }: any) => {
                     handleEdit={handleSave}
                     accountData={accountForm?.values || accountInitialDataEmpty}
                     isNew={isNew}
+                    is_active={is_active}
+                    setIsActive={setIsActive}
                 />
             </SectionCard>
         </Box>
@@ -126,6 +128,7 @@ const AccountCreateEditFormReduxed = reduxForm({
 
 const mapDispatchToProps = (dispatch: any) => ({
     init: bindActionCreators(initialize, dispatch),
+    setAccountsListState: bindActionCreators(setAccountsList, dispatch),
 });
 
 const AccountCreateEditViewForm = connect(

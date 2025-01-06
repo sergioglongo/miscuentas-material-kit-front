@@ -23,3 +23,15 @@ export async function reportAccountsResumeByUnitId(data: any) {
         })
         .catch((err: any) => console.log(err));
 }
+
+export async function reportAreasMonthToMonthByUnitId(data: any) {
+    return axiosClient
+        .post(`reports/reportAreasMonthToMonthByUnitId/`, data)
+        .then((response: any) => {
+            if (typeof response.data !== 'undefined' && response.data.success === true) {
+                return response.data;
+            }
+            return response;
+        })
+        .catch((err: any) => console.log(err));
+}

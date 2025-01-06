@@ -37,7 +37,6 @@ export function AreasCards({ title,
             <Box
                 display='flex'
                 flexDirection={isXsDown ? 'column' : 'row'}
-                
                 gap={3}
                 paddingX={2}
                 paddingY={2}

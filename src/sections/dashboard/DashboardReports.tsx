@@ -3,12 +3,13 @@ import { connect } from 'react-redux'
 import { Grid } from '@mui/material';
 import { _tasks, _posts, _timeline } from 'src/_mock';
 import AreaIcon from 'src/components/icon/AreaIcons';
-import { reportAccountsResumeByUnitId, reportAreasResumeByUnitId } from 'src/services/api/modules/reports.module';
+import { reportAccountsResumeByUnitId, reportAreasResumeByUnitId, reportAreasMonthToMonthByUnitId } from 'src/services/api/modules/reports.module';
 import { AreasTotalCards } from './cards/AreasTotalCards';
 import { AccountsTotalCards } from './cards/AccountsTotalCards';
 import { AreasPorcentualCircleGraph } from './cards/AreasPorcentualCircleGraph';
 import AreasCircleGraph from './cards/elements/AreasCircleGraph';
 import { AreasCards } from './cards/AreasCards';
+import AreasLinesGraph from './cards/elements/AreasLinesGraph';
 
 const transactionoptions = [
     { value: 'all', label: 'Todos' },
@@ -19,6 +20,7 @@ const transactionoptions = [
 const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
     const [areasResumeCircular, setAreasResumeCircular] = useState([]);
     const [areasResumeCards, setAreasResumeCards] = useState([]);
+    const [areasMonthToMonthCards, setAreasMonthToMonthCards] = useState<any>({});
     const [accountsResumeCards, setAccountsResumeCards] = useState([]);
     const [transactionOptionSelected, setTransactionOptionSelected] = useState('all');
     const processAreasResumeCircular = (areasResumeToProcess: any) => {
@@ -65,6 +67,27 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
         )
         return areasResumeFormated;
     }
+    const processAreasMonthToMonthCards = (areasMonthToMonthToProcess: any) => {
+        const categories: any = [];
+        const data: any = [];
+        areasMonthToMonthToProcess?.map((areaResume: any) => {
+            categories.push(`${areaResume.mes}`);
+            data.push(Math.round(parseFloat(areaResume.total)));
+            return areaResume
+        })
+        
+        const series = [
+            {
+                name: 'Totales',
+                data
+            }
+        ]
+        const areasProcessed = {
+            categories,
+            series
+        }
+        return areasProcessed;
+    }
     // item: { iconName: string; color: string; label: string; total: number };
     // { value: 'facebook', label: 'Facebook', total: 323234 }
     const loadingRef = useRef(false);
@@ -108,7 +131,27 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
                     })
                     .catch((err: any) => console.log(err))
                     .finally(() => {
-                        loadingRef.current = false;
+                        const dataReportMonth: any = {
+                            unitId: unitActive?.id,
+                            type: 'out',
+                            cantMeses: 6
+                        }
+                        reportAreasMonthToMonthByUnitId(dataReportMonth)
+                            .then((areasMonthToMonthResponse: any) => {
+                                if (areasMonthToMonthResponse?.success) {
+                                    if (areasMonthToMonthResponse.result.length > 0) {
+                                        const areasLineMonthtoMonthFormated: any = processAreasMonthToMonthCards(areasMonthToMonthResponse.result);
+                                        setAreasMonthToMonthCards(areasLineMonthtoMonthFormated);
+                                        console.log("AreasMonthToMonthFormated", areasLineMonthtoMonthFormated);
+                                    }
+                                } else {
+                                    console.log("No se pudieron obtener las areas");
+                                }
+                            })
+                            .catch((err: any) => console.log(err))
+                            .finally(() => {
+                                loadingRef.current = false;
+                            })
                     })
             })
     }, [unitActive, periodo, hoy, transactionOptionSelected]);
@@ -124,18 +167,15 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
     useEffect(() => {
         getReports();
         console.log("transactionOptionSelected", transactionOptionSelected);
-        
+
     }, [transactionOptionSelected, getReports]);
+    useEffect(() => {
+        console.log("cambio areasMonthToMonthCards", areasMonthToMonthCards);
+
+    }, [areasMonthToMonthCards])
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} md={12} lg={12}>
-                {/* <AreasPorcentualCircleGraph
-                    title="Gastos de areas"
-                    chart={{
-                        series: areasResumeCircular,
-                    }}
-                    sx={{ height: '500px' }}
-                /> */}
                 <AreasCards
                     title='Areas'
                     list={areasResumeCards}
@@ -160,6 +200,17 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
                     onSelectOption={setTransactionOptionSelected}
                 />
             </Grid> */}
+            <Grid item xs={12} md={8} lg={8}>
+                {areasMonthToMonthCards?.categories?.length > 0 &&
+                    <AreasLinesGraph
+                        series={areasMonthToMonthCards.series}
+                        categories={areasMonthToMonthCards.categories}
+                        heightContent="428px"
+                        title='Transacciones mensuales'
+                        subheader='Últimos 6 meses'
+                    />
+                }
+            </Grid>
             <Grid item xs={12} md={4} lg={4}>
                 <AccountsTotalCards
                     title="Estado de cuentas"

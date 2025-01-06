@@ -38,7 +38,7 @@ export function AccountsTotalCards({ title, subheader, list, heightContent, sx, 
       }}>
         <Grid container spacing={2} sx={{ overflowY: 'auto' }}>
           {list.map((item) => (
-            <Grid item key={item.label} xs={6} md={4} lg={6}>
+            <Grid item key={item.label} xs={6} sm={3} md={6} lg={6}>
               <IconValueLabelCard item={item} children={
                 <AccountIcon iconName={item.iconName} styles={{ fontSize: '40', display: 'flex', color: item.color }} />
               } />
