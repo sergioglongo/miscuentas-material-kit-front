@@ -158,7 +158,10 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
 
     useEffect(() => {
 
-        if ((areasResumeCircular.length === 0 || areasResumeCards.length === 0) && !loadingRef.current) {
+        if ((areasResumeCircular.length === 0 
+            || areasResumeCards.length === 0 
+            || accountsResumeCards.length === 0) 
+            && !loadingRef.current) {
             loadingRef.current = true;
             getReports();
         }
@@ -170,7 +173,7 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
 
     }, [transactionOptionSelected, getReports]);
     useEffect(() => {
-        console.log("cambio areasMonthToMonthCards", areasMonthToMonthCards);
+        // console.log("cambio areasMonthToMonthCards", areasMonthToMonthCards);
 
     }, [areasMonthToMonthCards])
     return (
@@ -189,17 +192,6 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
                     onSelectOption={setTransactionOptionSelected}
                 />
             </Grid>
-            {/* <Grid item xs={12} md={6} lg={4}>
-                <AreasTotalCards
-                    title="Transacciones de areas"
-                    list={areasResumeCards}
-                    sx={{ width: '100%' }}
-                    heightContent="450px"
-                    options={transactionoptions}
-                    transactionOptionSelected={transactionOptionSelected}
-                    onSelectOption={setTransactionOptionSelected}
-                />
-            </Grid> */}
             <Grid item xs={12} md={8} lg={8}>
                 {areasMonthToMonthCards?.categories?.length > 0 &&
                     <AreasLinesGraph

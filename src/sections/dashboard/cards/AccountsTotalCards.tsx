@@ -1,15 +1,7 @@
 import type { CardProps } from '@mui/material/Card';
-
-import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
-
-import { fShortenNumber } from 'src/utils/format-number';
-
-import { varAlpha } from 'src/theme/styles';
-
-import { Iconify } from 'src/components/iconify';
 import { IconValueLabelCard } from 'src/components/cards/IconValueLabelCard/IconValueLabelCard';
 import AccountIcon from 'src/components/icon/AccountIcon';
 import { CardContent, Grid } from '@mui/material';
@@ -23,7 +15,6 @@ type Props = CardProps & {
   list: { iconName: string; color: string; label: string; total: number }[];
 };
 
-
 export function AccountsTotalCards({ title, subheader, list, heightContent, sx, ...other }: Props) {
   return (
     <Card sx={sx} {...other}>
@@ -34,8 +25,15 @@ export function AccountsTotalCards({ title, subheader, list, heightContent, sx, 
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        height: heightContent
+        height: list.length === 0 ? 'auto' : heightContent
       }}>
+        {list.length === 0 ?
+                <CardContent sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        Sin datos en cuentas para mostrar
+                    </Typography>
+                </CardContent>
+                :
         <Grid container spacing={2} sx={{ overflowY: 'auto' }}>
           {list.map((item) => (
             <Grid item key={item.label} xs={6} sm={3} md={6} lg={6}>
@@ -45,6 +43,7 @@ export function AccountsTotalCards({ title, subheader, list, heightContent, sx, 
             </Grid>
           ))}
         </Grid>
+        }
       </CardContent>
     </Card>
   );

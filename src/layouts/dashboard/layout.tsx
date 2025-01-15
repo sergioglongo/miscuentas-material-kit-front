@@ -12,7 +12,7 @@ import { Iconify } from 'src/components/iconify';
 
 import { IUnit, IUser } from 'src/config/types/types';
 import { bindActionCreators } from '@reduxjs/toolkit';
-import { setUnitActive, setUnits } from 'src/redux/slices/units.slice';
+import { setUnitActive } from 'src/redux/slices/units.slice';
 import { setUser } from 'src/redux/slices/user.slice';
 import { connect } from 'react-redux';
 import { Main } from './main';
@@ -27,6 +27,7 @@ import { HeaderSection } from '../core/header-section';
 import { AccountPopover } from '../components/account-popover';
 import { LanguagePopover } from '../components/language-popover';
 import { NotificationsPopover } from '../components/notifications-popover';
+import { setUnitsList } from 'src/redux/slices/lists.slice';
 
 // ----------------------------------------------------------------------
 
@@ -168,7 +169,7 @@ function DashboardLayoutReduxed({ sx, children, header, units, setUnitActiveData
   );
 }
 const mapDispatchToProps = (dispatch: any) => ({
-  setUnitsData: bindActionCreators(setUnits, dispatch),
+  setUnitsData: bindActionCreators(setUnitsList, dispatch),
   setUnitActiveData: bindActionCreators(setUnitActive, dispatch),
   setUserData: bindActionCreators(setUser, dispatch),
 });

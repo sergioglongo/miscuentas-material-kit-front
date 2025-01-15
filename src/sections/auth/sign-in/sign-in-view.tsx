@@ -14,8 +14,9 @@ import { signIn } from 'src/services/api/modules/user.module';
 import { setUser } from 'src/redux/slices/user.slice';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import SignInForm from './sign-in-form';
+import { setUnitsList } from 'src/redux/slices/lists.slice';
 
-const SignInView = ({ signInForm, setUserData, setUnitsData, setUnitActiveData }: any) => {
+const SignInView = ({ signInForm, setUserData, setUnitsData, setUnitActiveData, setUnitsListData }: any) => {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState('');
   const [errorShow, setErrorShow] = useState<boolean>(false);
@@ -32,6 +33,7 @@ const SignInView = ({ signInForm, setUserData, setUnitsData, setUnitActiveData }
           const { units, ...userWithoutUnits } = user;
           setUserData({ userData: userWithoutUnits, isAuthorized: true, accessToken: res?.user?.accessToken });
           setUnitsData(units);
+          setUnitsListData(units);
           // setUnitActiveData(unitMain);
           router.push('/');
         } else {
@@ -96,6 +98,7 @@ const SingInFormReduxed = reduxForm({
 const mapDispatchToProps = (dispatch: any) => ({
   setUserData: bindActionCreators(setUser, dispatch),
   setUnitsData: bindActionCreators(setUnits, dispatch),
+  setUnitsListData: bindActionCreators(setUnitsList, dispatch),
   setUnitActiveData: bindActionCreators(setUnitActive, dispatch),
 });
 

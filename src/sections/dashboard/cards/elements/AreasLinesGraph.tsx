@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Box, Card, CardContent, CardHeader, CardProps, Divider, Typography } from '@mui/material';
 import { Chart, ChartLegends, ChartOptions, useChart } from 'src/components/chart';
 import { useTheme } from '@mui/material/styles';
@@ -7,7 +7,7 @@ import { fNumber } from 'src/utils/format-number';
 type Props = CardProps & {
     colors?: string[];
     categories: string[];
-    series: number[];
+    series: any[];
     title: string;
     subheader?: string;
     options?: ChartOptions;
@@ -15,7 +15,7 @@ type Props = CardProps & {
 };
 
 const AreasLinesGraph = ({ categories, series, options, colors, title, subheader, heightContent }: Props) => {
-
+    const [isEmpty, setIsEmpty] = React.useState(true);
     const chartOptions = useChart({
         // chart: { sparkline: { enabled: true } },
         // colors: chartColors,
@@ -26,56 +26,12 @@ const AreasLinesGraph = ({ categories, series, options, colors, title, subheader
             enabled: true,
             textAnchor: 'end',
         },
-        // yaxis: [
-        //     {
-        //       axisTicks: {
-        //         show: true
-        //       },
-        //       axisBorder: {
-        //         show: true,
-        //         color: "#FF1654"
-        //       },
-        //       labels: {
-        //         style: {
-        //           colors: "#FF1654"
-        //         }
-        //       },
-        //       title: {
-        //         text: "Series A",
-        //         style: {
-        //           color: "#FF1654"
-        //         }
-        //       }
-        //     },
-        //     {
-        //       opposite: true,
-        //       axisTicks: {
-        //         show: true
-        //       },
-        //       axisBorder: {
-        //         show: true,
-        //         color: "#247BA0"
-        //       },
-        //       labels: {
-        //         style: {
-        //           colors: "#247BA0"
-        //         }
-        //       },
-        //       title: {
-        //         text: "Series B",
-        //         style: {
-        //           color: "#247BA0"
-        //         }
-        //       }
-        //     }
-        //   ],
-        // tooltip: {
-        //     enabled: true,
-        // },
-        // plotOptions: { pie: { donut: { labels: { show: false } } } },
-        // ...chart.options,
+    
     });
-
+    useEffect(() => {
+        const empty = series[0].data.every((item:any) => item === 0);
+        setIsEmpty(empty);
+    },[series]);
     return (
         <Card>
             <CardHeader title={title} subheader={subheader} />
@@ -85,14 +41,14 @@ const AreasLinesGraph = ({ categories, series, options, colors, title, subheader
                 flexDirection: 'column',
                 justifyContent: 'flex-start',
                 alignItems: 'center',
-                height: heightContent
+                height: isEmpty ? 'auto' : heightContent
             }}>
 
                 <Box >
-                    {categories?.length === 0 ?
+                    {isEmpty ?
                         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                Sin datos en el periodo seleccionado
+                                Sin datos en los últimos 6 meses
                             </Typography>
                         </Box>
                         :

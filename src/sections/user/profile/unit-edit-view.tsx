@@ -5,23 +5,16 @@ import Typography from '@mui/material/Typography';
 import { useRouter } from 'src/routes/hooks';
 import { reduxForm, initialize } from 'redux-form';
 import { connect } from 'react-redux';
-import { setUser } from 'src/redux/slices/user.slice';
 import { bindActionCreators } from '@reduxjs/toolkit';
-import { useTheme, Theme, SxProps, Breakpoint } from '@mui/material/styles';
+import { useTheme, Breakpoint } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
-import { layoutClasses } from 'src/layouts/classes';
 import { createEditUnit } from 'src/services/api/modules/unit.module';
-import { Iconify } from 'src/components/iconify';
-import { Button } from '@mui/material';
-import FormLayout from 'src/components/forms/formLayout';
-import BasicCard from 'src/components/cards/basicCard.tsx/basicCard';
-import PostCard from 'src/components/cards/postCard/postCard';
 import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
-import ProfileEditForm from './profile-edit-form';
 import UnitEditForm from './unit-edit-form';
-import ProfileUnitList from './profile-unit-list';
+import { setUnits, updateUnit } from 'src/redux/slices/units.slice';
+import { setUnitsList } from 'src/redux/slices/lists.slice';
 
-const ProfileEditView = ({ unitData, unitForm, init, userData }: any) => {
+const ProfileEditView = ({ unitData, unitForm, init, userData, setUnitData, setUnitsDataList }: any) => {
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
     const [errorShow, setErrorShow] = useState<boolean>(false);
@@ -32,7 +25,8 @@ const ProfileEditView = ({ unitData, unitForm, init, userData }: any) => {
     useEffect(() => {
         if (estado) {
             init('unitForm', estado);
-            console.log("inicializacion de unitData");
+            console.log("inicializacion de unitData", estado);
+            setIcon(estado?.photo);
         }
         // console.log("unitData en unit-edit-view", estado);
 
@@ -41,14 +35,14 @@ const ProfileEditView = ({ unitData, unitForm, init, userData }: any) => {
     const handleSave = useMemo(() => (e: any) => {
         e.preventDefault();
         console.log("formulario a guardar:", unitForm?.values);
-        
+
         createEditUnit({
             id: unitForm?.values?.id,
             name: unitForm?.values?.name,
             description: unitForm?.values?.description,
             userid: userData?.id,
             photo: icon || '',
-            type:'owner',
+            type: 'owner',
             permissions: {
                 owner: true,
                 user: true,
@@ -58,6 +52,7 @@ const ProfileEditView = ({ unitData, unitForm, init, userData }: any) => {
             .then((res) => {
                 if (res?.success) {
                     console.log("User to update state", res);
+                    setUnitData(res.unit);
                     router.back();
                 } else {
                     setErrorMessage(res?.message);
@@ -116,6 +111,8 @@ const UnitEditFormReduxed = reduxForm({
 const mapDispatchToProps = (dispatch: any) => ({
     // setUserData: bindActionCreators(setUser, dispatch),
     init: bindActionCreators(initialize, dispatch),
+    setUnitData: bindActionCreators(updateUnit, dispatch),
+    setUnitsDataList: bindActionCreators(setUnitsList, dispatch),
 });
 
 const UnitEditViewForm = connect(

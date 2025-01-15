@@ -10,12 +10,12 @@ import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
 import { getAllAreas } from 'src/services/api/modules/area.module';
 import { InOutType, IPayMethod } from 'src/config/types/types';
 import { createEditCategory } from 'src/services/api/modules/category.module';
-import { setAccountsList } from 'src/redux/slices/lists.slice';
+import { setAccountsList, setPayMethodsList } from 'src/redux/slices/lists.slice';
 import { createEditPayMethod, getAllPayMethods } from 'src/services/api/modules/payMethod.module';
 import { getAllAccounts } from 'src/services/api/modules/account.module';
 import PayMethodCreateEditForm from './PayMethodCreateEditForm';
 
-const CategoryCreateEditView = ({ payMethodForm, init, unit, lists, setAccountsListState }: any) => {
+const CategoryCreateEditView = ({ payMethodForm, init, unit, lists, setAccountsListState, setPayMethodsListState }: any) => {
     const router = useRouter();
     const [isNew, setIsNew] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
@@ -67,6 +67,7 @@ const CategoryCreateEditView = ({ payMethodForm, init, unit, lists, setAccountsL
         createEditPayMethod(dataToSave)
             .then((res) => {
                 if (res?.success) {
+                    setPayMethodsListState([]);
                     router.back();
                 } else {
                     setErrorMessage(res?.message);
@@ -132,6 +133,7 @@ const PaymethodCreateEditFormReduxed = reduxForm({
 const mapDispatchToProps = (dispatch: any) => ({
     init: bindActionCreators(initialize, dispatch),
     setAccountsListState: bindActionCreators(setAccountsList, dispatch),
+    setPayMethodsListState: bindActionCreators(setPayMethodsList, dispatch),
 });
 
 const PaymethodCreateEditViewForm = connect(

@@ -59,7 +59,7 @@ function UnitEditForm({ handleSave, unitData, icon, setIcon }: any) {
                             placeholder='Ingrese el nombre de la unidad'
                             label="Nombre de unidad"
                             // InputLabelProps={{ shrink: true }}
-                            onChange={(e: any) => console.log(e.target.value)}
+                            // onChange={(e: any) => console.log(e.target.value)}
                             value={unitData?.name || ''}
                         />
                     </FormControl>
@@ -75,7 +75,7 @@ function UnitEditForm({ handleSave, unitData, icon, setIcon }: any) {
                             // InputProps={{  }}
                             aria-multiline
                             InputLabelProps={{ shrink: true }}
-                            onChange={(e: any) => console.log(e.target.value)}
+                            // onChange={(e: any) => console.log(e.target.value)}
                             value={unitData?.description || ''}
                         />
                     </FormControl>
