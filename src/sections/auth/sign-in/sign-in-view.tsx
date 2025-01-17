@@ -13,8 +13,8 @@ import { setUnitActive, setUnits } from 'src/redux/slices/units.slice';
 import { signIn } from 'src/services/api/modules/user.module';
 import { setUser } from 'src/redux/slices/user.slice';
 import { bindActionCreators } from '@reduxjs/toolkit';
-import SignInForm from './sign-in-form';
 import { setUnitsList } from 'src/redux/slices/lists.slice';
+import SignInForm from './sign-in-form';
 
 const SignInView = ({ signInForm, setUserData, setUnitsData, setUnitActiveData, setUnitsListData }: any) => {
   const router = useRouter();
@@ -49,7 +49,7 @@ const SignInView = ({ signInForm, setUserData, setUnitsData, setUnitActiveData, 
         console.log("error catch", err)
       });
 
-  }, [setUnitsData, signInForm, router, setUserData]);
+  }, [setUnitsData, signInForm, router, setUserData, setUnitsListData]);
 
 
   return (

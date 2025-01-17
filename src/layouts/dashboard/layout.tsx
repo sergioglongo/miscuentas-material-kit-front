@@ -15,6 +15,7 @@ import { bindActionCreators } from '@reduxjs/toolkit';
 import { setUnitActive } from 'src/redux/slices/units.slice';
 import { setUser } from 'src/redux/slices/user.slice';
 import { connect } from 'react-redux';
+import { setUnitsList } from 'src/redux/slices/lists.slice';
 import { Main } from './main';
 import { layoutClasses } from '../classes';
 import { NavMobile, NavDesktop } from './nav';
@@ -27,7 +28,6 @@ import { HeaderSection } from '../core/header-section';
 import { AccountPopover } from '../components/account-popover';
 import { LanguagePopover } from '../components/language-popover';
 import { NotificationsPopover } from '../components/notifications-popover';
-import { setUnitsList } from 'src/redux/slices/lists.slice';
 
 // ----------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ export type DashboardLayoutProps = {
 
 function DashboardLayoutReduxed({ sx, children, header, units, setUnitActiveData, setUnitsData, userData, setUserData }: DashboardLayoutProps) {
   const theme = useTheme();
-  const [unitsList, setUnitsList] = useState<any[]>([]);
+  const [unitsList, setUnitsListState] = useState<any[]>([]);
 
   useEffect(() => {
     if (units?.length !== 0) {
@@ -59,7 +59,7 @@ function DashboardLayoutReduxed({ sx, children, header, units, setUnitActiveData
           is_main_unit: unit?.user_unit && unit?.user_unit.is_main_unit || false
         }
       ));
-      setUnitsList(unitsFormatted);
+      setUnitsListState(unitsFormatted);
     }
   }, [units])
 

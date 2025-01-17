@@ -26,8 +26,6 @@ type Props = CardProps & {
 
 export function AreasTotalCard({ title, subheader, list, heightContent, sx, ...other }: Props) {
     const isXsDown = useMediaQuery((theme: any) => theme.breakpoints.down('xs'));
-  console.log("estoy en totalcard con lista");
-  
     return (
         <Box sx={{
           display: 'flex',

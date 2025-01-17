@@ -7,11 +7,9 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { useTheme, Breakpoint } from '@mui/material/styles';
 import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
-import { getAllAreas } from 'src/services/api/modules/area.module';
 import { InOutType, IPayMethod } from 'src/config/types/types';
-import { createEditCategory } from 'src/services/api/modules/category.module';
 import { setAccountsList, setPayMethodsList } from 'src/redux/slices/lists.slice';
-import { createEditPayMethod, getAllPayMethods } from 'src/services/api/modules/payMethod.module';
+import { createEditPayMethod } from 'src/services/api/modules/payMethod.module';
 import { getAllAccounts } from 'src/services/api/modules/account.module';
 import PayMethodCreateEditForm from './PayMethodCreateEditForm';
 
@@ -20,7 +18,6 @@ const CategoryCreateEditView = ({ payMethodForm, init, unit, lists, setAccountsL
     const [isNew, setIsNew] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
     const [errorShow, setErrorShow] = useState<boolean>(false);
-    const [accounts, setAccounts] = useState([]);
     const location = useLocation();
     const payMethodInitialData = location.state;
     const [type, setType] = useState<InOutType>(payMethodInitialData?.type || "out");
@@ -82,7 +79,7 @@ const CategoryCreateEditView = ({ payMethodForm, init, unit, lists, setAccountsL
                 console.log("error catch", err)
             });
 
-    }, [router, payMethodForm?.values, type]);
+    }, [router, payMethodForm?.values, type, setPayMethodsListState]);
 
     const theme = useTheme();
     const layoutQuery: Breakpoint = 'md';

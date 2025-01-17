@@ -26,22 +26,38 @@ const AreasLinesGraph = ({ categories, series, options, colors, title, subheader
             enabled: true,
             textAnchor: 'end',
         },
-    
+
     });
     useEffect(() => {
-        const empty = series[0].data.every((item:any) => item === 0);
+        const empty = series[0].data.every((item: any) => item === 0);
         setIsEmpty(empty);
-    },[series]);
+    }, [series]);
     return (
-        <Card>
-            <CardHeader title={title} subheader={subheader} />
+        <Card >
+            {/* <CardHeader title={title} subheader={subheader} /> */}
+            <Box display='flex' flexDirection='row' gap={4} alignItems="center" justifyContent="flex-start" paddingX={2}>
+                <Box display='flex' flexDirection='column' alignItems="flex-start" justifyContent="flex-start" padding={2} >
+                    <Typography variant="h5" sx={{ color: 'text.primary' }}>
+                        {title}
+                    </Typography>
+                    <Typography variant="h6" sx={{ color: 'text.secondary' }}>
+                        {subheader}
+                    </Typography>
+                </Box>
+                <ChartLegends
+                    labels={series.map((item) => item.name)}
+                    colors={chartOptions?.colors}
+                    sx={{ p: 3, justifyContent: 'center' }}
+                />
+            </Box>
             {/* <Box display="grid" gap={2} gridTemplateColumns="repeat(2, 1fr)" sx={{ p: 3 }}> */}
             <CardContent sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'flex-start',
                 alignItems: 'center',
-                height: isEmpty ? 'auto' : heightContent
+                height: isEmpty ? 'auto' : heightContent,
+                padding: 0,
             }}>
 
                 <Box >
@@ -61,7 +77,7 @@ const AreasLinesGraph = ({ categories, series, options, colors, title, subheader
                                 height={{ xs: 340, sm: 350, xl: 350 }}
                                 sx={{ my: 5, mx: 'auto' }}
                             />
-                            {/* <Divider sx={{ borderStyle: 'dashed' }} /> */}
+                            <Divider sx={{ borderStyle: 'dashed' }} />
 
                         </Box>
                     }
