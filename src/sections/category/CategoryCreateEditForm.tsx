@@ -4,7 +4,7 @@ import IconList from 'src/components/list/IconList';
 import { IArea, ICategory } from 'src/config/types/types';
 import { AutocompleteRedux, CheckboxRedux, SelectRedux, TextFieldErrorRedux } from 'src/components/forms/fields/ReduxFields'
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, Checkbox, FormControl, Grid, ListItemIcon, MenuItem, Switch, Typography } from '@mui/material'
+import { Box, Button, Checkbox, FormControl, Grid, ListItemIcon, MenuItem, Select, Switch, Typography } from '@mui/material'
 import { useRouter } from 'src/routes/hooks';
 import { Field, Form } from 'redux-form'
 import ModalConfirm from 'src/components/modal/ModalConfirm';
@@ -13,18 +13,19 @@ import AreaIcon from 'src/components/icon/AreaIcons';
 
 interface CategoryEditProps {
     handleEdit: any;
-    categoryData: ICategory;
-    color: string;
-    setColor: any;
+    categoryData: ICategory & { areaColor: string };
     icon: string;
     setIcon: any;
-    presetColors: string[],
+    color: string;
+    setColor: any;
+    areaSelected: any;
+    setAreaSelected: any;
     areasList: IArea[],
     isActive: boolean;
     setIsActive: any;
 }
 
-function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, icon, setIcon, presetColors, areasList, isActive, setIsActive }: CategoryEditProps) {
+function CategoryCreateEditForm({ handleEdit, categoryData, icon, setIcon, color, setColor, areaSelected, setAreaSelected, areasList, isActive, setIsActive }: CategoryEditProps) {
 
     const [openmodal, setOpenmodal] = useState(false);
     const [type, setType] = useState(categoryData?.type || 'out');
@@ -45,7 +46,11 @@ function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, ico
             boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.1)',
         },
     };
-
+    const colorDefine = (value:any) => {
+        const colorFind = areasList.find((area: IArea) => area.id === value);
+        console.log("area encontrada", colorFind);
+        
+    }
     const onSelectIcon = (iconSelected: string) => {
         setOpenmodal(false);
         setIcon(iconSelected);
@@ -91,23 +96,6 @@ function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, ico
                 </Grid>
                 <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Grid container spacing={2} style={{ width: '80%' }}>
-                        <Grid item xs={12} sm={12} style={{ width: '100%', flexDirection: 'row', justifyContent: 'flex-start' }} >
-                            <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', flexWrap: 'wrap', display: 'flex', flexDirection: 'row', justifyContent: 'space-arround' }}>
-                                <Typography variant="h6">Elija un color:</Typography>
-                                {presetColors.map((presetColor, index) => (
-                                    <Button
-                                        key={index}
-                                        className={styles.pickerSwatches}
-                                        style={{
-                                            background: presetColor,
-                                            border: `3px solid ${presetColor !== color ? presetColor : '#FAAC40'}`,
-                                            height: '30px',
-                                        }}
-                                        onClick={() => setColor(presetColor)}
-                                    />
-                                ))}
-                            </Grid>
-                        </Grid>
                         <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                             <Typography variant="h6">Elija un icono:</Typography>
                             <Button variant='contained' style={{ width: '200px' }} onClick={() => setOpenmodal(true)} >Elegir</Button>
@@ -151,7 +139,7 @@ function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, ico
                         <Typography variant="h6" style={{ marginLeft: '0px' }}>Salida</Typography>
                     </Box>
                     <Typography variant="h6" style={{ marginLeft: '16px' }}>Area:</Typography>
-                    <FormControl >
+                    {/* <FormControl >
                         <Field
                             name="areaId"
                             component={SelectRedux}
@@ -177,6 +165,30 @@ function CategoryCreateEditForm({ handleEdit, categoryData, color, setColor, ico
                                 </MenuItem>
                             ))}
                         </Field>
+                    </FormControl> */}
+                                        {/* <Typography variant="h6" >Areas:</Typography> */}
+                    <FormControl >
+                        <Select
+                            name="areaId"
+                            style={{ minWidth: '200px', marginLeft: '10px' }}
+                            variant="outlined"
+                            size='small'
+                            value={areaSelected || ''}
+                            // onChange={onChangeArea}
+                            onChange={(e: any) => setAreaSelected(e.target.value)}
+                        >
+                            <MenuItem value='' key='' >
+                                Seleccione un area
+                            </MenuItem>
+                            {areasList.map((item, index) => (
+                                <MenuItem value={item.id} key={index}  >
+                                    <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                                        <AreaIcon iconName={item?.icon} styles={{ fontSize: '20', display: 'flex', color: item?.color }} />
+                                        {item?.name}
+                                    </ListItemIcon>
+                                </MenuItem>
+                            ))}
+                        </Select>
                     </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-arround' }}>

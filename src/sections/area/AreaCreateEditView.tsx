@@ -11,8 +11,17 @@ import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
 import { setAreasList } from 'src/redux/slices/lists.slice';
 // import ProfileEditForm from '../user/profile/profile-edit-form';
 import { createEditArea } from 'src/services/api/modules/area.module';
+import { basePalette } from 'src/theme/core';
 import AreaCreateEditForm from './AreaCreateEditForm';
-// import ProfileEditForm from '../user/profile/profile-edit-form'
+
+
+const getColors = () => {
+    const colors = [];
+    for (let i = 1; i < 18; i+=1) {
+        colors.push(basePalette.listColors[i]);
+    }
+    return colors;
+}
 
 const AreaCreateEditView = ({ areaForm, init, unit, setAreasListState }: any) => {
     const router = useRouter();
@@ -25,7 +34,8 @@ const AreaCreateEditView = ({ areaForm, init, unit, setAreasListState }: any) =>
     const [type, setType] = useState(areaInitialData?.type || "out");
     const [isActive, setIsActive] = useState(areaInitialData?.is_active || true);
 
-    const presetColors = ["#cd9323", "#1a53d8", "#9a2151", "#0d6416", "#8d2808"];
+    const presetColors = getColors();
+    
     
     useEffect(() => {
         if (areaInitialData) {

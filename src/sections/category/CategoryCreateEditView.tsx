@@ -19,9 +19,9 @@ const CategoryCreateEditView = ({ categoryForm, init, unit, lists, setAreasListS
     const [errorShow, setErrorShow] = useState<boolean>(false);
     const location = useLocation();
     const categoryInitialData = location.state;
-    const [color, setColor] = useState(categoryInitialData?.color || categoryInitialData?.areaColor || "#b32aa9");
     const [icon, setIcon] = useState(categoryInitialData?.icon || "Home");
-    const presetColors = ["#cd9323", "#1a53d8", "#9a2151", "#0d6416", "#8d2808"];
+    const [areaSelected, setAreaSelected] = useState<any>('');
+    const [color, setColor] = useState<string>('#000000');
     const [isActive, setIsActive] = useState(categoryInitialData?.is_active || true);
 
     useEffect(() => {
@@ -30,6 +30,8 @@ const CategoryCreateEditView = ({ categoryForm, init, unit, lists, setAreasListS
                 .then((areasResponse: any) => {
                     if (areasResponse?.success) {
                         // setAreas(areasResponse.result);
+                        console.log("areasResponse", areasResponse);
+                        
                         setAreasListState(areasResponse.result);
                     } else {
                         console.log("No se pudieron obtener las areas");
@@ -42,12 +44,21 @@ const CategoryCreateEditView = ({ categoryForm, init, unit, lists, setAreasListS
     useEffect(() => {
         if (categoryInitialData) {
             init('categoryForm', categoryInitialData);
-            setColor(categoryInitialData?.color);
+            console.log("categoryInitialData", categoryInitialData);
             setIsNew(false);
+            setAreaSelected(categoryInitialData?.areaId);
+            setColor(categoryInitialData?.areaColor);
             setIsActive(categoryInitialData?.is_active);
         }
 
     }, [init, categoryInitialData]);
+
+    useEffect(() => {
+        const colorDefined = lists.areasList.find((areaItem: any) => areaItem.id === areaSelected)?.color;
+        console.log("areaselected", areaSelected, colorDefined);
+        
+        setColor(colorDefined);
+    }, [areaSelected, lists.areasList]);
 
     const handleSave = useMemo(() => (e: any) => {
         e.preventDefault();
@@ -56,7 +67,7 @@ const CategoryCreateEditView = ({ categoryForm, init, unit, lists, setAreasListS
             name: categoryForm?.values?.name,
             description: categoryForm?.values?.description,
             type: 'out',
-            color,
+            color: categoryInitialData?.areaColor,
             icon,
             deleted: categoryForm?.values?.deleted,
             is_active: isActive,
@@ -81,7 +92,7 @@ const CategoryCreateEditView = ({ categoryForm, init, unit, lists, setAreasListS
                 console.log("error catch", err)
             });
 
-    }, [router, categoryForm?.values, color, icon, isActive, setCategoriesListState]);
+    }, [router, categoryForm?.values, icon, isActive, setCategoriesListState, categoryInitialData?.areaColor]);
 
     const theme = useTheme();
     const layoutQuery: Breakpoint = 'md';
@@ -113,14 +124,15 @@ const CategoryCreateEditView = ({ categoryForm, init, unit, lists, setAreasListS
                 <CategoryCreateEditForm
                     handleEdit={handleSave}
                     categoryData={categoryForm?.values}
-                    color={color}
-                    setColor={setColor}
                     icon={icon}
                     setIcon={setIcon}
-                    presetColors={presetColors}
                     areasList={lists.areasList}
                     isActive={isActive}
                     setIsActive={setIsActive}
+                    color={color}
+                    setColor={setColor}
+                    areaSelected={areaSelected}
+                    setAreaSelected={setAreaSelected}
                 />
             </SectionCard>
         </Box>
