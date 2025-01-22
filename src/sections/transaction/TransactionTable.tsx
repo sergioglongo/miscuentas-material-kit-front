@@ -13,7 +13,7 @@ const TransactionTable = ({ unitActive }: any) => {
     const rowsPerPage = 10;
     const router = useRouter();
     const onEdit = (value: any) => {
-        console.log("Elegido editar id: ", value);
+        // console.log("Elegido editar id: ", value);
         router.navigateState('/transactionEdit', { id: value,});
     };
     const getMuiTheme = () => createTheme({

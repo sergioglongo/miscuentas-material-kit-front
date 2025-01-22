@@ -1,29 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Checkbox,IconButton, Tooltip } from '@mui/material';
+import { Checkbox, IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
 import { getAllTransactionsByUnitId } from 'src/services/api/modules/transaction.module';
 import PayMethodIcon from 'src/components/icon/paymethod-icons';
 import CommonIcon from 'src/components/icon/CommonIcons';
+import { fDate, fDateSlash } from 'src/utils/format-time';
 
-const PaymentsTable = ({ unitActive }: any) => {
-    const [transaction, setTransaction] = useState([]);
+const AccountTransactionsTable = ({ transactions }: any) => {
     const rowsPerPage = 10;
     const router = useRouter();
-    const onEdit = (payMethodData: any) => {
-        const payMethodInitialData = {
-            id: payMethodData[0],
-            name: payMethodData[2],
-            type: payMethodData[3],
-            method: payMethodData[4],
-            is_active: payMethodData[6],
-            deleted: payMethodData[7],
-            accountId: payMethodData[8],
-        }
-        console.log("presionado editar desde ", payMethodInitialData);
-        router.navigateState('/paymethodEdit', payMethodInitialData);
+    const onEdit = (value: any) => {
+        // console.log("Elegido editar id: ", value);
+        router.navigateState('/transactionEdit', { id: value,});
     };
     const getMuiTheme = () => createTheme({
         components: {
@@ -127,7 +118,7 @@ const PaymentsTable = ({ unitActive }: any) => {
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Editar">
-                            <IconButton aria-label="Ver" onClick={() => onEdit(tableMeta?.rowData)}>
+                            <IconButton aria-label="Ver" onClick={() => onEdit(value)}>
                                 <CommonIcon color='gray' iconName="Edit" />
                             </IconButton>
                         </Tooltip>
@@ -151,10 +142,39 @@ const PaymentsTable = ({ unitActive }: any) => {
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign:'left' }}>
+                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
                         {columnMeta.label}
                     </th>
                 )
+            }
+        },
+        {
+            name: 'amount',
+            label: 'Monto',
+            options: {
+                filter: false,
+                customHeadRender: (columnMeta: any) => (
+                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
+                        {columnMeta.label}
+                    </th>
+                )
+            }
+        },
+        {
+            name: 'date',
+            label: 'Fecha',
+            options: {
+                filter: false,
+                customHeadRender: (columnMeta: any) => (
+                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
+                        {columnMeta.label}
+                    </th>
+                ),
+                customBodyRender: (value: any) => (
+                    <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                        {fDateSlash(value)}
+                    </th>
+                ),
             }
         },
         {
@@ -170,9 +190,9 @@ const PaymentsTable = ({ unitActive }: any) => {
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         {value === 'out' ?
-                            <CommonIcon iconName='ArrowUpRight' styles={{ fontSize: '30', color: 'orange' }} />
-                            :
-                            <CommonIcon iconName='Download' styles={{ fontSize: '30', color: 'green' }} />
+                           <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
+                           :
+                           <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
                         }
                     </th>
                 ),
@@ -216,7 +236,7 @@ const PaymentsTable = ({ unitActive }: any) => {
                 filter: false,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ textAlign:'center' }}>
+                    <th style={{ textAlign: 'center' }}>
                         {columnMeta.label}
                     </th>
                 ),
@@ -225,6 +245,33 @@ const PaymentsTable = ({ unitActive }: any) => {
                         {value}
                     </th>
                 ),
+            }
+        },
+        {
+            name: 'areaName',
+            label: 'Area',
+            options: {
+                filter: false,
+                sort: false,
+                customHeadRender: (columnMeta: any) => (
+                    <th style={{ textAlign: 'center' }}>
+                        {columnMeta.label}
+                    </th>
+                ),
+                customBodyRender: (value: any) => (
+                    <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        {value}
+                    </th>
+                ),
+            }
+        },
+        {
+            name: 'areaId',
+            label: 'areaId',
+            options: {
+                filter: false,
+                sort: false,
+                display: 'excluded',
             }
         },
         {
@@ -237,8 +284,17 @@ const PaymentsTable = ({ unitActive }: any) => {
             }
         },
         {
-            name: 'accountId',
-            label: 'accountId',
+            name: 'payMethodId',
+            label: 'payMethodId',
+            options: {
+                filter: false,
+                sort: false,
+                display: 'excluded',
+            }
+        },
+        {
+            name: 'categoryId',
+            label: 'categoryId',
             options: {
                 filter: false,
                 sort: false,
@@ -302,30 +358,11 @@ const PaymentsTable = ({ unitActive }: any) => {
         // },
     };
 
-    useEffect(() => {
-        getAllTransactionsByUnitId(unitActive?.id,'')
-            .then((transactionsResponse: any) => {
-                console.log("transactionsResponse", transactionsResponse);
-                if (transactionsResponse?.success) {
-                    const transactionWithCategoryPayMethod = transactionsResponse.result.map((transactionItem: any) => (
-                        { ...transactionItem, 
-                            categoryName: transactionItem.category.name,
-                            payMethodName: transactionItem.pay_method.method
-                        }
-                    ));
-                    setTransaction(transactionWithCategoryPayMethod);
-                } else {
-                    console.log("No se pudieron obtener las transaction");
-                }
-            })
-            .catch((err: any) => console.log(err));
-    }, [unitActive]);
-
     return (
         <ThemeProvider theme={getMuiTheme()}>
             <MUIDataTable
-                title='Transacciones'
-                data={transaction}
+                title='Transacciones en cuenta'
+                data={transactions}
                 columns={columns}
                 options={options}
             />
@@ -340,4 +377,4 @@ export default connect(
         unitActive: state.units.unitActive,
     }),
     mapDispatchToProps
-)(PaymentsTable);
+)(AccountTransactionsTable);

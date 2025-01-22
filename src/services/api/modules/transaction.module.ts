@@ -22,6 +22,17 @@ export async function getAllTransactionsByUnitId(unitId: number, type: string) {
         })
         .catch((err: any) => console.log(err));
 }
+export async function getAllTransactionsByUnitAndAccount(data:any) {
+    return axiosClient
+        .post(`transaction/getAllByUnitAndAccount`, data)
+        .then((response: any) => {
+            if (typeof response.data !== 'undefined' && response.data.success === true) {
+                return response.data;
+            }
+            return response;
+        })
+        .catch((err: any) => console.log(err));
+}
 export async function getTransactionById(data: any) {
     return axiosClient
         .get(`transaction/getById/${data}`)

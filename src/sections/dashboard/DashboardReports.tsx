@@ -62,12 +62,14 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
             iconName: accountResume.type,
             color: 'black',
             label: accountResume.name,
-            total: accountResume.balance
+            total: accountResume.balance,
+            account: accountResume.id,
+            unitId: unitActive
         })
         )
         return areasResumeFormated;
     }
-    const processAreasMonthToMonthCards = (areasMonthToMonthToProcess: any, type: any) => {
+    const processAreasMonthToMonthCards = (areasMonthToMonthToProcess: any) => {
         const categories: any = [];
         const data: any = [];
         areasMonthToMonthToProcess?.map((areaResume: any) => {
@@ -75,10 +77,10 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
             data.push(Math.round(parseFloat(areaResume.total)));
             return areaResume
         })
-
+        
         const series = [
             {
-                name: type === 'in' ? 'Ingresos' : 'Gastos',
+                name: 'Totales',
                 data
             }
         ]
@@ -90,11 +92,9 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
     }
     // item: { iconName: string; color: string; label: string; total: number };
     // { value: 'facebook', label: 'Facebook', total: 323234 }
-    const loadingAccountsRef = useRef(false);
-    const loadingMonthRef = useRef(false);
-    const loadingAreasRef = useRef(false);
+    const loadingRef = useRef(false);
 
-    const getAreasReports = useCallback(() => {
+    const getReports = useCallback(() => {
         const dataReport: any = {
             unitId: unitActive?.id,
             startDate: periodo,
@@ -112,9 +112,6 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
                         const areasResumeCardsFormated = processAreasResumeCards(areasResumeResponse.result);
                         setAreasResumeCircular(areasResumeCircularFormated);
                         setAreasResumeCards(areasResumeCardsFormated);
-                    } else {
-                        setAreasResumeCircular([]);
-                        setAreasResumeCards([]);
                     }
                 } else {
                     console.log("No se pudieron obtener las areas");
@@ -122,113 +119,65 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
             })
             .catch((err: any) => console.log(err))
             .finally(() => {
-                loadingAreasRef.current = false;
-            })
-    }, [unitActive, periodo, hoy, transactionOptionSelected]);
-
-    const getAccountsReport = useCallback(() => {
-        const dataAccountsReport: any = {
-            unitId: unitActive?.id,
-        }
-        reportAccountsResumeByUnitId(dataAccountsReport)
-            .then((accountsResumeResponse: any) => {
-                if (accountsResumeResponse?.success) {
-                    if (accountsResumeResponse.result.length > 0) {
-                        const areasResumeCardsFormated = processAccountsResumeCards(accountsResumeResponse.result);
-                        setAccountsResumeCards(areasResumeCardsFormated);
-                    }
-                } else {
-                    console.log("No se pudieron obtener las cuentas");
-                }
-            })
-            .catch((err: any) => console.log(err))
-            .finally(() => {
-                loadingAccountsRef.current = false;
-            })
-    }, [unitActive]);
-
-    const getMonthToMonthReport = useCallback(() => {
-        const dataReportMonthOut: any = {
-            unitId: unitActive?.id,
-            type: 'out',
-            cantMeses: 6
-        }
-        reportAreasMonthToMonthByUnitId(dataReportMonthOut)
-            .then((areasMonthToMonthOutResponse: any) => {
-                if (areasMonthToMonthOutResponse?.success) {
-                    if (areasMonthToMonthOutResponse.result.length > 0) {
-                        const areasLineMonthtoMonthOutFormated: any = processAreasMonthToMonthCards(areasMonthToMonthOutResponse.result, 'out');
-                        return areasLineMonthtoMonthOutFormated.series || [];
-                    }
-                    // return [];
-                } else {
-                    console.log("No se pudieron obtener las areas");
-                    return [];
-                }
-                return [];
-            })
-            .then((areasLineSeries: any) => {
-                const dataReportMonthIn: any = {
-                    unitId: unitActive?.id,
-                    type: 'in',
-                    cantMeses: 6
-                }
-                reportAreasMonthToMonthByUnitId(dataReportMonthIn)
-                    .then((areasMonthToMonthInResponse: any) => {
-                        if (areasMonthToMonthInResponse?.success) {
-                            if (areasMonthToMonthInResponse.result.length > 0) {
-                                const areasLineMonthtoMonthInFormated: any = processAreasMonthToMonthCards(areasMonthToMonthInResponse.result, 'in');
-                                const series = {
-                                    categories: areasLineMonthtoMonthInFormated.categories,
-                                    series: [
-                                        ...areasLineMonthtoMonthInFormated.series,
-                                        areasLineSeries[0]
-                                    ]
-                                }
-                                setAreasMonthToMonthCards(series);
+                reportAccountsResumeByUnitId(dataReport)
+                    .then((accountsResumeResponse: any) => {
+                        if (accountsResumeResponse?.success) {
+                            // const categoriesWithArea = accountsResumeResponse.result.map((category: any) => ({ ...category, area: category.area.name, type: category.area.type, areaColor: category.area.color}));
+                            if (accountsResumeResponse.result.length > 0) {
+                                const areasResumeCardsFormated = processAccountsResumeCards(accountsResumeResponse.result);
+                                setAccountsResumeCards(areasResumeCardsFormated);
                             }
                         } else {
-                            console.log("No se pudieron obtener las areas");
+                            console.log("No se pudieron obtener las cuentas");
                         }
                     })
                     .catch((err: any) => console.log(err))
                     .finally(() => {
-                        loadingMonthRef.current = false;
-
+                        const dataReportMonth: any = {
+                            unitId: unitActive?.id,
+                            type: 'out',
+                            cantMeses: 6
+                        }
+                        reportAreasMonthToMonthByUnitId(dataReportMonth)
+                            .then((areasMonthToMonthResponse: any) => {
+                                if (areasMonthToMonthResponse?.success) {
+                                    if (areasMonthToMonthResponse.result.length > 0) {
+                                        const areasLineMonthtoMonthFormated: any = processAreasMonthToMonthCards(areasMonthToMonthResponse.result);
+                                        setAreasMonthToMonthCards(areasLineMonthtoMonthFormated);
+                                        // console.log("AreasMonthToMonthFormated", areasLineMonthtoMonthFormated);
+                                    }
+                                } else {
+                                    console.log("No se pudieron obtener las areas");
+                                }
+                            })
+                            .catch((err: any) => console.log(err))
+                            .finally(() => {
+                                loadingRef.current = false;
+                            })
                     })
             })
-            .catch((err: any) => console.log(err))
-    }, [unitActive]);
+    }, [unitActive, periodo, hoy, transactionOptionSelected]);
 
     useEffect(() => {
 
-        if (!loadingAccountsRef.current && unitActive?.id) {
-            loadingAccountsRef.current = true;
-            getAccountsReport();
+        if ((areasResumeCircular.length === 0 
+            || areasResumeCards.length === 0 
+            || accountsResumeCards.length === 0) 
+            && !loadingRef.current) {
+            loadingRef.current = true;
+            getReports();
         }
         // setTransactionOptionSelected(transactionoptions[0].value); 
-    }, [unitActive, getAccountsReport]);
-
+    }, [unitActive, periodo, hoy, areasResumeCircular, areasResumeCards, accountsResumeCards, getReports]);
     useEffect(() => {
+        getReports();
+        // console.log("transactionOptionSelected", transactionOptionSelected);
 
-        if (!loadingAreasRef.current && unitActive?.id) {
-            loadingAreasRef.current = true;
-            console.log("cambio unit o getareasreports");
-            
-            getAreasReports();
-        }
-        // setTransactionOptionSelected(transactionoptions[0].value); 
-    }, [unitActive, getAreasReports, periodo]);
-
+    }, [transactionOptionSelected, getReports]);
     useEffect(() => {
+        // console.log("cambio areasMonthToMonthCards", areasMonthToMonthCards);
 
-        if (!loadingMonthRef.current && unitActive?.id) {
-            loadingMonthRef.current = true;
-            getMonthToMonthReport();
-        }
-        // setTransactionOptionSelected(transactionoptions[0].value); 
-    }, [unitActive, getMonthToMonthReport]);
-
+    }, [areasMonthToMonthCards])
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} md={12} lg={12}>
@@ -260,7 +209,7 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
                 <AccountsTotalCards
                     title="Estado de cuentas"
                     list={accountsResumeCards}
-                    heightContent="465px"
+                    heightContent="450px"
                 />
             </Grid>
         </Grid>

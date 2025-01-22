@@ -21,7 +21,6 @@ function getFechas() {
   const hoyMenos15Dias = new Date(fechaActual.getTime() - 15 * 24 * 60 * 60 * 1000);
   const hoyMenos30Dias = new Date(fechaActual.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-
   return [
     { label: 'Semana actual', value: formatoFecha(inicioSemana) },
     { label: 'Mes actual', value: formatoFecha(primerDiaMes) },

@@ -21,6 +21,7 @@ export const AreaEdit = lazy(() => import('src/sections/area/AreaCreateEditView'
 
 export const AccountPage = lazy(() => import('src/pages/account/AccountPage'));
 export const AccountEdit = lazy(() => import('src/sections/account/AccountCreateEditView'));
+export const AccountTransactions = lazy(() => import('src/sections/account/AccountTransactionsView'));
 
 export const PayMethodPage = lazy(() => import('src/pages/payMethod/PayMethodPage'));
 export const PayMethodEdit = lazy(() => import('src/sections/payMethod/PayMethodCreateEditView'));
@@ -84,6 +85,7 @@ function RouterAutorized({user}:any) {
         { path: 'areaEdit', element: <AreaEdit /> },
         { path: 'categoryEdit', element: <CategoryEdit /> },
         { path: 'accountEdit', element: <AccountEdit /> },
+        { path: 'accountTransactions', element: <AccountTransactions /> },
         { path: 'payMethodEdit', element: <PayMethodEdit /> },
         { path: 'transactionEdit', element: <TransactionEdit /> },
         { path: 'paymentEdit', element: <PaymentEdit /> },

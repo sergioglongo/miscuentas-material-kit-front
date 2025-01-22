@@ -6,10 +6,11 @@ import { varAlpha } from 'src/theme/styles';
 
 type Props = CardProps & {
   item: { iconName: string; color: string; label: string; total: number };
+  onClick?: (item: any) => void;
   children?: React.ReactNode;
 };
 
-export function IconValueLabelCard({ item, children, sx, ...other }: Props) {
+export function IconValueLabelCard({ item, onClick, children, sx, ...other }: Props) {
   return (
     <Box
       key={item.label}
@@ -22,6 +23,7 @@ export function IconValueLabelCard({ item, children, sx, ...other }: Props) {
         flexDirection: 'column',
         border: `solid 1px ${varAlpha(theme.vars.palette.grey['500Channel'], 0.12)}`,
       })}
+      onClick={onClick ? () => onClick(item) : () => { }}
     >
       {/* <AreaIcon iconName={item.iconName} styles={{ fontSize: '40', display: 'flex', color: item.color }} /> */}
       {children}
