@@ -7,7 +7,9 @@ import TransactionTable from './TransactionTable';
 
 function TransactionView() {
   const router = useRouter();
-
+  const onNewTransaction = (value: any) => {
+    router.navigateState('/transactionEdit', { type: value, });
+  }
   return (
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5} gap={2}>
@@ -18,15 +20,15 @@ function TransactionView() {
           variant="contained"
           color="error"
           startIcon={<Iconify icon="mingcute:add-line" />}
-          onClick={() => router.push('/paymentEdit')}
-        >
+          onClick={() => onNewTransaction('out')}
+          >
           Gasto
         </Button>
         <Button
           variant="contained"
           color="success"
           startIcon={<Iconify icon="mingcute:add-line" />}
-          onClick={() => router.push('/incomeEdit')}
+          onClick={() => onNewTransaction('in')}
         >
           Ingreso
         </Button>

@@ -1,12 +1,11 @@
-import { Box, Button, MenuItem, Typography } from '@mui/material'
+import { Box, Button, MenuItem, Typography, Select } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { Iconify } from 'src/components/iconify'
 import { useLocation } from 'react-router-dom';
 import { DashboardContent } from 'src/layouts/dashboard'
 import { useRouter } from 'src/routes/hooks';
-import AccountTransactionsTable from './AccountTransactionsTable';
-import { Select } from '@mui/material';
 import { getAllTransactionsByUnitAndAccount } from 'src/services/api/modules/transaction.module';
+import AccountTransactionsTable from './AccountTransactionsTable';
 
 interface AccountTransactionViewProps {
     unitActive: any;
@@ -82,7 +81,7 @@ function AccountTransactionView({ unitActive, account }: any) {
                 }
             })
             .catch((err: any) => console.log(err));
-    }, [unitActive, account, periodo]);
+    }, [unitActive, account, periodo, transactionData]);
     useEffect(() => {
         console.log("accountState", accountState);
         

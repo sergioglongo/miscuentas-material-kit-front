@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Checkbox, IconButton, Tooltip } from '@mui/material';
+import { Box, Checkbox, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
 import { getAllAccountsByUnitId } from 'src/services/api/modules/account.module';
-import { fCurrency } from 'src/utils/format-number';
+import { fCurrency, fNumber } from 'src/utils/format-number';
 import AccountIcon from 'src/components/icon/AccountIcon';
 import CommonIcon from 'src/components/icon/CommonIcons';
 import { bindActionCreators } from '@reduxjs/toolkit';
@@ -17,6 +17,9 @@ const iconToShow = (iconName: string) => {
 
 const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
     const [accounts, setAccounts] = useState([]);
+    const [totalPesos, setTotalPesos] = useState(0);
+    const [totalDollar, setTotalDollar] = useState(0);
+    const [totalEuro, setTotalEuro] = useState(0);
     const rowsPerPage = 10;
     const router = useRouter();
     const onEdit = (accountData: any) => {
@@ -113,6 +116,33 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
             },
         },
     });
+    const customFooter = () => (
+        <Grid container rowSpacing={1} rowGap={2} columnSpacing={2} display='flex' flexDirection='column' alignItems='center' margin={2}>
+            <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography variant="h5" sx={{ color: 'text.secondary' }} >
+                    Totales:
+                </Typography>
+                <Box gap={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <AccountIcon iconName="Pesos" styles={{ fontSize: '30', display: 'flex', color: 'blue' }} />
+                    <Typography variant="h5" sx={{ color: 'text.primary' }} >
+                        {fNumber(totalPesos)}
+                    </Typography>
+                </Box>
+                <Box gap={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <AccountIcon iconName="Dolar" color="green" styles={{ dolarSize: 'xl', display: 'flex', dolarColor: 'green' }} />
+                    <Typography variant="h5" sx={{ color: 'text.primary' }} >
+                        {fNumber(totalDollar)}
+                    </Typography>
+                </Box>
+                <Box gap={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <AccountIcon iconName="Euro" styles={{ fontSize: '30', display: 'flex', color: 'black' }} />
+                    <Typography variant="h5" sx={{ color: 'text.primary' }} >
+                        {fNumber(totalEuro)}
+                    </Typography>
+                </Box>
+            </Grid>
+        </Grid>
+    );
     const columns: any = [
         {
             name: 'id',
@@ -176,7 +206,7 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
                     </th>
                 ),
                 customBodyRender: (value: any) => (
-                    <div>{fCurrency(value)}</div>
+                    <th>{fCurrency(value)}</th>
                 ),
             }
         },
@@ -290,7 +320,13 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
         customToolbar: () => {
 
         },
-
+        customFooter: (
+            count: number,
+            page: number,
+            rowsPerPageFooter: number,
+            changeRowsPerPage: any,
+            changePage: any
+        ) => (customFooter()),
         sortOrder: {
             name: 'entidad',
             direction: 'asc'
@@ -338,6 +374,27 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
                     if (accountResponse?.success) {
                         const categoriesWithArea = accountResponse.result.map((account: any) => ({ ...account, account: account.unit.name, description: account.unit.description, accountPhoto: account.unit.photo }));
                         setAccountsListState(categoriesWithArea);
+                        let totalPesosTemp = 0;
+                        let totalDolarTemp = 0;
+                        let totalEuroTemp = 0;
+                        categoriesWithArea.forEach((account: any) => {
+                            switch (account.currency) {
+                                case 'Pesos':
+                                    totalPesosTemp += account.balance;
+                                    break;
+                                case 'Dolar':
+                                    totalDolarTemp += account.balance;
+                                    break;
+                                default:
+                                    totalEuroTemp += account.balance;
+                                    break;
+                            }
+                        })
+                        setTotalDollar(totalDolarTemp);
+                        setTotalPesos(totalPesosTemp);
+                        setTotalEuro(totalEuroTemp);
+                        console.log("totales", totalDolarTemp, totalPesosTemp, totalEuroTemp);
+
                     } else {
                         console.log("No se pudieron obtener las accounts");
                     }

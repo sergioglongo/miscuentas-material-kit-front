@@ -16,13 +16,13 @@ function processInput(inputValue: InputNumberValue): number | null {
 
 // ----------------------------------------------------------------------
 
-export function fNumber(inputValue: InputNumberValue, options?: Options) {
+export function fNumber(inputValue: InputNumberValue,code: string = 'es-AR', options?: Options) {
   const locale = DEFAULT_LOCALE;
 
   const number = processInput(inputValue);
   if (number === null) return '';
 
-  const fm = new Intl.NumberFormat(locale.code, {
+  const fm = new Intl.NumberFormat(code, {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
     ...options,

@@ -10,6 +10,7 @@ import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
 import { IArea, ICategory, InOutType, IPayMethod, ITransaction } from 'src/config/types/types';
 import { getAllAccounts } from 'src/services/api/modules/account.module';
 import { fDate, fDateDbToDatePicker, localToUtc, utcToLocal } from 'src/utils/format-time';
+import { basePalette } from 'src/theme/core';
 import { createEditTransaction, getTransactionById } from 'src/services/api/modules/transaction.module';
 import { getAllCategoriesByUnitId } from 'src/services/api/modules/category.module';
 import { getAllPayMethodsByUnitId } from 'src/services/api/modules/payMethod.module';
@@ -29,9 +30,9 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
     const [type, setType] = useState<InOutType>(TransactionInitialData?.type || "out");
 
     useEffect(() => {
-        getAllAreasByUnitId(unit?.id,'')
+        getAllAreasByUnitId(unit?.id, type)
             .then((areasResponse: any) => {
-                console.log("areasResponse", areasResponse);
+                // console.log("areasResponse", areasResponse);
                 if (areasResponse?.success) {
                     setareasList(areasResponse.result);
                 } else {
@@ -40,37 +41,38 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
             }).catch((err: any) => console.log(err));
         getAllCategoriesByUnitId(unit?.id, '')
             .then((categoriesResponse: any) => {
-                console.log("categoriesResponse", categoriesResponse);
+                // console.log("categoriesResponse", categoriesResponse);
                 if (categoriesResponse?.success) {
                     setCategoriesList(categoriesResponse.result);
                 } else {
                     console.log("No se pudieron obtener las categorias");
                 }
             }).catch((err: any) => console.log(err));
-        getAllPayMethodsByUnitId(unit?.id, '')
+        getAllPayMethodsByUnitId(unit?.id, type)
             .then((payMethodsResponse: any) => {
-                console.log("payMethodsResponse", payMethodsResponse);
+                // console.log("payMethodsResponse", payMethodsResponse);
                 if (payMethodsResponse?.success) {
                     setPayMethodsList(payMethodsResponse.result);
                 } else {
                     console.log("No se pudieron obtener los metodos de pago");
                 }
-        }).catch((err: any) => console.log(err));
+            }).catch((err: any) => console.log(err));
 
-    }, [unit?.id, TransactionInitialData]);
+    }, [type, unit?.id]);
 
     useEffect(() => {
-        if (TransactionInitialData) {
+        if (TransactionInitialData?.id) {
             getTransactionById(TransactionInitialData?.id).then((resultTransaction: any) => {
                 if (resultTransaction?.success) {
                     console.log("transaction by Id", resultTransaction.result);
-                    const dataToInit = {...resultTransaction.result, date : utcToLocal(resultTransaction.result?.date)};
+                    const dataToInit = { ...resultTransaction.result, date: utcToLocal(resultTransaction.result?.date) };
                     init('transactionForm', dataToInit);
                     setIsNew(false);
-                    // setType(res.result.type);
+                    setType(resultTransaction.result.type);
                 }
             })
         }
+        console.log("TransactionInitialData", TransactionInitialData);
 
     }, [init, TransactionInitialData]);
 
@@ -130,11 +132,15 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
         >
             {/* <FormLayout > */}
             <SectionCard
-                title={isNew ? "Nueva transaccion" : "Editar transaccion"}
+                title={
+                    isNew ?
+                        `${type === "out" ? "Nuevo gasto" : "Nuevo ingreso"}`
+                        : `${type === "out" ? "Editar gasto" : "Editar ingreso"}`
+                }
                 subtitle=""
                 iconName="DocumentOk"
                 iconSize={50}
-            // iconColor={color}
+                iconColor={type === "out" ? basePalette.error.main : basePalette.success.main}
             >
                 {/* <PayMethodCreateEditForm
                     handleEdit={handleSave}
@@ -149,7 +155,7 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
                     transactionData={transactionForm?.values}
                     type={type}
                     setType={setType}
-                    // areaId={TransactionInitialData?.areaId}
+                // areaId={TransactionInitialData?.areaId}
                 />
             </SectionCard>
         </Box>

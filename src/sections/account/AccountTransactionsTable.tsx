@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Checkbox, IconButton, Tooltip } from '@mui/material';
+import { Box, Checkbox, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
 import { getAllTransactionsByUnitId } from 'src/services/api/modules/transaction.module';
 import PayMethodIcon from 'src/components/icon/paymethod-icons';
 import CommonIcon from 'src/components/icon/CommonIcons';
 import { fDate, fDateSlash } from 'src/utils/format-time';
+import AccountIcon from 'src/components/icon/AccountIcon';
+import { fNumber } from 'src/utils/format-number';
 
 const AccountTransactionsTable = ({ transactions }: any) => {
     const rowsPerPage = 10;
     const router = useRouter();
+    const [totalPesos, setTotalPesos] = useState(0);
     const onEdit = (value: any) => {
         // console.log("Elegido editar id: ", value);
         router.navigateState('/transactionEdit', { id: value,});
@@ -96,6 +99,21 @@ const AccountTransactionsTable = ({ transactions }: any) => {
             },
         },
     });
+    const customFooter = () => (
+        <Grid container rowSpacing={1} rowGap={2} columnSpacing={2} display='flex' flexDirection='column' alignItems='center' margin={2}>
+            <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography variant="h5" sx={{ color: 'text.secondary' }} >
+                    Total:
+                </Typography>
+                <Box gap={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <AccountIcon iconName="Pesos" styles={{ fontSize: '30', display: 'flex', color: 'blue' }} />
+                    <Typography variant="h5" sx={{ color: 'text.primary' }} >
+                        {fNumber(totalPesos)}
+                    </Typography>
+                </Box>
+            </Grid>
+        </Grid>
+    );
     const columns: any = [
         {
             name: 'id',
@@ -319,7 +337,13 @@ const AccountTransactionsTable = ({ transactions }: any) => {
         customToolbar: () => {
 
         },
-
+        customFooter: (
+            count: number,
+            page: number,
+            rowsPerPageFooter: number,
+            changeRowsPerPage: any,
+            changePage: any
+        ) => (customFooter()),
         sortOrder: {
             name: 'entidad',
             direction: 'asc'

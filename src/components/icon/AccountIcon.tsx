@@ -26,9 +26,9 @@ const AccountIcon = ({ iconName, styles }: any) => {
         case 'Dolar':
             return (
                 <Box display='flex' flexDirection='row' justifyContent='center' alignItems='center'>
-                    <FontAwesomeIcon icon={faU} size='1x'/>
-                    <FontAwesomeIcon icon={faDollarSign} size='lg' />
-                    <FontAwesomeIcon icon={faS} size='1x' />
+                    <FontAwesomeIcon icon={faU} size={styles.dolarSize ? styles.dolarSize : '1x'} color={styles.dolarColor ? styles.dolarColor : ''}/>
+                    <FontAwesomeIcon icon={faDollarSign} size={styles.dolarSize ? styles.dolarSize : 'lg'} color={styles.dolarColor ? styles.dolarColor : ''}/>
+                    <FontAwesomeIcon icon={faS} size={styles.dolarSize ? styles.dolarSize : '1x'} color={styles.dolarColor ? styles.dolarColor : ''}/>
                 </Box>
             )
         case 'Euro':

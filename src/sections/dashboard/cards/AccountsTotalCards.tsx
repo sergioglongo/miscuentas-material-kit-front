@@ -13,7 +13,7 @@ type Props = CardProps & {
   title?: string;
   subheader?: string;
   heightContent?: string;
-  list: { iconName: string; color: string; label: string; total: number }[];
+  list: { iconName: string; color: string; currency: string; label: string; total: number }[];
 };
 
 export function AccountsTotalCards({ title, subheader, list, heightContent, sx, ...other }: Props) {

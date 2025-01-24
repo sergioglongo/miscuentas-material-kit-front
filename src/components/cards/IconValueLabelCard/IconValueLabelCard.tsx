@@ -5,7 +5,7 @@ import { fCurrency } from 'src/utils/format-number';
 import { varAlpha } from 'src/theme/styles';
 
 type Props = CardProps & {
-  item: { iconName: string; color: string; label: string; total: number };
+  item: { iconName: string; color: string; currency: string; label: string; total: number };
   onClick?: (item: any) => void;
   children?: React.ReactNode;
 };
@@ -28,7 +28,7 @@ export function IconValueLabelCard({ item, onClick, children, sx, ...other }: Pr
       {/* <AreaIcon iconName={item.iconName} styles={{ fontSize: '40', display: 'flex', color: item.color }} /> */}
       {children}
       <Typography variant="h6" sx={{ mt: 1 }}>
-        {fCurrency(item.total)}
+        {item.currency ? fCurrency(item.total, item.currency) : fCurrency(item.total)}
       </Typography>
 
       <Typography variant="body2" sx={{ color: 'text.secondary' }}>

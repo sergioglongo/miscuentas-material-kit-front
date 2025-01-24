@@ -7,6 +7,8 @@ import MUIDataTable from 'mui-datatables';
 import { getAllTransactionsByUnitId } from 'src/services/api/modules/transaction.module';
 import PayMethodIcon from 'src/components/icon/paymethod-icons';
 import CommonIcon from 'src/components/icon/CommonIcons';
+import { fDateSlash } from 'src/utils/format-time';
+import { fCurrency } from 'src/utils/format-number';
 
 const TransactionTable = ({ unitActive }: any) => {
     const [transaction, setTransaction] = useState([]);
@@ -14,7 +16,7 @@ const TransactionTable = ({ unitActive }: any) => {
     const router = useRouter();
     const onEdit = (value: any) => {
         // console.log("Elegido editar id: ", value);
-        router.navigateState('/transactionEdit', { id: value,});
+        router.navigateState('/transactionEdit', { id: value, });
     };
     const getMuiTheme = () => createTheme({
         components: {
@@ -157,7 +159,29 @@ const TransactionTable = ({ unitActive }: any) => {
                     <th style={{ minWidth: '100px', textAlign: 'left' }}>
                         {columnMeta.label}
                     </th>
-                )
+                ),
+                customBodyRender: (value: any) => (
+                    <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                        {fCurrency(value)}
+                    </th>
+                ),
+            }
+        },
+        {
+            name: 'date',
+            label: 'Fecha',
+            options: {
+                filter: false,
+                customHeadRender: (columnMeta: any) => (
+                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
+                        {columnMeta.label}
+                    </th>
+                ),
+                customBodyRender: (value: any) => (
+                    <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                        {fDateSlash(value)}
+                    </th>
+                ),
             }
         },
         {
@@ -173,9 +197,9 @@ const TransactionTable = ({ unitActive }: any) => {
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         {value === 'out' ?
-                           <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
-                           :
-                           <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
+                            <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
+                            :
+                            <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
                         }
                     </th>
                 ),
@@ -353,7 +377,7 @@ const TransactionTable = ({ unitActive }: any) => {
                             payMethodName: transactionItem.pay_method.method,
                             areaName: transactionItem.category.area.name,
                             areaid: transactionItem.category.area.id,
-                            key:transactionItem.id
+                            key: transactionItem.id
                         }
                     ));
                     setTransaction(transactionWithCategoryPayMethod);

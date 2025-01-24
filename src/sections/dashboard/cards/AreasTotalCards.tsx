@@ -23,7 +23,7 @@ type Props = CardProps & {
   options: { value: string; label: string }[];
   onSelectOption: (option: string) => void;
   transactionOptionSelected: string;
-  list: { iconName: string; color: string; label: string; total: number }[];
+  list: { iconName: string; color: string; currency: string; label: string; total: number }[];
 };
 
 

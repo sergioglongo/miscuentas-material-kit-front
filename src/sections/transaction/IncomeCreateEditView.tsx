@@ -27,7 +27,7 @@ const IncomeCreateEditView = ({ incomeForm, init, unit }: any) => {
     const [payMethodsList, setPayMethodsList] = useState<IPayMethod[]>([]);
     const location = useLocation();
     const TransactionInitialData = location.state;
-    const [type, setType] = useState<InOutType>(TransactionInitialData?.type || "out");
+    const [type, setType] = useState<InOutType>(TransactionInitialData?.type || "in");
 
     useEffect(() => {
         getAllAreasByUnitId(unit?.id, 'in')

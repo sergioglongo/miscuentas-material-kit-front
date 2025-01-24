@@ -123,9 +123,6 @@ export function fDateDbToDatePicker(date: string) {
 
 export function utcToLocal(date: string) {
   const fechaLocal = moment(date).locale('es');
-  console.log("fechaUtc", date);
-  console.log("fechaLocal", fechaLocal.format('YYYY-MM-DD'));
-  
   return fechaLocal.format('YYYY-MM-DD');
 }
 
