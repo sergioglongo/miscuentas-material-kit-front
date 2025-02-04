@@ -9,7 +9,7 @@ import { useTheme, Breakpoint } from '@mui/material/styles';
 import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
 import { setAreasList, setCategoriesList } from 'src/redux/slices/lists.slice';
 import { getAllAreas } from 'src/services/api/modules/area.module';
-import { createEditCategory } from 'src/services/api/modules/category.module';
+import { createEditCategory, getCategoryById } from 'src/services/api/modules/category.module';
 import CategoryCreateEditForm from './CategoryCreateEditForm';
 
 const CategoryCreateEditView = ({ categoryForm, init, unit, lists, setAreasListState, setCategoriesListState }: any) => {
@@ -19,10 +19,11 @@ const CategoryCreateEditView = ({ categoryForm, init, unit, lists, setAreasListS
     const [errorShow, setErrorShow] = useState<boolean>(false);
     const location = useLocation();
     const categoryInitialData = location.state;
-    const [icon, setIcon] = useState(categoryInitialData?.icon || "Home");
     const [areaSelected, setAreaSelected] = useState<any>('');
+    const [icon, setIcon] = useState(categoryInitialData?.icon || "Home");
     const [color, setColor] = useState<string>('#000000');
     const [isActive, setIsActive] = useState(categoryInitialData?.is_active || true);
+    const loadingCategoryRef = useRef(false);
 
     useEffect(() => {
         if (lists.areasList.length === 0) {
@@ -41,18 +42,37 @@ const CategoryCreateEditView = ({ categoryForm, init, unit, lists, setAreasListS
         }
     }, [unit?.id, categoryInitialData, lists.areasList, setAreasListState]);
 
+    // useEffect(() => {
+    //     if (categoryInitialData) {
+    //         init('categoryForm', categoryInitialData);
+    //         console.log("categoryInitialData", categoryInitialData);
+    //         setIsNew(false);
+    //         setAreaSelected(categoryInitialData?.areaId);
+    //         setColor(categoryInitialData?.areaColor);
+    //         setIsActive(categoryInitialData?.is_active);
+    //     }
+
+    // }, [init, categoryInitialData]);
     useEffect(() => {
-        if (categoryInitialData) {
-            init('categoryForm', categoryInitialData);
-            console.log("categoryInitialData", categoryInitialData);
-            setIsNew(false);
-            setAreaSelected(categoryInitialData?.areaId);
-            setColor(categoryInitialData?.areaColor);
-            setIsActive(categoryInitialData?.is_active);
+        if (!loadingCategoryRef.current && categoryInitialData?.id) {
+            loadingCategoryRef.current = true;
+            getCategoryById(categoryInitialData?.id).then((resultCategory: any) => {
+                if (resultCategory?.success) {
+                    init('categoryForm', resultCategory?.result);
+                    setIsNew(false);
+                    setIcon(resultCategory?.result?.icon);
+                    setColor(resultCategory?.result?.color);
+                    setIsActive(resultCategory?.result?.is_active);
+                    console.log("resultCategory", resultCategory?.result);
+                    setCategoriesList(resultCategory?.result?.categories);
+                    setAreaSelected(resultCategory?.result?.areaId);
+                }
+            })
+                .finally(() => {
+                    loadingCategoryRef.current = false;
+                });
         }
-
     }, [init, categoryInitialData]);
-
     useEffect(() => {
         const colorDefined = lists.areasList.find((areaItem: any) => areaItem.id === areaSelected)?.color;
         console.log("areaselected", areaSelected, colorDefined);
@@ -67,11 +87,11 @@ const CategoryCreateEditView = ({ categoryForm, init, unit, lists, setAreasListS
             name: categoryForm?.values?.name,
             description: categoryForm?.values?.description,
             type: 'out',
-            color: categoryInitialData?.areaColor,
+            color,
             icon,
             deleted: categoryForm?.values?.deleted,
             is_active: isActive,
-            areaId: categoryForm?.values?.areaId
+            areaId: areaSelected,
         }
         console.log("formulario a guardar:", dataToSave);
         createEditCategory(dataToSave)
@@ -92,7 +112,7 @@ const CategoryCreateEditView = ({ categoryForm, init, unit, lists, setAreasListS
                 console.log("error catch", err)
             });
 
-    }, [router, categoryForm?.values, icon, isActive, setCategoriesListState, categoryInitialData?.areaColor]);
+    }, [router, categoryForm?.values, icon, isActive, setCategoriesListState, areaSelected, color]);
 
     const theme = useTheme();
     const layoutQuery: Breakpoint = 'md';

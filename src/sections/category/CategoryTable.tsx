@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
-import { Checkbox,IconButton, Tooltip } from '@mui/material';
+import { Checkbox, IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
 import { getAllCategoriesByUnitId } from 'src/services/api/modules/category.module';
@@ -13,6 +13,7 @@ import { setAreasList, setCategoriesList } from 'src/redux/slices/lists.slice';
 const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
     const [categories, setCategories] = useState([]);
     const rowsPerPage = 10;
+    const theme = useTheme();
     const router = useRouter();
     const onEdit = (categoryData: any) => {
         const categoryInitialData = {
@@ -155,11 +156,13 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
             label: 'Nombre',
             options: {
                 filter: false,
-                customHeadRender: (columnMeta: any) => (
-                    <th key={2} style={{ minWidth: '100px', textAlign:'left' }}>
-                        {columnMeta.label}
+                sort: true,
+                sortThirdClickReset: true,
+                customHeadRender: (columnMeta: any, updateDirection:any, sortOrder:any) => (
+                    <th key={2} style={{ textAlign: 'left' }} onClick={() => updateDirection(2)}>
+                        {columnMeta.label } {sortOrder.name === 'name' && sortOrder.direction !== 'none' ? sortOrder.direction === 'asc' ? '⬆️' : '⬇️' : ''}
                     </th>
-                )
+                ),
             }
         },
         {
@@ -168,7 +171,7 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th key={3} style={{ minWidth: '100px', textAlign:'left' }}>
+                    <th key={3} style={{ minWidth: '100px', textAlign: 'left' }}>
                         {columnMeta.label}
                     </th>
                 ),
@@ -190,9 +193,9 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         {value === 'out' ?
-                          <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
-                          :
-                          <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
+                            <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
+                            :
+                            <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
                         }
                     </th>
                 ),
@@ -212,7 +215,7 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
                 filter: false,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th key={5} style={{  }}>
+                    <th key={5} style={{}}>
                         {columnMeta.label}
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
@@ -276,15 +279,17 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
             name: 'area',
             label: 'Area',
             options: {
-                filter: false,
-                sort: false,
-                customHeadRender: (columnMeta: any) => (
-                    <th key={9} style={{ textAlign:'center' }}>
-                        {columnMeta.label}
+                filter: true,
+                sort: true,
+                sortThirdClickReset: true,
+                customHeadRender: (columnMeta: any, updateDirection:any, sortOrder:any) => (
+                    <th key={9} style={{ textAlign: 'center' }} onClick={() => updateDirection(9)}>
+                        {columnMeta.label } {sortOrder.name === 'area' && sortOrder.direction !== 'none' ? sortOrder.direction === 'asc' ? '⬆️' : '⬇️' : ''}
                     </th>
                 ),
+                
                 customBodyRender: (value: any) => (
-                    <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
                         {value}
                     </th>
                 ),
@@ -328,7 +333,7 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
         },
 
         sortOrder: {
-            name: 'entidad',
+            name: 'name',
             direction: 'asc'
         },
         setTableProps: () => ({
@@ -364,21 +369,21 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
         //   filterChoferes(searchText);
         // },
     };
- 
+
     const loadingRef = useRef(false);
 
     useEffect(() => {
         if (lists.categoriesList.length === 0 && !loadingRef.current) {
             getAllCategoriesByUnitId(unitActive?.id, '')
-            .then((categoriesResponse: any) => {
-                if (categoriesResponse?.success) {
-                    const categoriesWithArea = categoriesResponse.result.map((category: any) => ({ ...category, area: category.area.name, type: category.area.type, areaColor: category.area.color}));
-                    setCategoriesListState(categoriesWithArea);
-                } else {
-                    console.log("No se pudieron obtener las categories");
-                }
-            })
-            .catch((err: any) => console.log(err));
+                .then((categoriesResponse: any) => {
+                    if (categoriesResponse?.success) {
+                        const categoriesWithArea = categoriesResponse.result.map((category: any) => ({ ...category, area: category.area.name, type: category.area.type, areaColor: category.area.color }));
+                        setCategoriesListState(categoriesWithArea);
+                    } else {
+                        console.log("No se pudieron obtener las categories");
+                    }
+                })
+                .catch((err: any) => console.log(err));
         }
     }, [unitActive, lists.categoriesList, setCategoriesListState]);
 

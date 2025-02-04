@@ -48,7 +48,8 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
                     console.log("No se pudieron obtener las categorias");
                 }
             }).catch((err: any) => console.log(err));
-        getAllPayMethodsByUnitId(unit?.id, type)
+        const dataPayMethods = { unitId: unit?.id, type, is_active: true, deleted: false };
+        getAllPayMethodsByUnitId(dataPayMethods)
             .then((payMethodsResponse: any) => {
                 // console.log("payMethodsResponse", payMethodsResponse);
                 if (payMethodsResponse?.success) {

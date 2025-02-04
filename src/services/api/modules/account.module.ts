@@ -11,9 +11,15 @@ export async function getAllAccounts(filter: string) {
         })
         .catch((err: any) => console.log(err));
 }
-export async function getAllAccountsByUnitId(unitId: number) {
+export async function getAllAccountsByUnitId(unitId: number, is_active: boolean | null) {
+    let data = {};
+    if(is_active !== null){
+        data = {
+            is_active,
+        }
+    }
     return axiosClient
-        .get(`account/getAllByUnitId/${unitId}`)
+        .post(`account/getAllByUnitId/${unitId}`, data)
         .then((response: any) => {
             if (typeof response.data !== 'undefined' && response.data.success === true) {
                 return response.data;

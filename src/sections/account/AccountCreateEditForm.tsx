@@ -7,6 +7,7 @@ import { useRouter } from 'src/routes/hooks';
 import { Field, Form } from 'redux-form'
 import AccountIcon from 'src/components/icon/AccountIcon';
 import { grey } from '../../theme/core/palette';
+import AccountPayMethodsEditFrom from './AccountPayMethodsEditFrom';
 
 const currencyLista = [
     'Pesos',
@@ -26,37 +27,21 @@ interface CategoryEditProps {
     accountData: IAccount;
     isNew: boolean;
     is_active: boolean;
-    setIsActive: any
+    setIsActive: any;
+    payMethodsSelected: string[];
+    setPayMethodsSelected: any;
 }
 
-function AccountCreateEditForm({ handleEdit, accountData, isNew, is_active, setIsActive }: CategoryEditProps) {
-
-    const [openmodal, setOpenmodal] = useState(false);
-    const [currencySelected, setCurrencySelected] = useState('Pesos');
-    const [typeSelected, setTypeSelected] = useState('cash');
+function AccountCreateEditForm({ handleEdit, accountData, isNew, is_active, setIsActive, payMethodsSelected, setPayMethodsSelected }: CategoryEditProps) {
 
     const router = useRouter();
-    const styles: any = {
-        container: {
-            display: 'flex',
-            flexWrap: 'wrap',
-            width: '300px',
-            height: 'auto',
-            justifyContent: 'space-around',
-        },
-        icon: {
-            width: 'auto',
-            height: 'auto',
-            margin: '4px',
-            boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.1)',
-        },
-    };
 
-    useEffect(() => {
-        if (accountData) {
-            console.log("inicializacion de accountData", accountData);
-        }
-    }, [accountData, isNew])
+    // useEffect(() => {
+    //     if (accountData) {
+    //         console.log("inicializacion de accountData", accountData);
+
+    //     }
+    // }, [accountData, isNew])
 
     return (
         <Form onSubmit={handleEdit} style={{ margin: '10px' }}>
@@ -74,51 +59,52 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew, is_active, setI
                         />
                     </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={12} style={{ width: '100%' }}>
-                    <FormControl fullWidth>
-                        <Field
-                            name="balance"
-                            component={TextFieldErrorRedux}
-                            label="Balance"
-                            placeholder='Ingrese el monto'
-                            type="number"
-                            // InputProps={{  }}
-                            InputLabelProps={{ shrink: true }}
-                            onChange={(e: any) => console.log(e.target.value)}
-                            value={accountData?.balance || ''}
-                        />
-                    </FormControl>
+                <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                    <Grid container spacing={2} columnSpacing={1} >
+                        <Grid item xs={12} sm={6} md={4} >
+                            <Box>
+                                <FormControl >
+                                    <Field
+                                        name="balance"
+                                        component={TextFieldErrorRedux}
+                                        label="Balance"
+                                        placeholder='Ingrese el monto'
+                                        type="number"
+                                        // InputProps={{  }}
+                                        InputLabelProps={{ shrink: true }}
+                                        onChange={(e: any) => console.log(e.target.value)}
+                                        value={accountData?.balance || ''}
+                                    />
+                                </FormControl>
+                            </Box>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <Box style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                                <Typography variant="h6">Activada:</Typography>
+                                <Checkbox
+                                    size="large"
+                                    onChange={(e: any) => setIsActive(e.target.checked)}
+                                    checked={is_active}
+                                />
+                            </Box>
+                        </Grid>
+                    </Grid>
                 </Grid>
                 <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                    <Typography variant="h6">Activado:</Typography>
-                    <Checkbox
-                        size="large"
-                        onChange={(e: any) => setIsActive(e.target.checked)}
-                        checked={is_active}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                    <Typography variant="h6" style={{ marginLeft: '16px' }}>Moneda:</Typography>
+                    <Typography variant="h6" style={{}}>Moneda:</Typography>
                     <FormControl >
                         <Field
                             name="currency"
                             component={SelectRedux}
-                            // label="Area"
                             style={{ minWidth: '200px', marginLeft: '10px' }}
-                            // placeholder='Ingrese area'
-                            // defaultValue= "hello@gmail.com"
-                            // InputProps={{  }}
-                            // InputLabelProps={{ shrink: true }}
                             variant="outlined"
                             size='small'
-                            // onChange={(e: any) => console.log(e.target.id)}
                             value={accountData?.currency}
                         >
                             {currencyLista.map((item, index) => (
                                 <MenuItem
                                     value={item} key={index}
-                                    defaultValue={accountData?.currency === item ? accountData?.currency : ''}
-                                // style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+                                    // defaultValue={accountData?.currency === item ? accountData?.currency : ''}
                                 >
                                     <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                                         <AccountIcon iconName={item} styles={{ fontSize: '20', display: 'flex', color: grey[700] }} />
@@ -133,23 +119,15 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew, is_active, setI
                         <Field
                             name="type"
                             component={SelectRedux}
-                            // label="Area"
                             style={{ minWidth: '200px', marginLeft: '10px' }}
-                            // placeholder='Ingrese area'
-                            // defaultValue= "hello@gmail.com"
-                            // InputProps={{  }}
-                            // InputLabelProps={{ shrink: true }}
                             variant="outlined"
                             size='small'
-                            // onChange={(e: any) => console.log(e.target.id)}
                             defaultValue='Efectivo'
-                        // value={typeSelected}
                         >
                             {typesLista.map((item, index) => (
                                 <MenuItem
                                     value={item.id} key={index}
                                     defaultValue={accountData?.type === item.id ? accountData?.type : ''}
-                                // style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
                                 >
                                     <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                                         <AccountIcon iconName={item?.id} styles={{ fontSize: '25', display: 'flex', color: grey[700] }} />
@@ -160,6 +138,13 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew, is_active, setI
                         </Field>
                     </FormControl>
                 </Grid>
+                <AccountPayMethodsEditFrom
+                    sx={{ width: '100%', boxShadow: 2 }}
+                    title='Metodos de Pago de esta cuenta'
+                    subheader='Seleccione los metodos que desea incorporar como medio de pago para esta cuenta'
+                    payMethodsSelected={payMethodsSelected}
+                    setPayMethodsSelected={setPayMethodsSelected}
+                />
                 <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-arround' }}>
                     <Grid item xs={12} sm={6} style={{ width: '100%', marginTop: '10px' }}>
                         <Button fullWidth size="large" color="inherit" variant="contained" onClick={() => router.back()}>Cancelar</Button>

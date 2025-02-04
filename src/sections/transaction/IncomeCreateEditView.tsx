@@ -30,6 +30,7 @@ const IncomeCreateEditView = ({ incomeForm, init, unit }: any) => {
     const [type, setType] = useState<InOutType>(TransactionInitialData?.type || "in");
 
     useEffect(() => {
+
         getAllAreasByUnitId(unit?.id, 'in')
             .then((areasResponse: any) => {
                 console.log("areasResponse", areasResponse);
@@ -48,7 +49,8 @@ const IncomeCreateEditView = ({ incomeForm, init, unit }: any) => {
                     console.log("No se pudieron obtener las categorias");
                 }
             }).catch((err: any) => console.log(err));
-        getAllPayMethodsByUnitId(unit?.id, 'in')
+        const dataPayMethods = { unitId: unit?.id, type: 'in', is_active: true, deleted: false };
+        getAllPayMethodsByUnitId(dataPayMethods)
             .then((payMethodsResponse: any) => {
                 console.log("payMethodsResponse", payMethodsResponse);
                 if (payMethodsResponse?.success) {

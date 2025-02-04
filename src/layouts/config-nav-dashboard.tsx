@@ -45,15 +45,6 @@ export const navData = [
         icon: <CommonIcon color='gray' iconName="Category" styles={{ fontSize: '25', }} />,
 
       },
-    ]
-  },
-  {
-    key: 'accountsMenu',
-    title: 'Cuentas',
-    path: '',
-    icon: <CommonIcon color='gray' iconName="Home" styles={{ fontSize: '25', }} />,
-    isMenu: true,
-    submenu: [
       {
         key: 'accounts',
         title: 'Cuentas',
@@ -70,6 +61,23 @@ export const navData = [
       },
     ]
   },
+  // {
+  //   key: 'accountsMenu',
+  //   title: 'Cuentas',
+  //   path: '',
+  //   icon: <CommonIcon color='gray' iconName="Home" styles={{ fontSize: '25', }} />,
+  //   isMenu: true,
+  //   submenu: [
+
+  //     // {
+  //     //   key: 'payMethods',
+  //     //   title: 'Medios Pago',
+  //     //   path: '/paymethod',
+  //     //   icon: <CommonIcon color='gray' iconName="PayMethods" styles={{ fontSize: '25', }} />,
+
+  //     // },
+  //   ]
+  // },
 
   // {
   //   title: 'Productos',

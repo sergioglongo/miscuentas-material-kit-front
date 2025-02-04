@@ -154,14 +154,12 @@ const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
             label: 'Nombre',
             options: {
                 filter: false,
-                customHeadRender: (columnMeta: any) => (
-                    <th key={2} style={{ minWidth: '100px', textAlign: 'left' }}>
-                        {columnMeta.label}
+                sortThirdClickReset: true,
+                customHeadRender: (columnMeta: any, updateDirection:any, sortOrder:any) => (
+                    <th key={2} style={{ textAlign: 'left' }} onClick={() => updateDirection(2)}>
+                        {columnMeta.label } {sortOrder.name === 'name' && sortOrder.direction !== 'none' ? sortOrder.direction === 'asc' ? '⬆️' : '⬇️' : ''}
                     </th>
                 ),
-                //  customBodyRender: (value: any) => (
-                //     <th >{value}</th>
-                // ),
             }
         },
         {
@@ -185,9 +183,13 @@ const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
             options: {
                 filter: true,
                 sort: false,
-                customHeadRender: (columnMeta: any) => (
-                    <th key={4} style={{}}>{columnMeta.label}</th>
-                ), customBodyRender: (value: any, tableMeta: any) => () => (
+                sortThirdClickReset: true,
+                customHeadRender: (columnMeta: any, updateDirection:any, sortOrder:any) => (
+                    <th key={4} style={{ textAlign: 'center' }} onClick={() => updateDirection(4)}>
+                        {columnMeta.label } {sortOrder.name === 'type' && sortOrder.direction !== 'none' ? sortOrder.direction === 'asc' ? '⬆️' : '⬇️' : ''}
+                    </th>
+                ),
+                 customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         {value === 'out' 
                         ?
@@ -305,7 +307,7 @@ const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
         },
 
         sortOrder: {
-            name: 'entidad',
+            name: 'name',
             direction: 'asc'
         },
         setTableProps: () => ({

@@ -9,69 +9,31 @@ import { useRouter } from 'src/routes/hooks';
 import { Field, Form } from 'redux-form'
 import ModalConfirm from 'src/components/modal/ModalConfirm';
 import CategoryIcon, { CategoryIconsList } from 'src/components/icon/CategoryIcon';
-import AreaIcon from 'src/components/icon/AreaIcons';
 
 interface CategoryEditProps {
     handleEdit: any;
     categoryData: ICategory & { areaColor: string };
     icon: string;
     setIcon: any;
-    color: string;
-    setColor: any;
-    areaSelected: any;
-    setAreaSelected: any;
-    areasList: IArea[],
     isActive: boolean;
     setIsActive: any;
+    onCancel: any;
+    color: string;
 }
 
-function CategoryCreateEditForm({ handleEdit, categoryData, icon, setIcon, color, setColor, areaSelected, setAreaSelected, areasList, isActive, setIsActive }: CategoryEditProps) {
+function AreaCategoriesCreateEditForm({ handleEdit, categoryData, icon, setIcon, isActive, setIsActive, onCancel, color }: CategoryEditProps) {
 
     const [openmodal, setOpenmodal] = useState(false);
-    const [type, setType] = useState(categoryData?.type || 'out');
-    const [areasListToShow, setAreasListToShow] = useState<IArea[]>([]);
-    const router = useRouter();
-    const styles: any = {
-        container: {
-            display: 'flex',
-            flexWrap: 'wrap',
-            width: '300px',
-            height: 'auto',
-            justifyContent: 'space-around',
-        },
-        icon: {
-            width: 'auto',
-            height: 'auto',
-            margin: '4px',
-            boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.1)',
-        },
-    };
-    const colorDefine = (value: any) => {
-        const colorFind = areasList.find((area: IArea) => area.id === value);
-        console.log("area encontrada", colorFind);
 
-    }
     const onSelectIcon = (iconSelected: string) => {
         setOpenmodal(false);
         setIcon(iconSelected);
     }
-    const areasFilter = useCallback(
-        () => areasList.filter((area: IArea) => area.type === type),
-        [areasList, type]
-    );
-
-    useEffect(() => {
-        setType(categoryData?.type || 'out');
-    }, [categoryData?.type])
-
-    useEffect(() => {
-        setAreasListToShow(areasFilter());
-    }, [type, areasFilter])
 
     return (
         <Form onSubmit={handleEdit} style={{ margin: '10px' }}>
-            <Grid container rowSpacing={1} rowGap={2} columnSpacing={2} display='flex' flexDirection='column' alignItems='flex-start'>
-                <Grid item xs={12} sm={12} gap={5} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+            <Grid container rowSpacing={1} rowGap={2} columnSpacing={2} display='flex' flexDirection='column' alignItems='center'>
+                <Grid item xs={12} sm={12} gap={5} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
                     <FormControl fullWidth>
                         <Field
                             name="name"
@@ -81,16 +43,9 @@ function CategoryCreateEditForm({ handleEdit, categoryData, icon, setIcon, color
                             value={categoryData?.name || ''}
                         />
                     </FormControl>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <Typography variant="h6">Activado:</Typography>
-                        <Checkbox
-                            size="large"
-                            onChange={(e: any) => setIsActive(e.target.checked)}
-                            checked={isActive}
-                        />
-                    </Box>
+                    
                 </Grid>
-                <Grid item xs={12} sm={12} style={{ width: '100%' }}>
+                <Grid item xs={12} sm={12} gap={5} style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
                     <FormControl fullWidth>
                         <Field
                             name="description"
@@ -101,45 +56,10 @@ function CategoryCreateEditForm({ handleEdit, categoryData, icon, setIcon, color
                             value={categoryData?.description || ''}
                         />
                     </FormControl>
+
+
                 </Grid>
-                <Grid item xs={12} sm={12} gap={5} style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
-                    <Box gap={2} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center' }}>
-                        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                            <Typography variant="h6">Entrada</Typography>
-                            <Switch
-                                // defaultChecked
-                                onClick={(e: any) => setType(e.target.checked ? "out" : "in")}
-                                checked={type === 'out'}
-                            />
-                            <Typography variant="h6" style={{ marginLeft: '0px' }}>Salida</Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                            <Typography variant="h6" >Area:</Typography>
-                            <FormControl >
-                                <Select
-                                    name="areaId"
-                                    style={{ minWidth: '200px', marginLeft: '10px' }}
-                                    variant="outlined"
-                                    size='small'
-                                    value={areaSelected || ''}
-                                    // onChange={onChangeArea}
-                                    onChange={(e: any) => setAreaSelected(e.target.value)}
-                                >
-                                    <MenuItem value='' key='' >
-                                        Seleccione un area
-                                    </MenuItem>
-                                    {areasList.map((item, index) => (
-                                        <MenuItem value={item.id} key={index}  >
-                                            <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                                                <AreaIcon iconName={item?.icon} styles={{ fontSize: '20', display: 'flex', color: item?.color }} />
-                                                {item?.name}
-                                            </ListItemIcon>
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Box>
-                    </Box>
+                <Grid item xs={12} sm={12} gap={2} style={{ display: 'flex', flexDirection: 'column',alignItems: 'flex-start', justifyContent: 'flex-start' }}>
                     <Box gap={2} display='flex' flexDirection='row' justifyContent='flex-start' >
                         <Button
                             variant='contained'
@@ -163,12 +83,20 @@ function CategoryCreateEditForm({ handleEdit, categoryData, icon, setIcon, color
                                 />}
                         </Box>
                     </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        <Typography variant="h6">Activado:</Typography>
+                        <Checkbox
+                            size="large"
+                            onChange={(e: any) => setIsActive(e.target.checked)}
+                            checked={isActive}
+                        />
+                    </Box>
                 </Grid>
                 <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-arround' }}>
-                    <Grid item xs={12} sm={6} style={{ width: '100%', marginTop: '10px' }}>
-                        <Button fullWidth size="large" color="inherit" variant="contained" onClick={() => router.back()}>Cancelar</Button>
+                    <Grid item xs={12} sm={6} width='100%' marginTop='10px'>
+                        <Button fullWidth size="large" color="inherit" variant="contained" onClick={() => onCancel()}>Cancelar</Button>
                     </Grid>
-                    <Grid item xs={12} sm={6} style={{ width: '100%', marginTop: '10px' }}>
+                    <Grid item xs={12} sm={6} width='100%' marginTop='10px' >
 
                         <LoadingButton
                             fullWidth
@@ -212,9 +140,10 @@ function CategoryCreateEditForm({ handleEdit, categoryData, icon, setIcon, color
                 buttonPrimaryText="Aceptar"
                 buttonSecondaryShow={false}
                 buttonPrimaryShow={false}
+                inert={openmodal}
             />
         </Form >
     )
 }
 
-export default CategoryCreateEditForm;
+export default AreaCategoriesCreateEditForm;

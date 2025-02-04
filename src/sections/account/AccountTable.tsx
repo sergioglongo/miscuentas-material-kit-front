@@ -16,7 +16,6 @@ const iconToShow = (iconName: string) => {
 }
 
 const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
-    const [accounts, setAccounts] = useState([]);
     const [totalPesos, setTotalPesos] = useState(0);
     const [totalDollar, setTotalDollar] = useState(0);
     const [totalEuro, setTotalEuro] = useState(0);
@@ -368,9 +367,9 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
 
     useEffect(() => {
         if (lists.accountsList.length === 0 && !loadingRef.current) {
-            getAllAccountsByUnitId(unitActive?.id)
+            getAllAccountsByUnitId(unitActive?.id, null)
                 .then((accountResponse: any) => {
-                    console.log("accountResponse", accountResponse);
+                    // console.log("accountResponse", accountResponse);
                     if (accountResponse?.success) {
                         const categoriesWithArea = accountResponse.result.map((account: any) => ({ ...account, account: account.unit.name, description: account.unit.description, accountPhoto: account.unit.photo }));
                         setAccountsListState(categoriesWithArea);
@@ -393,7 +392,7 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
                         setTotalDollar(totalDolarTemp);
                         setTotalPesos(totalPesosTemp);
                         setTotalEuro(totalEuroTemp);
-                        console.log("totales", totalDolarTemp, totalPesosTemp, totalEuroTemp);
+                        // console.log("totales", totalDolarTemp, totalPesosTemp, totalEuroTemp);
 
                     } else {
                         console.log("No se pudieron obtener las accounts");

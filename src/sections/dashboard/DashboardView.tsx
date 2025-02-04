@@ -35,8 +35,8 @@ function DashboardView() {
   const [periodo, setPeriodo] = useState('30');
   const [fechasLista, setFechasLista] = useState([]);
   const hoy = formatoFecha(new Date());
-  const onNewTransaction = () => {
-    router.push('/paymentEdit');
+  const onNewTransaction = (value: any) => {
+    router.navigateState('/transactionEdit', { type: value, });
   }
   useEffect(() => {
     const fechas: any = getFechas();
@@ -76,7 +76,7 @@ function DashboardView() {
             variant="contained"
             color="error"
             startIcon={<Iconify icon="mingcute:add-line" />}
-            onClick={() => router.push('/paymentEdit')}
+            onClick={() => onNewTransaction('out')}
           >
             Gasto
           </Button>
@@ -84,11 +84,10 @@ function DashboardView() {
             variant="contained"
             color="success"
             startIcon={<Iconify icon="mingcute:add-line" />}
-            onClick={() => router.push('/incomeEdit')}
+            onClick={() => onNewTransaction('in')}
           >
             Ingreso
           </Button>
-
         </Box>
       </Box>
       {/* <AreaTable /> */}

@@ -9,24 +9,17 @@ import PayMethodIcon from 'src/components/icon/PayMethodIcons';
 import CommonIcon from 'src/components/icon/CommonIcons';
 import { grey } from 'src/theme/core';
 import { bindActionCreators } from '@reduxjs/toolkit';
-import { setAccountsList, setPayMethodsList } from 'src/redux/slices/lists.slice';
+import { setPayMethodsList } from 'src/redux/slices/lists.slice';
 
-const PayMethodTable = ({ unitActive, lists, setPayMethodsListState }: any) => {
+const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethodsListState, setOpenmodalPayMethodEdit }: any) => {
     const [payMethod, setPayMethod] = useState([]);
+
     const rowsPerPage = 10;
     const router = useRouter();
     const onEdit = (payMethodData: any) => {
-        const payMethodInitialData = {
-            id: payMethodData[0],
-            name: payMethodData[2],
-            type: payMethodData[3],
-            method: payMethodData[4],
-            is_active: payMethodData[6],
-            deleted: payMethodData[7],
-            accountId: payMethodData[8],
-        }
-        console.log("presionado editar desde ", payMethodInitialData);
-        router.navigateState('/paymethodEdit', payMethodInitialData);
+        console.log("presionado editar el metodo de pago ", payMethodData[0]);
+        setPayMethodSelected(payMethodData[0]);
+        setOpenmodalPayMethodEdit(true);
     };
     const getMuiTheme = () => createTheme({
         components: {
@@ -119,26 +112,26 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodsListState }: any) => {
         },
         {
             name: 'id',
-            label: 'Acciones',
+            label: 'Editar',
             options: {
                 filter: false,
                 customBodyRender: (value: any, tableMeta: any) => (
-                    <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-                        <Tooltip title="Ver detalle">
+                    <th style={{ width: 80, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                        {/* <Tooltip title="Ver detalle">
                             <IconButton aria-label="Ver" onClick={() => { }}>
                                 <CommonIcon color='gray' iconName="View" />
                             </IconButton>
-                        </Tooltip>
+                        </Tooltip> */}
                         <Tooltip title="Editar">
                             <IconButton aria-label="Ver" onClick={() => onEdit(tableMeta?.rowData)}>
                                 <CommonIcon color='gray' iconName="Edit" />
                             </IconButton>
                         </Tooltip>
-                        <Tooltip title="Eliminar">
+                        {/* <Tooltip title="Eliminar">
                             <IconButton aria-label="Ver" onClick={() => { }}>
                                 <CommonIcon color='gray' iconName="Delete" />
                             </IconButton>
-                        </Tooltip>
+                        </Tooltip> */}
                     </th>
                 ),
                 customHeadRender: (columnMeta: any) => (
@@ -334,7 +327,8 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodsListState }: any) => {
 
     useEffect(() => {
         if (lists.payMethodsList.length === 0 && !loadingRef.current) {
-            getAllPayMethodsByUnitId(unitActive?.id, '')
+            const dataPayMethods = { unitId: unitActive?.id, deleted: false };
+            getAllPayMethodsByUnitId(dataPayMethods)
                 .then((peyMethodsResponse: any) => {
                     console.log("peyMethodsResponse", peyMethodsResponse);
                     if (peyMethodsResponse?.success) {

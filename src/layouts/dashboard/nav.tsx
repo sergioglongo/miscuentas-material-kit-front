@@ -152,7 +152,7 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
               let isActived = item.path === pathname;
               if (item.isMenu) {
                 return (
-                  <Accordion key={item.title}>
+                  <Accordion key={item.title} expanded>
                     <AccordionSummary
                       expandIcon={<ExpandMore />}
                     // aria-controls="panel1a-content"

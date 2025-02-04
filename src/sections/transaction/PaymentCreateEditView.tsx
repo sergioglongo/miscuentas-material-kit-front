@@ -48,7 +48,8 @@ const PaymentCreateEditView = ({ paymentForm, init, unit }: any) => {
                     console.log("No se pudieron obtener las categorias");
                 }
             }).catch((err: any) => console.log(err));
-        getAllPayMethodsByUnitId(unit?.id, 'out')
+        const dataPayMethods = { unitId: unit?.id, type: 'out', is_active: true, deleted: false };
+        getAllPayMethodsByUnitId(dataPayMethods)
             .then((payMethodsResponse: any) => {
                 console.log("payMethodsResponse", payMethodsResponse);
                 if (payMethodsResponse?.success) {
@@ -56,7 +57,7 @@ const PaymentCreateEditView = ({ paymentForm, init, unit }: any) => {
                 } else {
                     console.log("No se pudieron obtener los metodos de pago");
                 }
-        }).catch((err: any) => console.log(err));
+            }).catch((err: any) => console.log(err));
 
     }, [unit?.id, TransactionInitialData]);
 
@@ -65,7 +66,7 @@ const PaymentCreateEditView = ({ paymentForm, init, unit }: any) => {
             getTransactionById(TransactionInitialData?.id).then((resultTransaction: any) => {
                 if (resultTransaction?.success) {
                     console.log("transaction by Id", resultTransaction.result);
-                    const dataToInit = {...resultTransaction.result, date : utcToLocal(resultTransaction.result?.date)};
+                    const dataToInit = { ...resultTransaction.result, date: utcToLocal(resultTransaction.result?.date) };
                     init('paymentForm', dataToInit);
                     setIsNew(false);
                     // setType(res.result.type);
@@ -150,7 +151,7 @@ const PaymentCreateEditView = ({ paymentForm, init, unit }: any) => {
                     transactionData={paymentForm?.values}
                     type={type}
                     setType={setType}
-                    // areaId={TransactionInitialData?.areaId}
+                // areaId={TransactionInitialData?.areaId}
                 />
             </SectionCard>
         </Box>

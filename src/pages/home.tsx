@@ -4,9 +4,6 @@ import { connect } from 'react-redux';
 import { useRouter } from 'src/routes/hooks';
 
 import { CONFIG } from 'src/config-global';
-import { IUserState } from 'src/config/types/types';
-
-import { OverviewAnalyticsView } from 'src/sections/overview/view';
 import DashboardPage from './dashboard/DashboardPage';
 
 // ----------------------------------------------------------------------

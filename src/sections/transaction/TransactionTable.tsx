@@ -112,8 +112,13 @@ const TransactionTable = ({ unitActive }: any) => {
             label: 'Acciones',
             options: {
                 filter: false,
-                customBodyRender: (value: any, tableMeta: any) => (
-                    <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                customBodyRender: (value: any, tableMeta: any) => {
+                    if(tableMeta.rowData[7] === 'Ajuste'){
+                        return <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                            Sin acciones
+                            </th>;
+                    }
+                    return <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                         <Tooltip title="Ver detalle">
                             <IconButton aria-label="Ver" onClick={() => { }}>
                                 <CommonIcon color='gray' iconName="View" />
@@ -130,7 +135,7 @@ const TransactionTable = ({ unitActive }: any) => {
                             </IconButton>
                         </Tooltip>
                     </th>
-                ),
+                },
                 customHeadRender: (columnMeta: any) => (
                     <th style={{ width: '80px', padding: 0, height: '40px' }}>
                         {columnMeta.label}
@@ -373,13 +378,15 @@ const TransactionTable = ({ unitActive }: any) => {
                     const transactionWithCategoryPayMethod = transactionsResponse.result.map((transactionItem: any) => (
                         {
                             ...transactionItem,
-                            categoryName: transactionItem.category.name,
+                            categoryName: transactionItem?.category?.name || 'Ajuste',
                             payMethodName: transactionItem.pay_method.method,
-                            areaName: transactionItem.category.area.name,
-                            areaid: transactionItem.category.area.id,
+                            areaName: transactionItem?.category?.area?.name || 'Ajuste',
+                            areaid: transactionItem?.category?.area?.id || 0,
                             key: transactionItem.id
                         }
                     ));
+                    console.log("transactionWithCategoryPayMethod", transactionWithCategoryPayMethod);
+
                     setTransaction(transactionWithCategoryPayMethod);
                 } else {
                     console.log("No se pudieron obtener las transaction");

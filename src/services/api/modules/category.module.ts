@@ -22,6 +22,17 @@ export async function getAllCategoriesByUnitId(unitId:number, type:string) {
         })
         .catch((err: any) => console.log(err));
 }
+export async function getCategoriesByAreaId(areaId:number) {
+    return axiosClient
+        .get(`category/getCategoriesByAreaId/${areaId}`)
+        .then((response: any) => {
+            if (typeof response.data !== 'undefined' && response.data.success === true) {
+                return response.data;
+            }
+            return response;
+        })
+        .catch((err: any) => console.log(err));
+}
 export async function getCategoryById(data: any) {
     return axiosClient
         .get(`category/getById/${data}`)

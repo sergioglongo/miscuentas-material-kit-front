@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
 import { useRouter } from 'src/routes/hooks';
 import { reduxForm, initialize } from 'redux-form';
@@ -8,8 +8,8 @@ import { bindActionCreators } from '@reduxjs/toolkit';
 import { useTheme, Breakpoint } from '@mui/material/styles';
 import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
 import { IAccount } from 'src/config/types/types';
-import { setAccountsList } from 'src/redux/slices/lists.slice';
-import { createEditAccount } from 'src/services/api/modules/account.module';
+import { setAccountsList, setPayMethodsList } from 'src/redux/slices/lists.slice';
+import { createEditAccount, getAccountById } from 'src/services/api/modules/account.module';
 import AccountCreateEditForm from './AccountCreateEditForm';
 
 const accountInitialDataEmpty = {
@@ -17,28 +17,53 @@ const accountInitialDataEmpty = {
     type: 'cash',
 }
 
-const AccountCreateEditView = ({ accountForm, init, unit, setAccountsListState }: any) => {
+const methodsList = [
+    { id: 'debit', name: 'Tarjeta Debito' },
+    { id: 'credit', name: 'Tarjeta Credito' },
+    { id: 'transfer', name: 'Transferencia' },
+    { id: 'other', name: 'Otro' },
+]
+
+const AccountCreateEditView = ({ accountForm, init, unit, setAccountsListState, setPayMethodsListState }: any) => {
     const router = useRouter();
-    const [errorMessage, setErrorMessage] = useState('');
-    const [errorShow, setErrorShow] = useState<boolean>(false);
-    const [areas, setAreas] = useState([]);
+    const [payMethodsSelected, setPayMethodsSelected] = useState([]);
     const location = useLocation();
     const accountInitialData = location.state;
     const [isNew, setIsNew] = useState(true);
     const [is_active, setIsActive] = useState(accountForm?.is_active || true);
+    const loadingAccountRef = useRef(false);
 
+    const processPaymethods = (accountData: any) => {
+        if (accountData?.pay_methods.length > 0) {
+            const payMethods = accountData?.pay_methods;
+            const payMethodsInAccount:any = [...new Set(payMethods.map((payMethod: any) => payMethod.method))];
+            console.log("payMethodsInAccount", payMethodsInAccount);
+            setPayMethodsSelected(payMethodsInAccount);
+        }
+    }
     useEffect(() => {
-        if (accountInitialData) {
-            init('accountForm', accountInitialData);
-            console.log("inicializacion de accountData", accountInitialData);
-            setIsNew(false);
-            setIsActive(accountInitialData?.is_active);
+        if (!loadingAccountRef.current && accountInitialData?.id) {
+            loadingAccountRef.current = true;
+            getAccountById(accountInitialData?.id).then((resultTransaction: any) => {
+                if (resultTransaction?.success) {
+                    init('accountForm', accountInitialData);
+                    setIsNew(false);
+                    processPaymethods(resultTransaction.result);
+                }
+            })
+                .finally(() => {
+                    loadingAccountRef.current = false;
+                });
         }
     }, [init, accountInitialData]);
+    useEffect(() => {
+        console.log("payMethodsSelected", payMethodsSelected);
+        
+    },[payMethodsSelected]);
 
     const handleSave = useMemo(() => (e: any) => {
         e.preventDefault();
-        const dataToSave:IAccount = {
+        const dataToSave: IAccount & { pay_methods: string[] } = {
             id: accountForm?.values?.id,
             name: accountForm?.values?.name,
             balance: accountForm?.values?.balance,
@@ -46,28 +71,27 @@ const AccountCreateEditView = ({ accountForm, init, unit, setAccountsListState }
             type: accountForm?.values?.type,
             deleted: accountForm?.values?.deleted,
             is_active,
-            unitId: accountForm?.values?.unitId || unit?.id
+            unitId: accountForm?.values?.unitId || unit?.id,
+            pay_methods: payMethodsSelected
         }
         console.log("formulario a guardar:", dataToSave);
         createEditAccount(dataToSave)
             .then((res) => {
                 if (res?.success) {
                     setAccountsListState([]);
+                    setPayMethodsListState([]);
+
                     router.back();
                 } else {
-                    setErrorMessage(res?.message);
-                    setErrorShow(true);
                     console.log("error else", res)
                 }
             }
             )
             .catch((err: any) => {
-                setErrorMessage(err?.message);
-                setErrorShow(true);
                 console.log("error catch", err)
             });
 
-    }, [router, accountForm?.values, unit?.id, is_active, setAccountsListState]);
+    }, [router, accountForm?.values, unit?.id, is_active, setAccountsListState, payMethodsSelected, setPayMethodsListState]);
 
     const theme = useTheme();
     const layoutQuery: Breakpoint = 'md';
@@ -115,6 +139,8 @@ const AccountCreateEditView = ({ accountForm, init, unit, setAccountsListState }
                     isNew={isNew}
                     is_active={is_active}
                     setIsActive={setIsActive}
+                    payMethodsSelected={payMethodsSelected}
+                    setPayMethodsSelected={setPayMethodsSelected}
                 />
             </SectionCard>
         </Box>
@@ -129,6 +155,7 @@ const AccountCreateEditFormReduxed = reduxForm({
 const mapDispatchToProps = (dispatch: any) => ({
     init: bindActionCreators(initialize, dispatch),
     setAccountsListState: bindActionCreators(setAccountsList, dispatch),
+    setPayMethodsListState: bindActionCreators(setPayMethodsList, dispatch),
 });
 
 const AccountCreateEditViewForm = connect(

@@ -10,14 +10,15 @@ import { useTheme, Breakpoint } from '@mui/material/styles';
 import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
 import { setAreasList } from 'src/redux/slices/lists.slice';
 // import ProfileEditForm from '../user/profile/profile-edit-form';
-import { createEditArea } from 'src/services/api/modules/area.module';
+import { createEditArea, getAreaById } from 'src/services/api/modules/area.module';
 import { basePalette } from 'src/theme/core';
+import { getCategoriesByAreaId } from 'src/services/api/modules/category.module';
 import AreaCreateEditForm from './AreaCreateEditForm';
 
 
 const getColors = () => {
     const colors = [];
-    for (let i = 1; i < 18; i+=1) {
+    for (let i = 1; i < 18; i += 1) {
         colors.push(basePalette.listColors[i]);
     }
     return colors;
@@ -27,25 +28,55 @@ const AreaCreateEditView = ({ areaForm, init, unit, setAreasListState }: any) =>
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
     const [errorShow, setErrorShow] = useState<boolean>(false);
+    const [isNew, setIsNew] = useState(true);
+    const [categoriesList, setCategoriesList] = useState<any>([]);
     const location = useLocation();
     const areaInitialData = location.state;
-    const [color, setColor] = useState(areaInitialData?.color ||"#b32aa9");
-    const [icon, setIcon] = useState(areaInitialData?.icon ||"Home");
+    const [color, setColor] = useState(areaInitialData?.color || "#b32aa9");
+    const [icon, setIcon] = useState(areaInitialData?.icon || "Home");
     const [type, setType] = useState(areaInitialData?.type || "out");
     const [isActive, setIsActive] = useState(areaInitialData?.is_active || true);
+    const loadingAreaRef = useRef(false);
 
     const presetColors = getColors();
-    
-    
+
+
+    // useEffect(() => {
+    //     if (areaInitialData) {
+    //         init('areaForm', areaInitialData);
+    //         setColor(areaInitialData?.color);
+    //         setIsActive(areaInitialData?.is_active);
+    //         setIsNew(false);
+    //     }
+    // }, [init, areaInitialData]);
     useEffect(() => {
-        if (areaInitialData) {
-            init('areaForm', areaInitialData);
-            setColor(areaInitialData?.color);
-            setIsActive(areaInitialData?.is_active);
+        if (!loadingAreaRef.current && areaInitialData?.id) {
+            loadingAreaRef.current = true;
+            getAreaById(areaInitialData?.id).then((resultTransaction: any) => {
+                if (resultTransaction?.success) {
+                    init('areaForm', areaInitialData);
+                    setIsNew(false);
+                    setIsActive(areaInitialData?.is_active);
+                    // processPaymethods(resultTransaction.result);
+                    console.log("resultTransaction", resultTransaction?.result);
+                    setCategoriesList(resultTransaction?.result?.categories);
+                }
+            })
+                .finally(() => {
+                    loadingAreaRef.current = false;
+                });
         }
     }, [init, areaInitialData]);
-
-    const handleSave = useMemo(() => (e: any) => {
+    const updateCategoriesList = () => {
+        getCategoriesByAreaId(areaInitialData?.id)
+        .then((categoriesResponse: any) => {
+            if (categoriesResponse?.success) {
+                console.log("categoriesResponse", categoriesResponse);
+                setCategoriesList(categoriesResponse?.result);
+            }
+        })
+    }
+    const handleSaveArea = useMemo(() => (e: any) => {
         e.preventDefault();
         const dataToSave = {
             id: areaForm?.values?.id,
@@ -58,7 +89,7 @@ const AreaCreateEditView = ({ areaForm, init, unit, setAreasListState }: any) =>
             is_active: isActive,
             unitId: unit.id
         }
-        console.log("formulario a guardar:", dataToSave);
+        console.log("formulario Area a guardar:", dataToSave);
         createEditArea(dataToSave)
             .then((res) => {
                 if (res?.success) {
@@ -100,16 +131,16 @@ const AreaCreateEditView = ({ areaForm, init, unit, setAreasListState }: any) =>
         >
             {/* <FormLayout > */}
             <SectionCard
-                title="Editar Area"
+                title={isNew ? "Nueva Area" : "Editar Area"}
                 subtitle=""
                 iconName="DocumentOk"
                 iconSize={50}
                 iconColor={color}
             >
-                {/* <ProfileEditForm handleEdit={handleSave} userData={{}} /> */}
+                {/* <ProfileEditForm handleEdit={handleSaveArea} userData={{}} /> */}
                 {/* <UnitEditForm units={units} /> */}
                 <AreaCreateEditForm
-                    handleEdit={handleSave}
+                    handleEdit={handleSaveArea}
                     areaData={areaForm?.values}
                     color={color}
                     setColor={setColor}
@@ -120,6 +151,9 @@ const AreaCreateEditView = ({ areaForm, init, unit, setAreasListState }: any) =>
                     presetColors={presetColors}
                     isActive={isActive}
                     setIsActive={setIsActive}
+                    isNew={isNew}
+                    categoriesList={categoriesList}
+                    updateCategoriesList={updateCategoriesList}
                 />
             </SectionCard>
         </Box>

@@ -108,7 +108,7 @@ function DashboardLayoutReduxed({ sx, children, header, units, setUnitActiveData
             rightArea: (
               <Box gap={1} display="flex" alignItems="center">
                 <Searchbar />
-                <LanguagePopover data={_langs} />
+                {/* <LanguagePopover data={_langs} /> */}
                 <NotificationsPopover data={_notifications} />
                 <AccountPopover
                   menuData={[
