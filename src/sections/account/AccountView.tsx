@@ -12,7 +12,6 @@ function AccountView() {
   const onNewCategory = () => {
     router.push('/accountEdit');
   }
-
   return (
     <DashboardContent>
       <Box display="flex" flexDirection={isMdDown ? 'column' : 'row'} justifyContent='space-arround' alignItems="flex-start" mb={5} >
@@ -37,6 +36,7 @@ function AccountView() {
       {/* <AreaTable /> */}
       {/* <CategoryTable /> */}
       <AccountTable />
+
     </DashboardContent>
   )
 }

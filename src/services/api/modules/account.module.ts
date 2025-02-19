@@ -51,3 +51,15 @@ export async function createEditAccount(data: any) {
         })
         .catch((err: any) => console.log(err));
 }
+
+export async function adjustAccountBalance(data: any) {
+    return axiosClient
+        .post(`account/adjustBalance`, data)
+        .then((response: any) => {
+            if (typeof response.data !== 'undefined' && response.data.success === true) {
+                return response.data;
+            }
+            return response;
+        })
+        .catch((err: any) => console.log(err));
+}

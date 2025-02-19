@@ -9,6 +9,7 @@ import AreaIcon from 'src/components/icon/AreaIcons';
 import CommonIcon from 'src/components/icon/CommonIcons';
 import MUIDataTable from 'mui-datatables';
 import { setAreasList } from 'src/redux/slices/lists.slice';
+import { grey } from 'src/theme/core';
 
 const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
     const [areaQueryLoad, setAreaQueryLoad] = useState(false);
@@ -62,8 +63,7 @@ const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
             MuiToolbar: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: '#f0f0f0',
-                        // borderRadius: 20,
+                        backgroundColor: grey[200],
                         fontWeight: 'bold',
                         marginBottom: '10px',
                     },
@@ -83,7 +83,7 @@ const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
             MuiTableFooter: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: '#f0f0f0',
+                        backgroundColor: grey[200],
                         borderRadius: 20,
                     },
                 },

@@ -31,8 +31,8 @@ export const CategoryEdit = lazy(() => import('src/sections/category/CategoryCre
 
 export const TransactionPage = lazy(() => import('src/pages/transaction/TransactionPage'));
 export const TransactionEdit = lazy(() => import('src/sections/transaction/TransactionCreateEditView'));
-export const PaymentEdit = lazy(() => import('src/sections/transaction/PaymentCreateEditView'));
-export const IncomeEdit = lazy(() => import('src/sections/transaction/IncomeCreateEditView'));
+// export const PaymentEdit = lazy(() => import('src/sections/transaction/PaymentCreateEditView'));
+// export const IncomeEdit = lazy(() => import('src/sections/transaction/IncomeCreateEditView'));
 
 export const UserPage = lazy(() => import('src/pages/user'));
 export const SignInPage = lazy(() => import('src/pages/login/sign-in'));
@@ -88,8 +88,8 @@ function RouterAutorized({user}:any) {
         { path: 'accountTransactions', element: <AccountTransactions /> },
         { path: 'payMethodEdit', element: <PayMethodEdit /> },
         { path: 'transactionEdit', element: <TransactionEdit /> },
-        { path: 'paymentEdit', element: <PaymentEdit /> },
-        { path: 'incomeEdit', element: <IncomeEdit /> },
+        // { path: 'paymentEdit', element: <PaymentEdit /> },
+        // { path: 'incomeEdit', element: <IncomeEdit /> },
       ],
     },
     {

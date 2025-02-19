@@ -115,8 +115,7 @@ export interface IPayMethod {
 }
 
 export interface ITransaction {
-  id: number;
-  name: string;
+  id?: number;
   description?: string | null;
   amount: number;
   discount?: number;

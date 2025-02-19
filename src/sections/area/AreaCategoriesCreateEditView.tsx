@@ -36,7 +36,7 @@ function AreaCategoriesCreateEditView({ categoryId, categoryForm, init, setCateg
                 });
         }
     }, [init, categoryId]);
-
+    
     const handleSave = useMemo(() => (e: any) => {
         e.preventDefault();
         e.stopPropagation();
@@ -55,7 +55,6 @@ function AreaCategoriesCreateEditView({ categoryId, categoryForm, init, setCateg
             .then((res) => {
                 if (res?.success) {
                     setCategoriesListState([]);
-                    // router.back();
                     onCancel();
                     updateCategoriesList();
                 } else {
@@ -82,6 +81,7 @@ function AreaCategoriesCreateEditView({ categoryId, categoryForm, init, setCateg
                     setIsActive={setIsActive}
                     onCancel={onCancel}
                     color={color}
+                    isNew={isNew}
                 />
             </Box>
         </Box>

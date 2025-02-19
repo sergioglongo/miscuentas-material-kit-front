@@ -1,13 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { IAccount } from 'src/config/types/types';
+import { connect } from 'react-redux'
 import { CheckboxRedux, SelectRedux, TextFieldErrorRedux } from 'src/components/forms/fields/ReduxFields'
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, Checkbox, FormControl, Grid, ListItemIcon, MenuItem, Typography } from '@mui/material'
+import { Box, Button, Checkbox, FormControl, Grid, IconButton, ListItemIcon, MenuItem, Typography, Tooltip, TextField } from '@mui/material'
 import { useRouter } from 'src/routes/hooks';
 import { Field, Form } from 'redux-form'
 import AccountIcon from 'src/components/icon/AccountIcon';
-import { grey } from '../../theme/core/palette';
+import { setAccountsList } from 'src/redux/slices/lists.slice';
+import ModalConfirm from 'src/components/modal/ModalConfirm';
+import { getAllAccountsByUnitId } from 'src/services/api/modules/account.module';
+import CommonIcon from 'src/components/icon/CommonIcons';
+import { bindActionCreators } from '@reduxjs/toolkit';
 import AccountPayMethodsEditFrom from './AccountPayMethodsEditFrom';
+import AccountAdjustModalViewForm from './AccountAdjustModalView';
+import { grey } from '../../theme/core/palette';
 
 const currencyLista = [
     'Pesos',
@@ -30,18 +37,37 @@ interface CategoryEditProps {
     setIsActive: any;
     payMethodsSelected: string[];
     setPayMethodsSelected: any;
+    unitActive: any;
+    setAccountsListState: any;
 }
 
-function AccountCreateEditForm({ handleEdit, accountData, isNew, is_active, setIsActive, payMethodsSelected, setPayMethodsSelected }: CategoryEditProps) {
+function AccountCreateEditForm({ handleEdit, accountData, isNew, is_active, setIsActive, unitActive, payMethodsSelected, setPayMethodsSelected, setAccountsListState }: CategoryEditProps) {
 
     const router = useRouter();
+    const onAdjust = () => {
+        setOpenmodalAdjust(true);
+    }
+    const [openmodalAdjust, setOpenmodalAdjust] = useState(false);
+    const [balanceAdjusted, setBalanceAdjusted] = useState(accountData?.balance);
 
-    // useEffect(() => {
-    //     if (accountData) {
-    //         console.log("inicializacion de accountData", accountData);
+    const getAccountsList = useCallback(() => {
+        getAllAccountsByUnitId(unitActive?.id, null)
+            .then((accountResponse: any) => {
+                if (accountResponse?.success) {
+                    const categoriesWithArea = accountResponse.result.map((account: any) => ({ ...account, account: account.unit.name, description: account.unit.description, accountPhoto: account.unit.photo }));
+                    setAccountsListState(categoriesWithArea);
+                    const accountRenew = categoriesWithArea.find((item: any) => item.id === accountData?.id);
+                    setBalanceAdjusted(accountRenew?.balance ?? 0);
+                } else {
+                    console.log("No se pudieron obtener las accounts");
+                }
+            })
+            .catch((err: any) => console.log(err));
+    }, [unitActive?.id, setAccountsListState, accountData?.id]);
 
-    //     }
-    // }, [accountData, isNew])
+    useEffect(() => {
+        setBalanceAdjusted(accountData?.balance);
+    }, [accountData?.balance]);
 
     return (
         <Form onSubmit={handleEdit} style={{ margin: '10px' }}>
@@ -60,9 +86,9 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew, is_active, setI
                     </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                    <Grid container spacing={2} columnSpacing={1} >
+                    <Grid container spacing={2} columnSpacing={1} gap={2}>
                         <Grid item xs={12} sm={6} md={4} >
-                            <Box>
+                            {isNew ?
                                 <FormControl >
                                     <Field
                                         name="balance"
@@ -72,11 +98,29 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew, is_active, setI
                                         type="number"
                                         // InputProps={{  }}
                                         InputLabelProps={{ shrink: true }}
-                                        onChange={(e: any) => console.log(e.target.value)}
+                                        // onChange={(e: any) => console.log(e.target.value)}
                                         value={accountData?.balance || ''}
+                                        disabled={!isNew}
                                     />
                                 </FormControl>
-                            </Box>
+                                :
+                                <Box width='100%' display='flex' flexDirection='row' alignItems='center' justifyContent='flex-start'>
+                                    <TextField
+                                        variant="standard"
+                                        name="balanceEdit"
+                                        label="Balance"
+                                        placeholder='Ingrese el monto'
+                                        type="number"
+                                        value={balanceAdjusted}
+                                        disabled
+                                        fullWidth
+                                    />
+                                    <Tooltip title="Ajustar Balance">
+                                        <IconButton aria-label="Ajustar" onClick={() => onAdjust()}>
+                                            <CommonIcon color='gray' iconName="Adjust" />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Box>}
                         </Grid>
                         <Grid item xs={12} sm={6} md={4}>
                             <Box style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
@@ -104,7 +148,7 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew, is_active, setI
                             {currencyLista.map((item, index) => (
                                 <MenuItem
                                     value={item} key={index}
-                                    // defaultValue={accountData?.currency === item ? accountData?.currency : ''}
+                                // defaultValue={accountData?.currency === item ? accountData?.currency : ''}
                                 >
                                     <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                                         <AccountIcon iconName={item} styles={{ fontSize: '20', display: 'flex', color: grey[700] }} />
@@ -165,8 +209,44 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew, is_active, setI
 
                 </Grid>
             </Grid>
+            <ModalConfirm
+                openmodal={openmodalAdjust}
+                setOpenmodal={setOpenmodalAdjust}
+                children={
+                    // <AreaCreateEditModalViewForm
+                    //     onCancel={() => setOpenmodalAdjust(false)}
+                    //     color={areaColorSelected}
+                    //     areaId={areaSelected}
+                    //     unitId={unit?.id}
+                    //     type={type}
+                    //     updateAreasList={getSetAreasList}
+                    // />
+                    <AccountAdjustModalViewForm
+                        onCancel={() => setOpenmodalAdjust(false)}
+                        accountData={accountData}
+                        updateList={getAccountsList}
+                    />
+                }
+                buttonPrimaryAction={() => setOpenmodalAdjust(false)}
+                buttonSecondaryAction={() => setOpenmodalAdjust(false)}
+                loading={false}
+                buttonSecondaryText="Cancelar"
+                buttonPrimaryText="Aceptar"
+                buttonSecondaryShow={false}
+                buttonPrimaryShow={false}
+            />
         </Form >
     )
 }
 
-export default AccountCreateEditForm;
+const mapDispatchToProps = (dispatch: any) => ({
+    setAccountsListState: bindActionCreators(setAccountsList, dispatch),
+})
+
+export default connect(
+    (state: any) => ({
+        unitActive: state.units.unitActive,
+    }),
+    mapDispatchToProps
+)(AccountCreateEditForm);
+// export default AccountCreateEditForm;

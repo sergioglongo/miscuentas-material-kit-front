@@ -1,23 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Box, Checkbox, Grid, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
-import { getAllTransactionsByUnitId } from 'src/services/api/modules/transaction.module';
 import PayMethodIcon from 'src/components/icon/paymethod-icons';
 import CommonIcon from 'src/components/icon/CommonIcons';
 import { fDate, fDateSlash } from 'src/utils/format-time';
 import AccountIcon from 'src/components/icon/AccountIcon';
-import { fNumber } from 'src/utils/format-number';
+import { fCurrency, fNumber } from 'src/utils/format-number';
 
-const AccountTransactionsTable = ({ transactions }: any) => {
+const AccountTransactionsTable = ({ transactions, totalIn, totalOut, totalBalance, account }: any) => {
     const rowsPerPage = 10;
     const router = useRouter();
-    const [totalPesos, setTotalPesos] = useState(0);
     const onEdit = (value: any) => {
         // console.log("Elegido editar id: ", value);
-        router.navigateState('/transactionEdit', { id: value,});
+        router.navigateState('/transactionEdit', { id: value, });
     };
     const getMuiTheme = () => createTheme({
         components: {
@@ -100,15 +98,48 @@ const AccountTransactionsTable = ({ transactions }: any) => {
         },
     });
     const customFooter = () => (
-        <Grid container rowSpacing={1} rowGap={2} columnSpacing={2} display='flex' flexDirection='column' alignItems='center' margin={2}>
-            <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                <Typography variant="h5" sx={{ color: 'text.secondary' }} >
-                    Total:
+        <Grid container rowSpacing={0} rowGap={1} display='flex' flexDirection='row' justifyContent='center' alignItems='center' margin={2}>
+            <Grid item xs={12} sm={6} md={4} gap={1} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography variant="h6" sx={{ color: 'text.secondary' }} >
+                    Ingresos:
                 </Typography>
-                <Box gap={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                    <AccountIcon iconName="Pesos" styles={{ fontSize: '30', display: 'flex', color: 'blue' }} />
-                    <Typography variant="h5" sx={{ color: 'text.primary' }} >
-                        {fNumber(totalPesos)}
+                <Box  style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <AccountIcon iconName="Pesos" styles={{ fontSize: '22', display: 'flex', color: 'green' }} />
+                    <Typography variant="h6" sx={{ color: 'text.primary', marginLeft: '2px' }} >
+                        {fNumber(totalIn)}
+                    </Typography>
+                </Box>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4} gap={1} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography variant="h6" sx={{ color: 'text.secondary' }} >
+                    Gastos:
+                </Typography>
+                <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <AccountIcon iconName="Pesos" styles={{ fontSize: '22', display: 'flex', color: 'red' }} />
+                    <Typography variant="h6" sx={{ color: 'text.primary', marginLeft: '2px' }} >
+                        {fNumber(totalOut)}
+                    </Typography>
+                </Box>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4} gap={1} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography variant="h6" sx={{ color: 'text.secondary' }} >
+                    Diferencia:
+                </Typography>
+                <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <AccountIcon iconName="Pesos" styles={{ fontSize: '22', display: 'flex', color: 'blue' }} />
+                    <Typography variant="h6" sx={{ color: 'text.primary', marginLeft: '2px' }} >
+                        {fNumber(totalBalance)}
+                    </Typography>
+                </Box>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4} gap={1} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography variant="h6" sx={{ color: 'text.secondary' }} >
+                    Actual en cuenta:
+                </Typography>
+                <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <AccountIcon iconName="Pesos" styles={{ fontSize: '22', display: 'flex', color: 'Black' }} />
+                    <Typography variant="h6" sx={{ color: 'text.primary', marginLeft: '2px' }} >
+                        {fNumber(account.balance)}
                     </Typography>
                 </Box>
             </Grid>
@@ -128,8 +159,13 @@ const AccountTransactionsTable = ({ transactions }: any) => {
             label: 'Acciones',
             options: {
                 filter: false,
-                customBodyRender: (value: any, tableMeta: any) => (
-                    <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                customBodyRender: (value: any, tableMeta: any) => {
+                    if (tableMeta.rowData[8] === 'Ajuste' || tableMeta.rowData[8] === '-') {
+                        return <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                            Sin acciones
+                        </th>;
+                    }
+                    return <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                         <Tooltip title="Ver detalle">
                             <IconButton aria-label="Ver" onClick={() => { }}>
                                 <CommonIcon color='gray' iconName="View" />
@@ -146,7 +182,7 @@ const AccountTransactionsTable = ({ transactions }: any) => {
                             </IconButton>
                         </Tooltip>
                     </th>
-                ),
+                },
                 customHeadRender: (columnMeta: any) => (
                     <th style={{ width: '80px', padding: 0, height: '40px' }}>
                         {columnMeta.label}
@@ -175,7 +211,29 @@ const AccountTransactionsTable = ({ transactions }: any) => {
                     <th style={{ minWidth: '100px', textAlign: 'left' }}>
                         {columnMeta.label}
                     </th>
-                )
+                ),
+                customBodyRender: (value: any, tableMeta: any) => (
+                    <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        {tableMeta.rowData[4] === '-' ? '' : tableMeta.rowData[6] === 'out' ? '-' : '+'} {fCurrency(value)}
+                    </th>
+                ),
+            }
+        },
+        {
+            name: 'acumulated',
+            label: 'Acumulado',
+            options: {
+                filter: false,
+                customHeadRender: (columnMeta: any) => (
+                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
+                        {columnMeta.label}
+                    </th>
+                ),
+                customBodyRender: (value: any) => (
+                    <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        { value !== '-' ? fCurrency(value) : '-'}
+                    </th>
+                ),
             }
         },
         {
@@ -208,9 +266,11 @@ const AccountTransactionsTable = ({ transactions }: any) => {
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         {value === 'out' ?
-                           <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
-                           :
-                           <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
+                            <CommonIcon iconName='CircleUp' styles={{ fontSize: '22', color: 'orange' }} />
+                            :
+                            value === 'in' ?
+                                <CommonIcon iconName='CircleDown' styles={{ fontSize: '22', color: 'green' }} />
+                                : ''
                         }
                     </th>
                 ),

@@ -54,8 +54,7 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethods
             MuiToolbar: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: '#f0f0f0',
-                        // borderRadius: 20,
+                        backgroundColor: grey[200],
                         fontWeight: 'bold',
                         marginBottom: '10px',
                     },
@@ -75,7 +74,7 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethods
             MuiTableFooter: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: '#f0f0f0',
+                        backgroundColor: grey[200],
                         borderRadius: 20,
                     },
                 },

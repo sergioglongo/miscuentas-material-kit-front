@@ -17,13 +17,6 @@ const accountInitialDataEmpty = {
     type: 'cash',
 }
 
-const methodsList = [
-    { id: 'debit', name: 'Tarjeta Debito' },
-    { id: 'credit', name: 'Tarjeta Credito' },
-    { id: 'transfer', name: 'Transferencia' },
-    { id: 'other', name: 'Otro' },
-]
-
 const AccountCreateEditView = ({ accountForm, init, unit, setAccountsListState, setPayMethodsListState }: any) => {
     const router = useRouter();
     const [payMethodsSelected, setPayMethodsSelected] = useState([]);
@@ -37,7 +30,6 @@ const AccountCreateEditView = ({ accountForm, init, unit, setAccountsListState, 
         if (accountData?.pay_methods.length > 0) {
             const payMethods = accountData?.pay_methods;
             const payMethodsInAccount:any = [...new Set(payMethods.map((payMethod: any) => payMethod.method))];
-            console.log("payMethodsInAccount", payMethodsInAccount);
             setPayMethodsSelected(payMethodsInAccount);
         }
     }
@@ -48,6 +40,7 @@ const AccountCreateEditView = ({ accountForm, init, unit, setAccountsListState, 
                 if (resultTransaction?.success) {
                     init('accountForm', accountInitialData);
                     setIsNew(false);
+                    setIsActive(resultTransaction.result?.is_active);
                     processPaymethods(resultTransaction.result);
                 }
             })
@@ -56,10 +49,6 @@ const AccountCreateEditView = ({ accountForm, init, unit, setAccountsListState, 
                 });
         }
     }, [init, accountInitialData]);
-    useEffect(() => {
-        console.log("payMethodsSelected", payMethodsSelected);
-        
-    },[payMethodsSelected]);
 
     const handleSave = useMemo(() => (e: any) => {
         e.preventDefault();

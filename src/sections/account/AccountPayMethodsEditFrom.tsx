@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardProps, Checkbox, Grid, Typography } from '@mui/material'
 import React from 'react'
+import { grey } from '../../theme/core/palette';
 
 type Props = CardProps & {
     title?: string;
@@ -28,16 +29,17 @@ function AccountPayMethodsEditFrom({ title = '', subheader = '', type = 'bank', 
 
     return (
         <Card sx={sx} {...other}>
-            <CardHeader title={title} subheader={subheader} />
+            <CardHeader title={title} subheader={subheader} sx={{backgroundColor:grey[100]}} />
             {/* <Box display="grid" gap={2} gridTemplateColumns="repeat(2, 1fr)" sx={{ p: 3 }}> */}
             <CardContent sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'flex-start',
                 alignItems: 'center',
+                backgroundColor:grey[100],
                 height: '100%'
             }}>
-                <Grid container spacing={2} sx={{ marginTop: '10px', }}>
+                <Grid container spacing={2} sx={{ marginTop: '0px', }}>
                     {methodsList.map((item) => (
                         <Grid item xs={6} sm={4} md={3} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                             <Typography variant="h6">{item.name}</Typography>

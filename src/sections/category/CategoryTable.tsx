@@ -4,11 +4,12 @@ import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 import { Checkbox, IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
-import { getAllCategoriesByUnitId } from 'src/services/api/modules/category.module';
+import { getAllCategoriesBody } from 'src/services/api/modules/category.module';
 import CategoryIcon from 'src/components/icon/CategoryIcon';
 import CommonIcon from 'src/components/icon/CommonIcons';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { setAreasList, setCategoriesList } from 'src/redux/slices/lists.slice';
+import { grey } from '@mui/material/colors';
 
 const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
     const [categories, setCategories] = useState([]);
@@ -64,7 +65,7 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
             MuiToolbar: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: '#f0f0f0',
+                        backgroundColor: grey[200],
                         // borderRadius: 20,
                         fontWeight: 'bold',
                         marginBottom: '10px',
@@ -85,7 +86,7 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
             MuiTableFooter: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: '#f0f0f0',
+                        backgroundColor: grey[200],
                         borderRadius: 20,
                     },
                 },
@@ -374,7 +375,11 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
 
     useEffect(() => {
         if (lists.categoriesList.length === 0 && !loadingRef.current) {
-            getAllCategoriesByUnitId(unitActive?.id, '')
+            const data = {
+                unitId: unitActive?.id,
+                deleted: false
+            }
+            getAllCategoriesBody(data)
                 .then((categoriesResponse: any) => {
                     if (categoriesResponse?.success) {
                         const categoriesWithArea = categoriesResponse.result.map((category: any) => ({ ...category, area: category.area.name, type: category.area.type, areaColor: category.area.color }));

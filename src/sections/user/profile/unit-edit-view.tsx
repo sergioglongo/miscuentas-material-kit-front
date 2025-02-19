@@ -8,13 +8,12 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { useTheme, Breakpoint } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
-import { createEditUnit } from 'src/services/api/modules/unit.module';
+import { createEditUnit, getUnitsByUserId } from 'src/services/api/modules/unit.module';
 import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
-import { updateUnit } from 'src/redux/slices/units.slice';
-import { setUnitsList } from 'src/redux/slices/lists.slice';
+import { setUnits, updateUnit } from 'src/redux/slices/units.slice';
 import UnitEditForm from './unit-edit-form';
 
-const ProfileEditView = ({ unitData, unitForm, init, userData, setUnitData, setUnitsDataList }: any) => {
+const ProfileEditView = ({ unitData, unitForm, init, userData, setUnitData, setUnitsList }: any) => {
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
     const [errorShow, setErrorShow] = useState<boolean>(false);
@@ -53,6 +52,9 @@ const ProfileEditView = ({ unitData, unitForm, init, userData, setUnitData, setU
                 if (res?.success) {
                     console.log("User to update state", res);
                     setUnitData(res.unit);
+                    getUnitsByUserId(userData?.id).then((units: any) => {
+                        setUnitsList(units?.result);
+                    })
                     router.back();
                 } else {
                     setErrorMessage(res?.message);
@@ -66,7 +68,7 @@ const ProfileEditView = ({ unitData, unitForm, init, userData, setUnitData, setU
                 setErrorShow(true);
                 console.log("error catch", err)
             });
-    }, [router, unitForm?.values, userData?.id, icon, setUnitData]);
+    }, [router, unitForm?.values, userData?.id, icon, setUnitData, setUnitsList]);
 
     const theme = useTheme();
     const layoutQuery: Breakpoint = 'md';
@@ -112,7 +114,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     // setUserData: bindActionCreators(setUser, dispatch),
     init: bindActionCreators(initialize, dispatch),
     setUnitData: bindActionCreators(updateUnit, dispatch),
-    setUnitsDataList: bindActionCreators(setUnitsList, dispatch),
+    setUnitsList: bindActionCreators(setUnits, dispatch),
 });
 
 const UnitEditViewForm = connect(

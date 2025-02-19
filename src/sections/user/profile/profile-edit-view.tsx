@@ -9,6 +9,8 @@ import { Iconify } from 'src/components/iconify';
 import { setUser } from 'src/redux/slices/user.slice';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { useTheme, Breakpoint } from '@mui/material/styles';
+import { setUnits } from 'src/redux/slices/units.slice';
+import { getUnitsByUserId } from 'src/services/api/modules/unit.module';
 import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
 import ProfileEditForm from './profile-edit-form';
 import ProfileUnitList from './profile-unit-list';
@@ -17,7 +19,6 @@ const ProfileEditView = ({ profileForm, user, userData, setUserData, init }: any
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
     const [errorShow, setErrorShow] = useState<boolean>(false);
-    const [units, setUnits] = useState<any>([]);
 
     const onNewUnit = () => {
         router.push('/unitEdit');
@@ -31,7 +32,7 @@ const ProfileEditView = ({ profileForm, user, userData, setUserData, init }: any
 
     }, [userData, init])
 
-    const handleSignIn = useMemo(() => (e: any) => {
+    const handleSave = useMemo(() => (e: any) => {
         e.preventDefault();
         console.log("formulario a guardar:", profileForm?.values);
         createEditUser({
@@ -45,7 +46,7 @@ const ProfileEditView = ({ profileForm, user, userData, setUserData, init }: any
                     const userUpdateState = { ...user, userData: res?.user };
                     console.log("User to update state", userUpdateState);
                     setUserData(userUpdateState);
-                    router.back();
+                    router.replace('/');
                 } else {
                     setErrorMessage(res?.message);
                     setErrorShow(true);
@@ -88,7 +89,7 @@ const ProfileEditView = ({ profileForm, user, userData, setUserData, init }: any
                 iconSize={50}
                 iconColor={theme.palette.primary.main}
             >
-                <ProfileEditForm handleEdit={handleSignIn} userData={userData} />
+                <ProfileEditForm handleEdit={handleSave} userData={userData} />
                 {/* <UnitEditForm units={units} /> */}
             </SectionCard>
             {/* </FormLayout> */}

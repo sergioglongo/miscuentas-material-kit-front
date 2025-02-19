@@ -192,19 +192,6 @@ function AreaCreateEditForm({ handleEdit, areaData, color, setColor, icon, setIc
                 titulo="Elija un icono"
                 children={
                     <Box width="300px" display="grid" gap={1} gridTemplateColumns="repeat(4, 1fr)" sx={{ p: 1 }}>
-                        {/* {
-                            AreaIconsList.map((iconItem, index) => (
-                                <IconList
-                                    key={index}
-                                    icon={iconItem}
-                                    index={index}
-                                    onSelectIcon={onSelectIcon}
-                                    separation='1px'
-                                >
-                                    <AreaIcon iconName={iconItem} styles={{ fontSize: 20 }} />
-                                </IconList>
-                            ))
-                        } */}
                         {presetColors.map((presetColor, index) => (
                             <Button
                                 key={index}

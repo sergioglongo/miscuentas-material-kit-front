@@ -4,6 +4,7 @@ import { persistReducer, FLUSH, PAUSE, PERSIST, persistStore, PURGE, REGISTER, R
 import { reducer as form } from 'redux-form';
 import userReducer from './slices/user.slice';
 import unitsReducer from './slices/units.slice';
+import trasactionsReducer from './slices/transactions.slice';
 import listsReducer from './slices/lists.slice';
 
 const persistConfig = {
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
     user: userReducer,
     units: unitsReducer,
     lists: listsReducer,
+    transactions: trasactionsReducer,
     form,
 })
 

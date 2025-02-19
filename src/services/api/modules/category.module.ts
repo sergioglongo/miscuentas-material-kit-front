@@ -11,9 +11,9 @@ export async function getAllCategories() {
         })
         .catch((err: any) => console.log(err));
 }
-export async function getAllCategoriesByUnitId(unitId:number, type:string) {
+export async function getAllCategoriesBody(data:any) {
     return axiosClient
-        .get(`category/getAllByUnitId/${unitId}${type ? `/${type}` : ''}`)
+        .post(`category/getAllBody`, data)
         .then((response: any) => {
             if (typeof response.data !== 'undefined' && response.data.success === true) {
                 return response.data;

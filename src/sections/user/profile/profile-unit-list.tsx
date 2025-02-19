@@ -22,12 +22,12 @@ const ProfileUnitListReduxed = ({ userData }: any) => {
     useEffect(() => {
         getUnitsByUserId(userData?.id).then((res: any) => {
             setUnits(res?.result);
-            console.log("units", res?.result);
         })
-            .then((res: any) => {
-
-            })
+        .catch(() => {
+            setUnits([]);
+        });
     }, [userData?.id]);
+    
     return (
         units?.length > 0 &&
         <Box

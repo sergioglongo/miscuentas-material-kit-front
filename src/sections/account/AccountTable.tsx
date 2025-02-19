@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, Checkbox, Grid, IconButton, Tooltip, Typography } from '@mui/material';
@@ -8,17 +8,19 @@ import { getAllAccountsByUnitId } from 'src/services/api/modules/account.module'
 import { fCurrency, fNumber } from 'src/utils/format-number';
 import AccountIcon from 'src/components/icon/AccountIcon';
 import CommonIcon from 'src/components/icon/CommonIcons';
+import { grey } from 'src/theme/core';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { setAccountsList } from 'src/redux/slices/lists.slice';
-
-const iconToShow = (iconName: string) => {
-
-}
+import ModalConfirm from 'src/components/modal/ModalConfirm';
+import AccountAdjustModalViewForm from './AccountAdjustModalView';
 
 const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
     const [totalPesos, setTotalPesos] = useState(0);
     const [totalDollar, setTotalDollar] = useState(0);
     const [totalEuro, setTotalEuro] = useState(0);
+    const [openmodalAdjust, setOpenmodalAdjust] = useState(false);
+    const [accountDataSelected, setAccountDataSelected] = useState<any>(null);
+
     const rowsPerPage = 10;
     const router = useRouter();
     const onEdit = (accountData: any) => {
@@ -35,6 +37,16 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
         console.log("presionado editar desde ", accountInitialData);
         router.navigateState('/accountEdit', accountInitialData);
     };
+    const onAdjust = (accountIdAdjust: any) => {
+        const accountData = {
+            id: accountIdAdjust[0],
+            name: accountIdAdjust[2],
+            balance: accountIdAdjust[3],
+            unitId: accountIdAdjust[8],
+        }
+        setAccountDataSelected(accountData);
+        setOpenmodalAdjust(true);
+    }
     const getMuiTheme = () => createTheme({
         components: {
             MuiTable: {
@@ -68,7 +80,7 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
             MuiToolbar: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: '#f0f0f0',
+                        backgroundColor: grey[200],
                         // borderRadius: 20,
                         fontWeight: 'bold',
                         marginBottom: '10px',
@@ -158,9 +170,9 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
                 filter: false,
                 customBodyRender: (value: any, tableMeta: any) => (
                     <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-                        <Tooltip title="Ver detalle">
-                            <IconButton aria-label="Ver" onClick={() => { }}>
-                                <CommonIcon color='gray' iconName="View" />
+                        <Tooltip title="Ajustar Balance">
+                            <IconButton aria-label="Ajustar" onClick={() => onAdjust(tableMeta?.rowData)}>
+                                <CommonIcon color='gray' iconName="Adjust" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Editar">
@@ -364,53 +376,88 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
         // },
     };
     const loadingRef = useRef(false);
+    const totalCalc = (accounts:any) => {
+        let totalPesosTemp = 0;
+                    let totalDolarTemp = 0;
+                    let totalEuroTemp = 0;
+                    accounts.forEach((account: any) => {
+                        switch (account.currency) {
+                            case 'Pesos':
+                                totalPesosTemp += account.balance;
+                                break;
+                            case 'Dolar':
+                                totalDolarTemp += account.balance;
+                                break;
+                            default:
+                                totalEuroTemp += account.balance;
+                                break;
+                        }
+                    })
+                    setTotalDollar(totalDolarTemp);
+                    setTotalPesos(totalPesosTemp);
+                    setTotalEuro(totalEuroTemp);
+    }
+    const getAccountsList = useCallback(() => {
+        getAllAccountsByUnitId(unitActive?.id, null)
+            .then((accountResponse: any) => {
+                // console.log("accountResponse", accountResponse);
+                if (accountResponse?.success) {
+                    const categoriesWithArea = accountResponse.result.map((account: any) => ({ ...account, account: account.unit.name, description: account.unit.description, accountPhoto: account.unit.photo }));
+                    setAccountsListState(categoriesWithArea);
+                    totalCalc(categoriesWithArea);
+                    // console.log("totales", totalDolarTemp, totalPesosTemp, totalEuroTemp);
+                } else {
+                    console.log("No se pudieron obtener las accounts");
+                }
+            })
+            .catch((err: any) => console.log(err));
+    }, [unitActive?.id, setAccountsListState]);
 
     useEffect(() => {
         if (lists.accountsList.length === 0 && !loadingRef.current) {
-            getAllAccountsByUnitId(unitActive?.id, null)
-                .then((accountResponse: any) => {
-                    // console.log("accountResponse", accountResponse);
-                    if (accountResponse?.success) {
-                        const categoriesWithArea = accountResponse.result.map((account: any) => ({ ...account, account: account.unit.name, description: account.unit.description, accountPhoto: account.unit.photo }));
-                        setAccountsListState(categoriesWithArea);
-                        let totalPesosTemp = 0;
-                        let totalDolarTemp = 0;
-                        let totalEuroTemp = 0;
-                        categoriesWithArea.forEach((account: any) => {
-                            switch (account.currency) {
-                                case 'Pesos':
-                                    totalPesosTemp += account.balance;
-                                    break;
-                                case 'Dolar':
-                                    totalDolarTemp += account.balance;
-                                    break;
-                                default:
-                                    totalEuroTemp += account.balance;
-                                    break;
-                            }
-                        })
-                        setTotalDollar(totalDolarTemp);
-                        setTotalPesos(totalPesosTemp);
-                        setTotalEuro(totalEuroTemp);
-                        // console.log("totales", totalDolarTemp, totalPesosTemp, totalEuroTemp);
-
-                    } else {
-                        console.log("No se pudieron obtener las accounts");
-                    }
-                })
-                .catch((err: any) => console.log(err));
+            getAccountsList();
+        } else {
+            totalCalc(lists.accountsList);
         }
-    }, [unitActive, lists.areasList, setAccountsListState, lists.accountsList]);
+    }, [lists.accountsList, getAccountsList, loadingRef]);
 
     return (
-        <ThemeProvider theme={getMuiTheme()}>
-            <MUIDataTable
-                title='Cuentas'
-                data={lists.accountsList}
-                columns={columns}
-                options={options}
+        <Box>
+            <ThemeProvider theme={getMuiTheme()}>
+                <MUIDataTable
+                    title='Cuentas'
+                    data={lists.accountsList}
+                    columns={columns}
+                    options={options}
+                />
+            </ThemeProvider >
+            <ModalConfirm
+                openmodal={openmodalAdjust}
+                setOpenmodal={setOpenmodalAdjust}
+                children={
+                    // <AreaCreateEditModalViewForm
+                    //     onCancel={() => setOpenmodalAdjust(false)}
+                    //     color={areaColorSelected}
+                    //     areaId={areaSelected}
+                    //     unitId={unit?.id}
+                    //     type={type}
+                    //     updateAreasList={getSetAreasList}
+                    // />
+                    <AccountAdjustModalViewForm
+                        onCancel={() => setOpenmodalAdjust(false)}
+                        accountData={accountDataSelected}
+                        updateList={getAccountsList}
+                    />
+                }
+                buttonPrimaryAction={() => setOpenmodalAdjust(false)}
+                buttonSecondaryAction={() => setOpenmodalAdjust(false)}
+                loading={false}
+                buttonSecondaryText="Cancelar"
+                buttonPrimaryText="Aceptar"
+                buttonSecondaryShow={false}
+                buttonPrimaryShow={false}
             />
-        </ThemeProvider >
+        </Box>
     )
 }
 

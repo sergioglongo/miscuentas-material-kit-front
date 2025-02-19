@@ -1,36 +1,43 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Iconify } from 'src/components/iconify';
 import IconList from 'src/components/list/IconList';
-import { IArea, ICategory } from 'src/config/types/types';
-import { AutocompleteRedux, CheckboxRedux, SelectRedux, TextFieldErrorRedux } from 'src/components/forms/fields/ReduxFields'
+import ModalConfirm from 'src/components/modal/ModalConfirm';
+import AreaIcon, { AreaIconsList } from 'src/components/icon/AreaIcons';
+import { IArea } from 'src/config/types/types';
+import { TextFieldErrorRedux } from 'src/components/forms/fields/ReduxFields'
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, Checkbox, FormControl, Grid, ListItemIcon, MenuItem, Select, Switch, Typography } from '@mui/material'
-import { useRouter } from 'src/routes/hooks';
 import { Field, Form } from 'redux-form'
-import ModalConfirm from 'src/components/modal/ModalConfirm';
-import CategoryIcon, { CategoryIconsList } from 'src/components/icon/CategoryIcon';
+import styles from './area.module.css';
 
-interface CategoryEditProps {
+interface AreaEditModalProps {
     handleEdit: any;
-    categoryData: ICategory & { areaColor: string };
+    areaData: IArea;
     icon: string;
     setIcon: any;
     isActive: boolean;
     setIsActive: any;
     onCancel: any;
     color: string;
-    isNew: boolean
+    setColor: any;
+    isNew: boolean;
+    presetColors: string[];
 }
 
-function AreaCategoriesCreateEditForm({ handleEdit, categoryData, icon, setIcon, isActive, setIsActive, onCancel, color, isNew }: CategoryEditProps) {
+function AreaCreateEditModalForm({ handleEdit, areaData, icon, setIcon, isActive, setIsActive, onCancel, color, setColor, presetColors, isNew }: AreaEditModalProps) {
 
     const [openmodal, setOpenmodal] = useState(false);
+    const [openmodalColor, setOpenmodalColor] = useState(false);
 
     const onSelectIcon = (iconSelected: string) => {
         setOpenmodal(false);
         setIcon(iconSelected);
     }
+    console.log("areaData", areaData);
 
+    const onSelectColor = (colorSelected: string) => {
+        setOpenmodalColor(false);
+        setColor(colorSelected);
+    }
     return (
         <Form onSubmit={handleEdit} style={{ margin: '10px' }}>
             <Grid container rowSpacing={1} rowGap={2} columnSpacing={2} display='flex' flexDirection='column' alignItems='center'>
@@ -41,7 +48,7 @@ function AreaCategoriesCreateEditForm({ handleEdit, categoryData, icon, setIcon,
                             component={TextFieldErrorRedux}
                             placeholder='Ingrese el nombre'
                             label="Nombre"
-                            value={categoryData?.name || ''}
+                            value={areaData?.name || ''}
                         />
                     </FormControl>
 
@@ -54,7 +61,7 @@ function AreaCategoriesCreateEditForm({ handleEdit, categoryData, icon, setIcon,
                             label="Descripción"
                             placeholder='Ingrese la descripción'
                             InputLabelProps={{ shrink: true }}
-                            value={categoryData?.description || ''}
+                            value={areaData?.description || ''}
                         />
                     </FormControl>
 
@@ -68,10 +75,16 @@ function AreaCategoriesCreateEditForm({ handleEdit, categoryData, icon, setIcon,
                             onClick={() => setOpenmodal(true)} >
                             Elegir Icono
                         </Button>
+                        <Button
+                            variant='contained'
+                            style={{ height: '40px', padding: '20px' }}
+                            onClick={() => setOpenmodalColor(true)} >
+                            Elegir color
+                        </Button>
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                            {(!!categoryData?.icon || !!icon) &&
-                                <CategoryIcon
-                                    iconName={icon || categoryData?.icon}
+                            {(!!areaData?.icon || !!icon) &&
+                                <AreaIcon
+                                    iconName={icon || areaData?.icon}
                                     styles={{
                                         fontSize: 100,
                                         display: 'flex',
@@ -84,15 +97,15 @@ function AreaCategoriesCreateEditForm({ handleEdit, categoryData, icon, setIcon,
                                 />}
                         </Box>
                     </Box>
-                    { !isNew &&
-                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <Typography variant="h6">Activado:</Typography>
-                        <Checkbox
-                            size="large"
-                            onChange={(e: any) => setIsActive(e.target.checked)}
-                            checked={isActive}
-                        />
-                    </Box>
+                    {!isNew &&
+                        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                            <Typography variant="h6">Activado:</Typography>
+                            <Checkbox
+                                size="large"
+                                onChange={(e: any) => setIsActive(e.target.checked)}
+                                checked={isActive}
+                            />
+                        </Box>
                     }
                 </Grid>
                 <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-arround' }}>
@@ -122,7 +135,7 @@ function AreaCategoriesCreateEditForm({ handleEdit, categoryData, icon, setIcon,
                 children={
                     <Box width="300px" display="grid" gap={1} gridTemplateColumns="repeat(4, 1fr)" sx={{ p: 1 }}>
                         {
-                            CategoryIconsList.map((iconItem, index) => (
+                            AreaIconsList.map((iconItem: any, index: number) => (
                                 <IconList
                                     key={index}
                                     icon={iconItem}
@@ -130,7 +143,7 @@ function AreaCategoriesCreateEditForm({ handleEdit, categoryData, icon, setIcon,
                                     onSelectIcon={onSelectIcon}
                                     separation='1px'
                                 >
-                                    <CategoryIcon iconName={iconItem} styles={{ fontSize: 20 }} />
+                                    <AreaIcon iconName={iconItem} styles={{ fontSize: 20 }} />
                                 </IconList>
                             ))
                         }
@@ -145,8 +158,38 @@ function AreaCategoriesCreateEditForm({ handleEdit, categoryData, icon, setIcon,
                 buttonPrimaryShow={false}
                 inert={openmodal}
             />
+            <ModalConfirm
+                openmodal={openmodalColor}
+                setOpenmodal={setOpenmodalColor}
+                titulo="Elija un icono"
+                children={
+                    <Box width="300px" display="grid" gap={1} gridTemplateColumns="repeat(4, 1fr)" sx={{ p: 1 }}>
+                        {presetColors.map((presetColor, index) => (
+                            <Button
+                                key={index}
+                                className={styles.pickerSwatches}
+                                style={{
+                                    background: presetColor,
+                                    border: `3px solid ${presetColor !== color ? presetColor : '#FAAC40'}`,
+                                    height: '30px',
+                                    width: '30px',
+                                }}
+                                // onClick={() => setColor(presetColor)}
+                                onClick={() => onSelectColor(presetColor)}
+                            />
+                        ))}
+                    </Box>
+                }
+                buttonPrimaryAction={() => setOpenmodalColor(false)}
+                buttonSecondaryAction={() => setOpenmodalColor(false)}
+                loading={false}
+                buttonSecondaryText="Cancelar"
+                buttonPrimaryText="Aceptar"
+                buttonSecondaryShow={false}
+                buttonPrimaryShow={false}
+            />
         </Form >
     )
 }
 
-export default AreaCategoriesCreateEditForm;
+export default AreaCreateEditModalForm;

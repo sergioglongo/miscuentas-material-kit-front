@@ -11,9 +11,9 @@ export async function getAllAreas(filter: string) {
         })
         .catch((err: any) => console.log(err));
 }
-export async function getAllAreasByUnitId(unitId:number, type:string) {
+export async function getAllAreasBody(data: any) {
     return axiosClient
-    .get(`area/getAllByUnitId/${unitId}${type ? `/${type}` : ''}`)
+    .post(`area/getAllBody`, data)
         .then((response: any) => {
             if (typeof response.data !== 'undefined' && response.data.success === true) {
                 return response.data;

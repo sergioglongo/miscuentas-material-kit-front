@@ -12,12 +12,13 @@ import { getAllAccounts } from 'src/services/api/modules/account.module';
 import { fDate, fDateDbToDatePicker, localToUtc, utcToLocal } from 'src/utils/format-time';
 import { basePalette } from 'src/theme/core';
 import { createEditTransaction, getTransactionById } from 'src/services/api/modules/transaction.module';
-import { getAllCategoriesByUnitId } from 'src/services/api/modules/category.module';
+import { setTransactions } from 'src/redux/slices/transactions.slice';
+import { getAllCategoriesBody } from 'src/services/api/modules/category.module';
 import { getAllPayMethodsByUnitId } from 'src/services/api/modules/payMethod.module';
-import { getAllAreasByUnitId } from 'src/services/api/modules/area.module';
+import { getAllAreasBody } from 'src/services/api/modules/area.module';
 import TransactionCreateEditForm from './TransactionCreateEditForm';
 
-const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
+const TransactionCreateEditView = ({ transactionForm, setTransactionsListState, init, unit }: any) => {
     const router = useRouter();
     const [isNew, setIsNew] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
@@ -25,21 +26,30 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
     const [areasList, setareasList] = useState<IArea[]>([]);
     const [categoriesList, setCategoriesList] = useState<ICategory[]>([]);
     const [payMethodsList, setPayMethodsList] = useState<IPayMethod[]>([]);
+    const [categorySelected, setCategorySelected] = useState<number | ''>('');
     const location = useLocation();
     const TransactionInitialData = location.state;
     const [type, setType] = useState<InOutType>(TransactionInitialData?.type || "out");
 
-    useEffect(() => {
-        getAllAreasByUnitId(unit?.id, type)
-            .then((areasResponse: any) => {
-                // console.log("areasResponse", areasResponse);
-                if (areasResponse?.success) {
-                    setareasList(areasResponse.result);
-                } else {
-                    console.log("No se pudieron obtener las areas");
-                }
-            }).catch((err: any) => console.log(err));
-        getAllCategoriesByUnitId(unit?.id, '')
+    const getSetAreasList = () => {
+        const data = { unitId: unit?.id, type, is_active: true };
+        getAllAreasBody(data)
+        .then((areasResponse: any) => {
+            console.log("areasResponse", areasResponse);
+            if (areasResponse?.success) {
+                setareasList(areasResponse.result);
+            } else {
+                console.log("No se pudieron obtener las areas");
+            }
+        }).catch((err: any) => console.log(err));
+    }
+    const getSetCategoriesList = () => {
+        const data = {
+            unitId: unit?.id,
+            deleted: false,
+            is_active: true
+        }
+        getAllCategoriesBody(data)
             .then((categoriesResponse: any) => {
                 // console.log("categoriesResponse", categoriesResponse);
                 if (categoriesResponse?.success) {
@@ -48,6 +58,10 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
                     console.log("No se pudieron obtener las categorias");
                 }
             }).catch((err: any) => console.log(err));
+    }
+    useEffect(() => {
+        getSetAreasList();
+        getSetCategoriesList();
         const dataPayMethods = { unitId: unit?.id, type, is_active: true, deleted: false };
         getAllPayMethodsByUnitId(dataPayMethods)
             .then((payMethodsResponse: any) => {
@@ -59,7 +73,7 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
                 }
             }).catch((err: any) => console.log(err));
 
-    }, [type, unit?.id]);
+    }, [type, unit?.id]); // eslint-disable-line
 
     useEffect(() => {
         if (TransactionInitialData?.id) {
@@ -74,21 +88,19 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
             })
         }
         console.log("TransactionInitialData", TransactionInitialData);
-
     }, [init, TransactionInitialData]);
 
     const handleSave = useMemo(() => (e: any) => {
         e.preventDefault();
         const dataToSave: ITransaction = {
             id: transactionForm?.values?.id,
-            name: transactionForm?.values?.name,
             description: transactionForm?.values?.description,
             amount: transactionForm?.values?.amount,
             discount: transactionForm?.values?.discount,
             date: localToUtc(transactionForm?.values?.date),
             type,
             deleted: transactionForm?.values?.deleted || false,
-            categoryId: transactionForm?.values?.categoryId,
+            categoryId: categorySelected || transactionForm?.values?.categoryId,
             payMethodId: transactionForm?.values?.payMethodId,
             unitId: transactionForm?.values?.unitId || unit?.id
         }
@@ -100,6 +112,7 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
                 } else {
                     setErrorMessage(res?.message);
                     setErrorShow(true);
+                    setTransactionsListState([]);
                     console.log("error else", res)
                 }
             }
@@ -110,26 +123,21 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
                 console.log("error catch", err)
             });
 
-    }, [router, transactionForm?.values, unit?.id, type]);
+    }, [router, transactionForm?.values, unit?.id, type, categorySelected, setTransactionsListState]);
 
     const theme = useTheme();
     const layoutQuery: Breakpoint = 'md';
 
     return (
-        <Box
-            component="main"
+        <Box component="main" display='flex' alignItems='center' flexDirection='column' rowGap={2}
             sx={{
-                display: 'flex',
                 flex: '1 1 auto',
-                alignItems: 'center',
-                flexDirection: 'column',
                 p: theme.spacing(3, 2, 10, 2),
                 [theme.breakpoints.up(layoutQuery)]: {
                     justifyContent: 'center',
                     p: theme.spacing(2, 10, 10, 10),
                 },
             }}
-            rowGap={2}
         >
             {/* <FormLayout > */}
             <SectionCard
@@ -143,11 +151,6 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
                 iconSize={50}
                 iconColor={type === "out" ? basePalette.error.main : basePalette.success.main}
             >
-                {/* <PayMethodCreateEditForm
-                    handleEdit={handleSave}
-                    accountsList={accounts}
-                    payMethodData={transactionForm?.values}
-                /> */}
                 <TransactionCreateEditForm
                     handleEdit={handleSave}
                     areasList={areasList}
@@ -156,8 +159,13 @@ const TransactionCreateEditView = ({ transactionForm, init, unit }: any) => {
                     transactionData={transactionForm?.values}
                     type={type}
                     setType={setType}
-                // areaId={TransactionInitialData?.areaId}
+                    unit={unit}
+                    getSetCategoriesList={getSetCategoriesList}
+                    getSetAreasList={getSetAreasList}
+                    categorySelected={categorySelected}
+                    setCategorySelected={setCategorySelected}
                 />
+                
             </SectionCard>
         </Box>
     );
@@ -170,6 +178,7 @@ const TransactionCreateEditFormReduxed = reduxForm({
 
 const mapDispatchToProps = (dispatch: any) => ({
     init: bindActionCreators(initialize, dispatch),
+    setTransactionsListState: bindActionCreators(setTransactions, dispatch),
 });
 
 const TransactionCreateEditViewForm = connect(

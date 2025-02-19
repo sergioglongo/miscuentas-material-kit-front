@@ -20,6 +20,7 @@ import {
     faCircleRight,
     faCircleUp,
     faClone,
+    faCodeCompare,
     faCopy,
     faCube,
     faCubes,
@@ -84,6 +85,9 @@ const CommonIcon = ({ iconName, styles }: any) => {
       break;   
     case 'Delete':
       iconLabel = faTrashCan;
+      break;   
+    case 'Adjust':
+      iconLabel = faCodeCompare;
       break;   
     case 'Folder':
       iconLabel = faFolder;

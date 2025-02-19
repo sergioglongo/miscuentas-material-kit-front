@@ -13,6 +13,7 @@ function SectionCard(props: any) {
         titleAlign = 'center',
         title = 'Sin titulo',
         subtitle = 'Sin subtitulo',
+        titleVariant = 'h3',
         iconName,
         iconSize = 40,
         iconColor = 'gray'
@@ -28,7 +29,7 @@ function SectionCard(props: any) {
                         </Box>
                     }
                     <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <Typography variant='h3'>{title}</Typography>
+                        <Typography variant={titleVariant} >{title}</Typography>
                         <Typography variant="subtitle1">{subtitle}</Typography>
                     </Box>
                 </Box>
