@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
-import { Grid } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import { _tasks, _posts, _timeline } from 'src/_mock';
 import AreaIcon from 'src/components/icon/AreaIcons';
 import { reportAccountsResumeByUnitId, reportAreasResumeByUnitId, reportAreasMonthToMonthByUnitId } from 'src/services/api/modules/reports.module';
+import { fCurrency } from 'src/utils/format-number';
+import CircularProgress from '@mui/material/CircularProgress';
 import { AreasTotalCards } from './cards/AreasTotalCards';
 import { AccountsTotalCards } from './cards/AccountsTotalCards';
 import { AreasPorcentualCircleGraph } from './cards/AreasPorcentualCircleGraph';
@@ -18,17 +20,26 @@ const transactionoptions = [
 ]
 
 const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
-    const [areasResumeCircular, setAreasResumeCircular] = useState([]);
-    const [areasResumeCards, setAreasResumeCards] = useState([]);
+    const [areasResumeCircularIn, setAreasResumeCircularIn] = useState([]);
+    const [areasResumeCircularOut, setAreasResumeCircularOut] = useState([]);
+    const [areasResumeCardsIn, setAreasResumeCardsIn] = useState([]);
+    const [areasResumeCardsOut, setAreasResumeCardsOut] = useState([]);
+    const [totalIn, setTotalIn] = useState(0);
+    const [totalOut, setTotalOut] = useState(0);
+    const [loadingAreaResume, setLoadingAreaResume] = useState(false);
+    const [loadingAcountsReport, setLoadingAccountsReport] = useState(false);
+    const [loadingMonthly, setLoadingMonthly] = useState(false);
     const [areasMonthToMonthCards, setAreasMonthToMonthCards] = useState<any>({});
     const [accountsResumeCards, setAccountsResumeCards] = useState<any>([]);
-    const [transactionOptionSelected, setTransactionOptionSelected] = useState('all');
     const processAreasResumeCircular = (areasResumeToProcess: any) => {
+        // console.log("areasResumeToProcess", areasResumeToProcess);
+
         const areasResumeFormated = areasResumeToProcess?.reduce((acc: any, current: any, index: number) => {
             if (index < 3) {
                 acc.push({
                     label: current.category.area.name,
                     value: current.total_amount,
+                    type: current.type,
                     icon: <AreaIcon iconName={current.category.area.icon} styles={{ fontSize: '36', display: 'flex', color: 'black' }} />
                 });
             } else {
@@ -37,6 +48,7 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
                     acc.push({
                         label: 'Otros',
                         value: current.total_amount,
+                        type: current.type,
                         icon: <AreaIcon iconName='Home' styles={{ fontSize: '36', display: 'flex', color: 'black' }} />
                     });
                 } else {
@@ -45,6 +57,7 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
             }
             return acc;
         }, []);
+        // console.log("areasResumeFormated", areasResumeFormated);
         return areasResumeFormated;
     }
     const processAreasResumeCards = (areasResumeToProcess: any) => {
@@ -74,23 +87,23 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
     }, [unitActive]);
     const processAreasMonthToMonthCards = (areasMonthToMonthToProcess: any, type: any) => {
         const categories: any = [];
-        const data: any = [];
+        const dataIn: any = [];
+        const dataOut: any = [];
         areasMonthToMonthToProcess?.map((areaResume: any) => {
+            console.log("areaResume map", areaResume,);
             categories.push(`${areaResume.mes}`);
-            data.push(Math.round(parseFloat(areaResume.total)));
+            dataIn.push(Math.round(parseFloat(areaResume.report.in.total)));
+            dataOut.push(Math.round(parseFloat(areaResume.report.out.total)));
             return areaResume
         })
 
-        const series = [
-            {
-                name: type === 'in' ? 'Ingresos' : 'Gastos',
-                data
-            }
-        ]
         const areasProcessed = {
+            dataIn,
+            dataOut,
             categories,
-            series
         }
+        console.log("areasProcessed", areasProcessed);
+
         return areasProcessed;
     }
     // item: { iconName: string; color: string; label: string; total: number };
@@ -105,21 +118,29 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
             startDate: periodo,
             endDate: hoy,
         }
-        if (transactionOptionSelected !== 'all') {
-            dataReport.type = transactionOptionSelected
-        }
+        setLoadingAreaResume(true);
         reportAreasResumeByUnitId(dataReport)
             .then((areasResumeResponse: any) => {
                 if (areasResumeResponse?.success) {
                     // const categoriesWithArea = areasResumeResponse.result.map((category: any) => ({ ...category, area: category.area.name, type: category.area.type, areaColor: category.area.color}));
-                    if (areasResumeResponse.result.length > 0) {
-                        const areasResumeCircularFormated = processAreasResumeCircular(areasResumeResponse.result);
-                        const areasResumeCardsFormated = processAreasResumeCards(areasResumeResponse.result);
-                        setAreasResumeCircular(areasResumeCircularFormated);
-                        setAreasResumeCards(areasResumeCardsFormated);
+                    if (areasResumeResponse.result) {
+                        // console.log("areasResumeResponse.result", areasResumeResponse.result.in.reportIn);
+
+                        const areasResumeCircularFormatedIn = processAreasResumeCircular(areasResumeResponse.result.in.reportIn);
+                        const areasResumeCircularFormatedOut = processAreasResumeCircular(areasResumeResponse.result.out.reportOut);
+                        const areasResumeCardsFormatedIn = processAreasResumeCards(areasResumeResponse.result.in.reportIn);
+                        const areasResumeCardsFormatedOut = processAreasResumeCards(areasResumeResponse.result.out.reportOut);
+                        setAreasResumeCircularIn(areasResumeCircularFormatedIn);
+                        setAreasResumeCircularOut(areasResumeCircularFormatedOut);
+                        setAreasResumeCardsIn(areasResumeCardsFormatedIn);
+                        setAreasResumeCardsOut(areasResumeCardsFormatedOut);
+                        setTotalIn(areasResumeResponse.result.in.total);
+                        setTotalOut(areasResumeResponse.result.out.total);
                     } else {
-                        setAreasResumeCircular([]);
-                        setAreasResumeCards([]);
+                        setAreasResumeCircularIn([]);
+                        setAreasResumeCircularOut([]);
+                        setAreasResumeCardsIn([]);
+                        setAreasResumeCardsOut([]);
                     }
                 } else {
                     console.log("No se pudieron obtener las areas");
@@ -128,13 +149,15 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
             .catch((err: any) => console.log(err))
             .finally(() => {
                 loadingAreasRef.current = false;
+                setLoadingAreaResume(false);
             })
-    }, [unitActive, periodo, hoy, transactionOptionSelected]);
+    }, [unitActive, periodo, hoy]);
 
     const getAccountsReport = useCallback(() => {
         const dataAccountsReport: any = {
             unitId: unitActive?.id,
         }
+        setLoadingAccountsReport(true);
         reportAccountsResumeByUnitId(dataAccountsReport)
             .then((accountsResumeResponse: any) => {
                 if (accountsResumeResponse?.success) {
@@ -149,60 +172,45 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
             .catch((err: any) => console.log(err))
             .finally(() => {
                 loadingAccountsRef.current = false;
+                setLoadingAccountsReport(false);
             })
     }, [unitActive, processAccountsResumeCards]);
 
     const getMonthToMonthReport = useCallback(() => {
-        const dataReportMonthOut: any = {
+
+        const dataReportMonthIn: any = {
             unitId: unitActive?.id,
-            type: 'out',
+            // type: 'in',
             cantMeses: 6
         }
-        reportAreasMonthToMonthByUnitId(dataReportMonthOut)
-            .then((areasMonthToMonthOutResponse: any) => {
-                if (areasMonthToMonthOutResponse?.success) {
-                    if (areasMonthToMonthOutResponse.result.length > 0) {
-                        const areasLineMonthtoMonthOutFormated: any = processAreasMonthToMonthCards(areasMonthToMonthOutResponse.result, 'out');
-                        return areasLineMonthtoMonthOutFormated.series || [];
+        setLoadingMonthly(true);
+        reportAreasMonthToMonthByUnitId(dataReportMonthIn)
+            .then((areasMonthToMonthInResponse: any) => {
+                if (areasMonthToMonthInResponse?.success) {
+                    if (areasMonthToMonthInResponse.result.length > 0) {
+                        console.log("areasMonthToMonthInResponse.result", areasMonthToMonthInResponse.result);
+
+                        const areasLineMonthtoMonthInFormated: any = processAreasMonthToMonthCards(areasMonthToMonthInResponse.result, 'in');
+                        const series = {
+                            categories: areasLineMonthtoMonthInFormated.categories,
+                            series: [
+                                { name: "Ingresos", data: areasLineMonthtoMonthInFormated.dataIn },
+                                { name: "Egresos", data: areasLineMonthtoMonthInFormated.dataOut },
+                            ]
+                        }
+                        console.log("series", series);
+
+                        setAreasMonthToMonthCards(series);
                     }
-                    // return [];
                 } else {
                     console.log("No se pudieron obtener las areas");
-                    return [];
                 }
-                return [];
-            })
-            .then((areasLineSeries: any) => {
-                const dataReportMonthIn: any = {
-                    unitId: unitActive?.id,
-                    type: 'in',
-                    cantMeses: 6
-                }
-                reportAreasMonthToMonthByUnitId(dataReportMonthIn)
-                    .then((areasMonthToMonthInResponse: any) => {
-                        if (areasMonthToMonthInResponse?.success) {
-                            if (areasMonthToMonthInResponse.result.length > 0) {
-                                const areasLineMonthtoMonthInFormated: any = processAreasMonthToMonthCards(areasMonthToMonthInResponse.result, 'in');
-                                const series = {
-                                    categories: areasLineMonthtoMonthInFormated.categories,
-                                    series: [
-                                        ...areasLineMonthtoMonthInFormated.series,
-                                        areasLineSeries[0]
-                                    ]
-                                }
-                                setAreasMonthToMonthCards(series);
-                            }
-                        } else {
-                            console.log("No se pudieron obtener las areas");
-                        }
-                    })
-                    .catch((err: any) => console.log(err))
-                    .finally(() => {
-                        loadingMonthRef.current = false;
-
-                    })
             })
             .catch((err: any) => console.log(err))
+            .finally(() => {
+                loadingMonthRef.current = false;
+                setLoadingMonthly(false);
+            })
     }, [unitActive]);
 
     useEffect(() => {
@@ -215,11 +223,9 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
     }, [unitActive, getAccountsReport]);
 
     useEffect(() => {
-
-        if (!loadingAreasRef.current && unitActive?.id) {
+        if (!loadingAreasRef.current && unitActive?.id && periodo) {
             loadingAreasRef.current = true;
-            console.log("cambio unit o getareasreports");
-
+            console.log("cambio unit o getareasreports o periodo");
             getAreasReports();
         }
         // setTransactionOptionSelected(transactionoptions[0].value); 
@@ -237,18 +243,32 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} md={12} lg={12}>
-                <AreasCards
-                    title='Areas'
-                    list={areasResumeCards}
-                    chart={{
-                        series: areasResumeCircular,
-                    }}
-                    // sx={{ height: '500px' }}
-                    // heightContent="450px"
-                    options={transactionoptions}
-                    transactionOptionSelected={transactionOptionSelected}
-                    onSelectOption={setTransactionOptionSelected}
-                />
+                <Box display='flex' flexDirection='column' gap={2}>
+                    <AreasCards
+                        title='Egresos por área'
+                        list={areasResumeCardsOut}
+                        totalText={`Total: ${fCurrency(totalOut)}`}
+                        chart={{
+                            series: areasResumeCircularOut,
+                        }}
+                        loading={loadingAreaResume}
+                        // sx={{ height: '500px' }}
+                        // heightContent="450px"
+                        options={transactionoptions}
+                    />
+                    <AreasCards
+                        title='Ingresos por área'
+                        list={areasResumeCardsIn}
+                        totalText={`Total: ${fCurrency(totalIn)}`}
+                        chart={{
+                            series: areasResumeCircularIn,
+                        }}
+                        loading={loadingAreaResume}
+                        // sx={{ height: '500px' }}
+                        // heightContent="450px"
+                        options={transactionoptions}
+                    />
+                </Box>
             </Grid>
             <Grid item xs={12} md={8} lg={8}>
                 {areasMonthToMonthCards?.categories?.length > 0 &&
@@ -258,6 +278,7 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
                         heightContent="428px"
                         title='Transacciones mensuales'
                         subheader='Últimos 6 meses'
+                        loading={loadingMonthly}
                     />
                 }
             </Grid>
@@ -266,6 +287,7 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
                     title="Estado de cuentas"
                     list={accountsResumeCards}
                     heightContent="465px"
+                    loading={loadingAcountsReport}
                 />
             </Grid>
         </Grid>

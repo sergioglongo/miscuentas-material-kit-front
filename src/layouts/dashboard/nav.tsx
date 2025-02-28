@@ -129,7 +129,16 @@ export function NavMobile({
 
 export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
   const pathname = usePathname();
-  const [open, setOpen] = useState<boolean[]>([false, false, false]);
+  // Inicializamos con el key del primer ítem de menú que encontremos
+  const [expandedAccordion, setExpandedAccordion] = useState<string | false>(() => {
+    const menuItem = data.find(item => item.isMenu);
+    return menuItem?.key || false;
+  });
+
+  const handleAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+    setExpandedAccordion(isExpanded ? panel : false);
+  };
+
   return (
     <>
       <Box display="flex" flexDirection="row" alignItems="center" justifyContent="flex-start" gap={2}>
@@ -152,20 +161,36 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
               let isActived = item.path === pathname;
               if (item.isMenu) {
                 return (
-                  <Accordion key={item.title} expanded>
+                  <Accordion 
+                    key={item.title} 
+                    expanded={expandedAccordion === item.key}
+                    onChange={handleAccordionChange(item.key)}
+                    // sx={{ '& .MuiAccordion-root': { minHeight: 0 } }}
+                  >
                     <AccordionSummary
                       expandIcon={<ExpandMore />}
-                    // aria-controls="panel1a-content"
+                      sx={{ 
+                        minHeight: '40px !important',
+                        '& .MuiAccordionSummary-content': {
+                          margin: '4px 0',
+                        }
+                      }}
                     >
-                      <Typography variant="subtitle1">{item.title}</Typography>
+                      <Typography 
+                        variant="subtitle1" 
+                        sx={{ 
+                          fontSize: '1.1rem',
+                          fontWeight: 600
+                        }}
+                      >
+                        {item.title}
+                      </Typography>
                     </AccordionSummary>
-                    <AccordionDetails >
+                    <AccordionDetails sx={{ pt: 0, pb: 1 }}>
                       {item.submenu?.map((subItem) => {
                         isActived = subItem.path === pathname;
                         return listNavItem(subItem, isActived);
-                      }
-                      )
-                      }
+                      })}
                     </AccordionDetails>
                   </Accordion>
                 )

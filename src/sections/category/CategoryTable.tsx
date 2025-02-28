@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
-import { Checkbox, IconButton, Tooltip } from '@mui/material';
+import { Box, Checkbox, IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
 import { getAllCategoriesBody } from 'src/services/api/modules/category.module';
@@ -10,6 +10,7 @@ import CommonIcon from 'src/components/icon/CommonIcons';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { setAreasList, setCategoriesList } from 'src/redux/slices/lists.slice';
 import { grey } from '@mui/material/colors';
+import { getPayMethodTypeName } from 'src/utils/list-translate';
 
 const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
     const [categories, setCategories] = useState([]);
@@ -159,9 +160,9 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
                 filter: false,
                 sort: true,
                 sortThirdClickReset: true,
-                customHeadRender: (columnMeta: any, updateDirection:any, sortOrder:any) => (
+                customHeadRender: (columnMeta: any, updateDirection: any, sortOrder: any) => (
                     <th key={2} style={{ textAlign: 'left' }} onClick={() => updateDirection(2)}>
-                        {columnMeta.label } {sortOrder.name === 'name' && sortOrder.direction !== 'none' ? sortOrder.direction === 'asc' ? '⬆️' : '⬇️' : ''}
+                        {columnMeta.label} {sortOrder.name === 'name' && sortOrder.direction !== 'none' ? sortOrder.direction === 'asc' ? '⬆️' : '⬇️' : ''}
                     </th>
                 ),
             }
@@ -193,11 +194,15 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        {value === 'out' ?
-                            <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
-                            :
-                            <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
-                        }
+                        <Tooltip title={`${getPayMethodTypeName(value)}`}>
+                            <Box>
+                                {value === 'out' ?
+                                    <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
+                                    :
+                                    <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
+                                }
+                            </Box>
+                        </Tooltip>
                     </th>
                 ),
                 filterType: 'dropdown',
@@ -283,12 +288,12 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
                 filter: true,
                 sort: true,
                 sortThirdClickReset: true,
-                customHeadRender: (columnMeta: any, updateDirection:any, sortOrder:any) => (
+                customHeadRender: (columnMeta: any, updateDirection: any, sortOrder: any) => (
                     <th key={9} style={{ textAlign: 'center' }} onClick={() => updateDirection(9)}>
-                        {columnMeta.label } {sortOrder.name === 'area' && sortOrder.direction !== 'none' ? sortOrder.direction === 'asc' ? '⬆️' : '⬇️' : ''}
+                        {columnMeta.label} {sortOrder.name === 'area' && sortOrder.direction !== 'none' ? sortOrder.direction === 'asc' ? '⬆️' : '⬇️' : ''}
                     </th>
                 ),
-                
+
                 customBodyRender: (value: any) => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
                         {value}
@@ -364,6 +369,11 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
                 title: 'Mostrar Columnas',
                 titleAria: 'Mostrar/Ocultar Columnas',
             },
+            pagination: {
+                next: 'Siguiente',
+                previous: 'Anterior',
+                rowsPerPage: 'Por página:',
+              }
         },
         // onSearchChange: (searchText) => {
         //   console.log('onSearchChange', searchText);

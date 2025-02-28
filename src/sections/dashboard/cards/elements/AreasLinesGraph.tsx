@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Box, Card, CardContent, CardHeader, CardProps, Divider, Typography } from '@mui/material';
+import { Box, Card, CardContent, CardHeader, CardProps, CircularProgress, Divider, Typography } from '@mui/material';
 import { Chart, ChartLegends, ChartOptions, useChart } from 'src/components/chart';
 import { useTheme } from '@mui/material/styles';
 import { fNumber } from 'src/utils/format-number';
@@ -12,9 +12,10 @@ type Props = CardProps & {
     subheader?: string;
     options?: ChartOptions;
     heightContent?: string;
+    loading?: boolean;
 };
 
-const AreasLinesGraph = ({ categories, series, options, colors, title, subheader, heightContent }: Props) => {
+const AreasLinesGraph = ({ categories, series, options, colors, title, subheader, heightContent, loading }: Props) => {
     const [isEmpty, setIsEmpty] = React.useState(true);
     const chartOptions = useChart({
         // chart: { sparkline: { enabled: true } },
@@ -56,34 +57,40 @@ const AreasLinesGraph = ({ categories, series, options, colors, title, subheader
                 flexDirection: 'column',
                 justifyContent: 'flex-start',
                 alignItems: 'center',
-                height: isEmpty ? 'auto' : heightContent,
+                height: isEmpty || loading ? 'auto' : heightContent,
                 padding: 0,
             }}>
 
                 <Box >
-                    {isEmpty ?
-                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                Sin datos en los últimos 6 meses
-                            </Typography>
-                        </Box>
-                        :
-                        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 0 }}>
-                            <Chart
-                                type="line"
-                                series={series}
-                                options={chartOptions}
-                                width={{ xs: 300, sm: 550, xl: 650 }}
-                                height={{ xs: 340, sm: 350, xl: 350 }}
-                                sx={{ my: 5, mx: 'auto' }}
-                            />
-                            <Divider sx={{ borderStyle: 'dashed' }} />
+                    {
+                        loading ?
+                            <Box display='flex' justifyContent='center' alignItems='center' height='100%' padding={5}>
+                                < CircularProgress />
+                            </Box>
+                            :
+                            isEmpty ?
+                                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                        Sin datos en los últimos 6 meses
+                                    </Typography>
+                                </Box>
+                                :
+                                <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 0 }}>
+                                    <Chart
+                                        type="line"
+                                        series={series}
+                                        options={chartOptions}
+                                        width={{ xs: 300, sm: 550, xl: 650 }}
+                                        height={{ xs: 340, sm: 350, xl: 350 }}
+                                        sx={{ my: 5, mx: 'auto' }}
+                                    />
+                                    <Divider sx={{ borderStyle: 'dashed' }} />
 
-                        </Box>
+                                </Box>
                     }
                 </Box>
             </CardContent>
-        </Card>
+        </Card >
     );
 }
 

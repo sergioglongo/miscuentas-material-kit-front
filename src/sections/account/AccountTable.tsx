@@ -9,12 +9,14 @@ import { fCurrency, fNumber } from 'src/utils/format-number';
 import AccountIcon from 'src/components/icon/AccountIcon';
 import CommonIcon from 'src/components/icon/CommonIcons';
 import { grey } from 'src/theme/core';
+import { getCurrencyName, getTypeName } from 'src/utils/list-translate';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { setAccountsList } from 'src/redux/slices/lists.slice';
 import ModalConfirm from 'src/components/modal/ModalConfirm';
 import AccountAdjustModalViewForm from './AccountAdjustModalView';
+import TransferCreateEditViewForm from '../transfer/TransferCreateEditView';
 
-const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
+const AccountTable = ({ unitActive, lists, setAccountsListState, transferCreateEditShow, setTransferCreateEditShow }: any) => {
     const [totalPesos, setTotalPesos] = useState(0);
     const [totalDollar, setTotalDollar] = useState(0);
     const [totalEuro, setTotalEuro] = useState(0);
@@ -47,6 +49,11 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
         setAccountDataSelected(accountData);
         setOpenmodalAdjust(true);
     }
+
+    const onClickName = (item: any) => {
+        const data = { unitActive: item[8], account: item[0] }
+        router.navigateState('/accountTransactions', data);
+    };
     const getMuiTheme = () => createTheme({
         components: {
             MuiTable: {
@@ -200,8 +207,15 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
+                    <th style={{ minWidth: '100px', textAlign: 'left' }} >
                         {columnMeta.label}
+                    </th>
+                ),
+                customBodyRender: (value: any, tableMeta: any) => (
+                    <th onClick={() => onClickName(tableMeta?.rowData)}>
+                        <Tooltip title={`Ver detalles de movimientos en cuenta ${value}`}>
+                            {value}
+                        </Tooltip>
                     </th>
                 )
             }
@@ -233,7 +247,11 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <AccountIcon iconName={value} styles={{ fontSize: '30', color: 'black' }} />
+                        <Tooltip title={`${getCurrencyName(value)}`}>
+                            <Box>
+                                <AccountIcon iconName={value} styles={{ fontSize: '30', color: 'black' }} />
+                            </Box>
+                        </Tooltip>
                     </th>
                 ),
                 filterType: 'dropdown',
@@ -257,7 +275,11 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <AccountIcon iconName={value} styles={{ fontSize: '30', color: 'black' }} />
+                        <Tooltip title={`${getTypeName(value)}`}>
+                            <Box>
+                                <AccountIcon iconName={value} styles={{ fontSize: '30', color: 'black' }} />
+                            </Box>
+                        </Tooltip>
                     </th>
                 ),
                 filterType: 'dropdown',
@@ -369,6 +391,11 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
                 title: 'Mostrar Columnas',
                 titleAria: 'Mostrar/Ocultar Columnas',
             },
+            pagination: {
+                next: 'Siguiente',
+                previous: 'Anterior',
+                rowsPerPage: 'Por página:',
+              }
         },
         // onSearchChange: (searchText) => {
         //   console.log('onSearchChange', searchText);
@@ -376,26 +403,26 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
         // },
     };
     const loadingRef = useRef(false);
-    const totalCalc = (accounts:any) => {
+    const totalCalc = (accounts: any) => {
         let totalPesosTemp = 0;
-                    let totalDolarTemp = 0;
-                    let totalEuroTemp = 0;
-                    accounts.forEach((account: any) => {
-                        switch (account.currency) {
-                            case 'Pesos':
-                                totalPesosTemp += account.balance;
-                                break;
-                            case 'Dolar':
-                                totalDolarTemp += account.balance;
-                                break;
-                            default:
-                                totalEuroTemp += account.balance;
-                                break;
-                        }
-                    })
-                    setTotalDollar(totalDolarTemp);
-                    setTotalPesos(totalPesosTemp);
-                    setTotalEuro(totalEuroTemp);
+        let totalDolarTemp = 0;
+        let totalEuroTemp = 0;
+        accounts.forEach((account: any) => {
+            switch (account.currency) {
+                case 'Pesos':
+                    totalPesosTemp += account.balance;
+                    break;
+                case 'Dolar':
+                    totalDolarTemp += account.balance;
+                    break;
+                default:
+                    totalEuroTemp += account.balance;
+                    break;
+            }
+        })
+        setTotalDollar(totalDolarTemp);
+        setTotalPesos(totalPesosTemp);
+        setTotalEuro(totalEuroTemp);
     }
     const getAccountsList = useCallback(() => {
         getAllAccountsByUnitId(unitActive?.id, null)
@@ -451,6 +478,23 @@ const AccountTable = ({ unitActive, lists, setAccountsListState }: any) => {
                 }
                 buttonPrimaryAction={() => setOpenmodalAdjust(false)}
                 buttonSecondaryAction={() => setOpenmodalAdjust(false)}
+                loading={false}
+                buttonSecondaryText="Cancelar"
+                buttonPrimaryText="Aceptar"
+                buttonSecondaryShow={false}
+                buttonPrimaryShow={false}
+            />
+            <ModalConfirm
+                openmodal={transferCreateEditShow}
+                setOpenmodal={setTransferCreateEditShow}
+                children={
+                    <TransferCreateEditViewForm
+                        onCancel={() => setTransferCreateEditShow(false)}
+                        updateTransactionsList={() => getAccountsList()}
+                    />
+                }
+                buttonPrimaryAction={() => setTransferCreateEditShow(false)}
+                buttonSecondaryAction={() => setTransferCreateEditShow(false)}
                 loading={false}
                 buttonSecondaryText="Cancelar"
                 buttonPrimaryText="Aceptar"

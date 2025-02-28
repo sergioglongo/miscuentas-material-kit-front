@@ -130,3 +130,10 @@ export function localToUtc(date:any) {
   const fechaUtc = moment(date, 'YYYY-MM-DD').utc();
   return fechaUtc.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 }
+
+export const fDateYYmmdd = (fecha: Date) => {
+  const año = fecha.getFullYear();
+  const mes = fecha.getMonth() + 1;
+  const dia = fecha.getDate();
+  return `${año}-${mes.toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
+};

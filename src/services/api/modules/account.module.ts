@@ -63,3 +63,27 @@ export async function adjustAccountBalance(data: any) {
         })
         .catch((err: any) => console.log(err));
 }
+
+export async function getAllAccountsForTransfer(data:any) {
+    return axiosClient
+        .post(`account/getAllForTransfer`, data)
+        .then((response: any) => {
+            if (typeof response.data !== 'undefined' && response.data.success === true) {
+                return response.data;
+            }
+            return response;
+        })
+        .catch((err: any) => console.log(err));
+}
+
+export async function transferCreateEdit(data: any) {
+    return axiosClient
+        .post(`transfer/createEdit`, data)
+        .then((response: any) => {
+            if (typeof response.data !== 'undefined' && response.data.success === true) {
+                return response.data;
+            }
+            return response;
+        })
+        .catch((err: any) => console.log(err));
+}

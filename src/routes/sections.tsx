@@ -59,15 +59,18 @@ const renderFallback = (
 );
 
 function RouterAutorized({user}:any) {
+  const isAuthorized = user?.isAuthorized;
 
   return useRoutes([
     {
-      element: (
+      element: isAuthorized ? (
         <DashboardLayout>
           <Suspense fallback={renderFallback}>
             <Outlet />
           </Suspense>
         </DashboardLayout>
+      ) : (
+        <Navigate to="/sign-in" replace />
       ),
       children: [
         { element: <HomePage />, index: true },
@@ -94,7 +97,9 @@ function RouterAutorized({user}:any) {
     },
     {
       path: 'sign-in',
-      element: (
+      element: isAuthorized ? (
+        <Navigate to="/" replace />
+      ) : (
         <AuthLayout>
           <SignInPage />
         </AuthLayout>

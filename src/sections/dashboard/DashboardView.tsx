@@ -32,7 +32,7 @@ function getFechas() {
 function DashboardView() {
   const isMdDown = useMediaQuery((theme: any) => theme.breakpoints.down('md'));
   const router = useRouter();
-  const [periodo, setPeriodo] = useState('30');
+  const [periodo, setPeriodo] = useState(null);
   const [fechasLista, setFechasLista] = useState([]);
   const hoy = formatoFecha(new Date());
   const onNewTransaction = (value: any) => {
@@ -43,7 +43,6 @@ function DashboardView() {
     setFechasLista(fechas);
     setPeriodo(fechas[0].value);
   }, [])
-
   return (
     <DashboardContent>
       <Box

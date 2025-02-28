@@ -14,83 +14,26 @@ import { bindActionCreators } from '@reduxjs/toolkit';
 import { AlertSnack } from 'src/components/notifications/AlertSnack';
 import ModalConfirm from 'src/components/modal/ModalConfirm';
 import { grey } from 'src/theme/core';
+import { getMethodName, getPayMethodTypeName } from 'src/utils/list-translate';
 
 const methodsList = [
-    { id: 'debit', name: 'Debito', type: 'out'},
+    { id: 'debit', name: 'Debito', type: 'out' },
     { id: 'credit', name: 'Credito', type: 'out' },
     { id: 'cash', name: 'Efectivo', type: 'in/out' },
     { id: 'transfer', name: 'Transferencia', type: 'in/out' },
     { id: 'other', name: 'Otro', type: 'out' },
 ]
 
-const TransactionTable = ({ unitActive, transactionsList, setTransactionsListState }: any) => {
+const TransactionTable = ({ transactionsList, onDelete }: any) => {
     const rowsPerPage = 10;
     const router = useRouter();
-    const [deleteConfirmShow, setDeleteConfirmShow] = useState(false);
-    const [deleteItemSelected, setDeleteItemSelected] = useState(0);
-    const [errorShow, setErrorShow] = useState(false);
-    const [successShow, setSuccessShow] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
- 
-    const getSetAllTransactions = useCallback(() => {
-        const data = {
-            unitId: unitActive?.id
-        }
-        getAllTransactionsBody(data)
-            .then((transactionsResponse: any) => {
-                console.log("transactionsResponse", transactionsResponse);
-                if (transactionsResponse?.success) {
-                    const transactionWithCategoryPayMethod = transactionsResponse.result.map((transactionItem: any) => (
-                        {
-                            ...transactionItem,
-                            categoryName: transactionItem?.category?.name || 'Ajuste',
-                            payMethodName: transactionItem.pay_method.method,
-                            areaName: transactionItem?.category?.area?.name || 'Ajuste',
-                            areaid: transactionItem?.category?.area?.id || 0,
-                            key: transactionItem.id
-                        }
-                    ));
-                    console.log("transactionWithCategoryPayMethod", transactionWithCategoryPayMethod);
-
-                    setTransactionsListState(transactionWithCategoryPayMethod);
-                } else {
-                    setErrorMessage("No se pudieron obtener las transactiones");
-                    setErrorShow(true);
-                    console.log("No se pudieron obtener las transactions");
-                }
-            })
-            .catch((err: any) => console.log(err));
-    }, [unitActive, setTransactionsListState]);
 
     const onEdit = (value: any) => {
         // console.log("Elegido editar id: ", value);
         router.navigateState('/transactionEdit', { id: value, });
     };
-    const onDelete = (value: any) => {
-        setDeleteItemSelected(value);
-        setDeleteConfirmShow(true);
-    }
-    const onDeleteConfirm = () => {
-        // console.log("Elegido editar id: ", value);
-        deleteTransaction(deleteItemSelected)
-            .then((response: any) => {
-                console.log("response", response);
-                if (response.success) {
-                    getSetAllTransactions();
-                    setSuccessShow(true);
-                    setDeleteConfirmShow(false);
-                } else {
-                    setDeleteConfirmShow(false);
-                    setErrorMessage(response.message);
-                    setErrorShow(true);
-                }
-            })
-            .catch((err: any) => {
-                setDeleteConfirmShow(false);
-                setErrorMessage(err.message);
-                setErrorShow(true);
-            });
-    };
+
+
     const getMuiTheme = () => createTheme({
         components: {
             MuiTable: {
@@ -186,7 +129,7 @@ const TransactionTable = ({ unitActive, transactionsList, setTransactionsListSta
             options: {
                 filter: false,
                 customBodyRender: (value: any, tableMeta: any) => {
-                    if (tableMeta.rowData[7] === 'Ajuste') {
+                    if (tableMeta.rowData[8] === 'Ajustes' || tableMeta.rowData[8] === '-') {
                         return <th style={{ width: 120, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                             Sin acciones
                         </th>;
@@ -274,11 +217,16 @@ const TransactionTable = ({ unitActive, transactionsList, setTransactionsListSta
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        {value === 'out' ?
-                            <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
-                            :
-                            <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
-                        }
+                        <Tooltip title={`${getPayMethodTypeName(value)}`}>
+                            <Box>
+
+                                {value === 'out' ?
+                                    <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
+                                    :
+                                    <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
+                                }
+                            </Box>
+                        </Tooltip>
                     </th>
                 ),
                 filterType: 'dropdown',
@@ -302,9 +250,14 @@ const TransactionTable = ({ unitActive, transactionsList, setTransactionsListSta
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <PayMethodIcon iconName={value} styles={{ fontSize: '40', display: 'flex', color: 'black' }} />
+                        <Tooltip title={`${getMethodName(value)}`}>
+                            <Box>
+                                <PayMethodIcon iconName={value} styles={{ fontSize: '40', display: 'flex', color: 'black' }} />
+                            </Box>
+                        </Tooltip>
                     </th>
                 ),
+               
                 // filterType: 'multiselect', // Cambiar a multiselect para permitir múltiples opciones
                 // customFilterListOptions: (filterList:any, currentColumnValue:any) => {
                 //     const uniqueOptions = [...new Set(currentColumnValue.map((row:any) => row[filterList.columnName]))];
@@ -437,17 +390,17 @@ const TransactionTable = ({ unitActive, transactionsList, setTransactionsListSta
                 title: 'Mostrar Columnas',
                 titleAria: 'Mostrar/Ocultar Columnas',
             },
+            pagination: {
+                next: 'Siguiente',
+                previous: 'Anterior',
+                rowsPerPage: 'Por página:',
+              }
         },
         // onSearchChange: (searchText) => {
         //   console.log('onSearchChange', searchText);
         //   filterChoferes(searchText);
         // },
     };
-
-
-    useEffect(() => {
-        getSetAllTransactions();
-    }, [getSetAllTransactions]);
 
     return (
         <Box>
@@ -459,48 +412,7 @@ const TransactionTable = ({ unitActive, transactionsList, setTransactionsListSta
                     options={options}
                 />
             </ThemeProvider >
-            <Snackbar
-                open={errorShow}
-                // message={errorMessage}
-                autoHideDuration={3000}
-                onClose={() => setErrorShow(false)}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                }}
-            >
-                <AlertSnack onClose={() => setErrorShow(false)} severity="error">
-                    {errorMessage}
-                </AlertSnack>
-            </Snackbar>
-            <Snackbar
-                open={successShow}
-                // message={errorMessage}
-                autoHideDuration={5000}
-                onClose={() => setSuccessShow(false)}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                }}
-            >
-                <AlertSnack onClose={() => setSuccessShow(false)} severity="success">
-                    Transacción eliminada satisfactoriamente
-                </AlertSnack>
-            </Snackbar>
-            <ModalConfirm
-                openmodal={deleteConfirmShow}
-                setOpenmodal={setDeleteConfirmShow}
-                children={<Box>¿Seguro que desea eliminar la transacción? <br />
-                    Se revertira el movimiento en la cuenta correspondiente
-                </Box>}
-                buttonPrimaryAction={onDeleteConfirm}
-                buttonSecondaryAction={() => setDeleteConfirmShow(false)}
-                loading={false}
-                buttonSecondaryText="Cancelar"
-                buttonPrimaryText="Aceptar"
-                buttonSecondaryShow
-                buttonPrimaryShow
-            />
+
         </Box>
     )
 }

@@ -1,26 +1,13 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { connect } from 'react-redux';
-import { useRouter } from 'src/routes/hooks';
 
 import { CONFIG } from 'src/config-global';
 import DashboardPage from './dashboard/DashboardPage';
 
 // ----------------------------------------------------------------------
 
-function Page({user}:any) {
-  const router = useRouter();
-
-  useEffect(() => {
-    if(user?.isAuthorized){
-      console.log("autorizado", user?.isAuthorized);
-    } else {
-      console.log("no autorizado",user?.isAuthorized);
-      router.push('/sign-in');
-    }
-    
-  },[user?.isAuthorized, router])
-
+function Page() {
   return (
     <>
       <Helmet>
@@ -32,7 +19,6 @@ function Page({user}:any) {
         <meta name="keywords" content="react,material,kit,application,dashboard,admin,template" />
       </Helmet>
       <DashboardPage />
-      {/* <OverviewAnalyticsView /> */}
     </>
   );
 }

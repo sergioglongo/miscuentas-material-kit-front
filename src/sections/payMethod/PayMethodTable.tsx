@@ -1,15 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Checkbox, IconButton, Tooltip } from '@mui/material';
+import { Box, Checkbox, IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
 import { getAllPayMethodsByUnitId } from 'src/services/api/modules/payMethod.module';
 import PayMethodIcon from 'src/components/icon/PayMethodIcons';
 import CommonIcon from 'src/components/icon/CommonIcons';
-import { grey } from 'src/theme/core';
+import { grey, secondary } from 'src/theme/core';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { setPayMethodsList } from 'src/redux/slices/lists.slice';
+import { getMethodName, getPayMethodTypeName } from 'src/utils/list-translate';
 
 const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethodsListState, setOpenmodalPayMethodEdit }: any) => {
     const [payMethod, setPayMethod] = useState([]);
@@ -164,11 +165,17 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethods
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        {value === 'out' ?
-                            <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
-                            :
-                            <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
-                        }
+                        <Tooltip title={`${getPayMethodTypeName(value)}`}>
+                            <Box>
+                                {value === 'out' ?
+                                    <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
+                                    : value === 'in' ?
+                                        <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
+                                        :
+                                        <CommonIcon iconName='Adjust' styles={{ fontSize: '30', color: secondary }} />
+                                }
+                            </Box>
+                        </Tooltip>
                     </th>
                 ),
                 filterType: 'dropdown',
@@ -192,7 +199,11 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethods
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <PayMethodIcon iconName={value} styles={{ fontSize: '40', display: 'flex', color: grey[700] }} />
+                        <Tooltip title={`${getMethodName(value)}`}>
+                            <Box>
+                                <PayMethodIcon iconName={value} styles={{ fontSize: '40', display: 'flex', color: grey[700] }} />
+                            </Box>
+                        </Tooltip>
                     </th>
                 ),
                 filterType: 'dropdown',
@@ -316,6 +327,11 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethods
                 title: 'Mostrar Columnas',
                 titleAria: 'Mostrar/Ocultar Columnas',
             },
+            pagination: {
+                next: 'Siguiente',
+                previous: 'Anterior',
+                rowsPerPage: 'Por página:',
+              }
         },
         // onSearchChange: (searchText) => {
         //   console.log('onSearchChange', searchText);

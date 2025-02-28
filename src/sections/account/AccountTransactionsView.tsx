@@ -7,10 +7,6 @@ import { useRouter } from 'src/routes/hooks';
 import { getAllTransactionsByUnitAndAccount } from 'src/services/api/modules/transaction.module';
 import AccountTransactionsTable from './AccountTransactionsTable';
 
-interface AccountTransactionViewProps {
-    unitActive: any;
-    account: any;
-}
 const formatoFecha = (fecha: Date) => {
     const año = fecha.getFullYear();
     const mes = fecha.getMonth() + 1;
@@ -41,7 +37,7 @@ function AccountTransactionView({ unitActive, account }: any) {
     const diaActual = fechaActual.getDay();
     const [transactions, setTransactions] = useState([]);
     const [accountState, setAccountState] = useState<any>({});
-    const [periodo, setPeriodo] = useState(new Date(fechaActual.getFullYear(), fechaActual.getMonth(), fechaActual.getDate() - diaActual));
+    const [periodo, setPeriodo] = useState();
     const [fechasLista, setFechasLista] = useState([]);
     const [totalIn, setTotalIn] = useState(0);
     const [totalOut, setTotalOut] = useState(0);
@@ -103,38 +99,40 @@ function AccountTransactionView({ unitActive, account }: any) {
         router.navigateState('/transactionEdit', { type: value, });
       }
     useEffect(() => {
-        const data = {
-            unitId: transactionData.unitActive,
-            account: transactionData.account,
-            dateFrom: periodo,
-            dateTo: formatoFecha(new Date()),
+        if(periodo){
+            const data = {
+                unitId: transactionData.unitActive,
+                account: transactionData.account,
+                dateFrom: periodo,
+                dateTo: formatoFecha(new Date()),
+            }
+            console.log("data a enviar en consulta", transactionData);
+    
+            getAllTransactionsByUnitAndAccount(data)
+                .then((transactionsResponse: any) => {
+                    console.log("transactionsResponse", transactionsResponse);
+                    if (transactionsResponse?.success) {
+                        const transactionWithCategoryPayMethod = transactionsResponse.transaction.map((transactionItem: any) => (
+                            {
+                                ...transactionItem,
+                                categoryName: transactionItem?.category?.name || 'Ajuste',
+                                payMethodName: transactionItem.pay_method.method,
+                                areaName: transactionItem.category?.area?.name || 'Ajuste',
+                                areaid: transactionItem.category?.area.id || 0,
+                                key: transactionItem.id + 1
+                            }
+                        ));
+                        // setTransactions(transactionWithCategoryPayMethod);
+                        setAccountState(transactionsResponse?.account);
+                        // calcTotals(transactionsResponse.transaction);
+                        const transactionsWithAcumulado: any = calcAcumulated(transactionWithCategoryPayMethod, transactionsResponse.account.balance);
+                        setTransactions(transactionsWithAcumulado);
+                    } else {
+                        console.log("No se pudieron obtener las transaction");
+                    }
+                })
+                .catch((err: any) => console.log(err));
         }
-        console.log("data a enviar en consulta", transactionData);
-
-        getAllTransactionsByUnitAndAccount(data)
-            .then((transactionsResponse: any) => {
-                console.log("transactionsResponse", transactionsResponse);
-                if (transactionsResponse?.success) {
-                    const transactionWithCategoryPayMethod = transactionsResponse.transaction.map((transactionItem: any) => (
-                        {
-                            ...transactionItem,
-                            categoryName: transactionItem?.category?.name || 'Ajuste',
-                            payMethodName: transactionItem.pay_method.method,
-                            areaName: transactionItem.category?.area?.name || 'Ajuste',
-                            areaid: transactionItem.category?.area.id || 0,
-                            key: transactionItem.id + 1
-                        }
-                    ));
-                    // setTransactions(transactionWithCategoryPayMethod);
-                    setAccountState(transactionsResponse?.account);
-                    // calcTotals(transactionsResponse.transaction);
-                    const transactionsWithAcumulado: any = calcAcumulated(transactionWithCategoryPayMethod, transactionsResponse.account.balance);
-                    setTransactions(transactionsWithAcumulado);
-                } else {
-                    console.log("No se pudieron obtener las transaction");
-                }
-            })
-            .catch((err: any) => console.log(err));
     }, [unitActive, account, periodo, transactionData]); // eslint-disable-line
     useEffect(() => {
         console.log("accountState", accountState);
@@ -166,6 +164,7 @@ function AccountTransactionView({ unitActive, account }: any) {
                 </Typography> */}
                     <Box display="flex" flexDirection='row' alignItems='center'>
                         <Typography variant="h6" >Fecha:</Typography>
+                        {periodo &&
                         <Select
                             name="areaId"
                             style={{ minWidth: '200px', marginLeft: '10px' }}
@@ -177,6 +176,7 @@ function AccountTransactionView({ unitActive, account }: any) {
                             {/* <MenuItem value='30' key='1' >mes actual</MenuItem> */}
                             {fechasLista.map((item: any, index: number) => <MenuItem value={item.value} key={index} >{item.label}</MenuItem>)}
                         </Select>
+}
                     </Box>
                     <Box display='flex' flexDirection='row' gap={2}>
                         <Button

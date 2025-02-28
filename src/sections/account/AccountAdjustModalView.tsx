@@ -55,9 +55,6 @@ function AreaCreateEditModalView({ accountData, accountAdjustModalForm, unitId, 
             });
 
     }, [accountAdjustModalForm?.values, setAccountListState, updateList, type, unitId, accountData, amount]); // eslint-disable-line
-    const onAmountChange = (value: any) => {
-        
-    }
 
     return (
         <Box>

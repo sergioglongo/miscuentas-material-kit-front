@@ -1,5 +1,5 @@
-import { Box, Button, Typography, useMediaQuery } from '@mui/material'
-import React from 'react'
+import { Box, Button, Tooltip, Typography, useMediaQuery } from '@mui/material'
+import React, { useState } from 'react'
 import { Iconify } from 'src/components/iconify'
 import { DashboardContent } from 'src/layouts/dashboard'
 import { useRouter } from 'src/routes/hooks';
@@ -8,9 +8,13 @@ import AccountTable from './AccountTable';
 function AccountView() {
   const router = useRouter();
   const isMdDown = useMediaQuery((theme: any) => theme.breakpoints.down('md'));
+  const [transferCreateEditShow, setTransferCreateEditShow] = useState(false);
 
-  const onNewCategory = () => {
+  const onNewAccount = () => {
     router.push('/accountEdit');
+  }
+  const onNewTransfer = () => {
+    setTransferCreateEditShow(true);
   }
   return (
     <DashboardContent>
@@ -23,19 +27,35 @@ function AccountView() {
             Lista de cuentas disponibles. Monedas disponibles Pesos, Dolares y Euros.
           </Typography>
         </Box>
-        <Button
-          sx={{ height: 40, width: 200, alignSelf:'center' }}
-          variant="contained"
-          color="inherit"
-          startIcon={<Iconify icon="mingcute:add-line" />}
-          onClick={onNewCategory}
-        >
-          Nueva Cuenta
-        </Button>
+        <Box display='flex' flexDirection='row' gap={2}>
+          <Tooltip title="Transfiere de una cuenta propia a otra">
+            <Button
+              style={{color: 'white',}}
+              variant="contained"
+              color="warning"
+              startIcon={<Iconify icon="mingcute:add-line" />}
+              onClick={() => onNewTransfer()}
+            >
+              Transferencia
+            </Button>
+          </Tooltip>
+          <Button
+            sx={{ height: 40, minWidth: 180, alignSelf: 'center' }}
+            variant="contained"
+            color="inherit"
+            startIcon={<Iconify icon="mingcute:add-line" />}
+            onClick={onNewAccount}
+          >
+            Nueva Cuenta
+          </Button>
+        </Box>
       </Box>
       {/* <AreaTable /> */}
       {/* <CategoryTable /> */}
-      <AccountTable />
+      <AccountTable
+        transferCreateEditShow={transferCreateEditShow}
+        setTransferCreateEditShow={setTransferCreateEditShow}
+      />
 
     </DashboardContent>
   )

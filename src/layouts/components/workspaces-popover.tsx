@@ -18,6 +18,7 @@ import { setUnitActive } from 'src/redux/slices/units.slice';
 import { updateParams } from 'src/redux/slices/user.slice';
 import UnitIcon from 'src/components/icon/unit-icons';
 import { IUnit, IUser } from 'src/config/types/types';
+import { useRouter } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
 
@@ -41,6 +42,8 @@ function WorkspacesPopover({ data = [], sx, unitActive, setUnitActiveData, updat
 
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
+  const router = useRouter();
+
   const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     setOpenPopover(event.currentTarget);
   }, []);
@@ -54,9 +57,10 @@ function WorkspacesPopover({ data = [], sx, unitActive, setUnitActiveData, updat
       setWorkspace(newValue);
       setUnitActiveData(newValue)
       updateUnitActive({ unitActive: newValue });
+      router.replace('/');
       handleClosePopover();
     },
-    [handleClosePopover, setUnitActiveData, updateUnitActive]
+    [handleClosePopover, setUnitActiveData, updateUnitActive, router]
   );
 
   const renderAvatar = (alt: string, src: string) => (
@@ -72,17 +76,17 @@ function WorkspacesPopover({ data = [], sx, unitActive, setUnitActiveData, updat
           setUnitActiveData(unit)
           updateUnitActive({ unitActive: unit });
           console.log("se establece la unidad activa", unitActive);
-          
         }
       })
-    } else if(user.isAuthorized){
+    } else if (user.isAuthorized) {
       const newValue = data.find(item => item.is_main_unit);
       console.log("Se establece l a unidad principal", newValue);
       setWorkspace(newValue)
       setUnitActiveData(newValue)
       updateUnitActive({ unitActive: newValue });
-    } 
-  }, [unitActive, data, setUnitActiveData, updateUnitActive, user.isAuthorized])
+
+    }
+  }, [unitActive, data, setUnitActiveData, updateUnitActive, user.isAuthorized, router])
 
   // useEffect(() => {
   //   if (data && data.length > 0) {

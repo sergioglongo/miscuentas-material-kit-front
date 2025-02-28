@@ -3,13 +3,14 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 import { getAllAreas } from 'src/services/api/modules/area.module';
-import { Checkbox, Icon, IconButton, Tooltip } from '@mui/material';
+import { Box, Checkbox, Icon, IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import AreaIcon from 'src/components/icon/AreaIcons';
 import CommonIcon from 'src/components/icon/CommonIcons';
 import MUIDataTable from 'mui-datatables';
 import { setAreasList } from 'src/redux/slices/lists.slice';
 import { grey } from 'src/theme/core';
+import { getPayMethodTypeName } from 'src/utils/list-translate';
 
 const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
     const [areaQueryLoad, setAreaQueryLoad] = useState(false);
@@ -114,7 +115,7 @@ const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
             name: 'id',
             label: 'id',
             options: {
-                filter: false,                
+                filter: false,
                 display: 'excluded',
             }
         },
@@ -155,9 +156,9 @@ const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
             options: {
                 filter: false,
                 sortThirdClickReset: true,
-                customHeadRender: (columnMeta: any, updateDirection:any, sortOrder:any) => (
+                customHeadRender: (columnMeta: any, updateDirection: any, sortOrder: any) => (
                     <th key={2} style={{ textAlign: 'left' }} onClick={() => updateDirection(2)}>
-                        {columnMeta.label } {sortOrder.name === 'name' && sortOrder.direction !== 'none' ? sortOrder.direction === 'asc' ? '⬆️' : '⬇️' : ''}
+                        {columnMeta.label} {sortOrder.name === 'name' && sortOrder.direction !== 'none' ? sortOrder.direction === 'asc' ? '⬆️' : '⬇️' : ''}
                     </th>
                 ),
             }
@@ -184,19 +185,23 @@ const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
                 filter: true,
                 sort: false,
                 sortThirdClickReset: true,
-                customHeadRender: (columnMeta: any, updateDirection:any, sortOrder:any) => (
+                customHeadRender: (columnMeta: any, updateDirection: any, sortOrder: any) => (
                     <th key={4} style={{ textAlign: 'center' }} onClick={() => updateDirection(4)}>
-                        {columnMeta.label } {sortOrder.name === 'type' && sortOrder.direction !== 'none' ? sortOrder.direction === 'asc' ? '⬆️' : '⬇️' : ''}
+                        {columnMeta.label} {sortOrder.name === 'type' && sortOrder.direction !== 'none' ? sortOrder.direction === 'asc' ? '⬆️' : '⬇️' : ''}
                     </th>
                 ),
-                 customBodyRender: (value: any, tableMeta: any) => () => (
+                customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        {value === 'out' 
-                        ?
-                            <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
-                            :
-                            <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
-                        }
+                        <Tooltip title={`${getPayMethodTypeName(value)}`}>
+                            <Box>
+                                {value === 'out'
+                                    ?
+                                    <CommonIcon iconName='CircleUp' styles={{ fontSize: '30', color: 'orange' }} />
+                                    :
+                                    <CommonIcon iconName='CircleDown' styles={{ fontSize: '30', color: 'green' }} />
+                                }
+                            </Box>
+                        </Tooltip>
                     </th>
                 ),
                 filterType: 'dropdown',
@@ -215,7 +220,7 @@ const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
                 filter: false,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th key={5}  style={{}}>{columnMeta.label}</th>
+                    <th key={5} style={{}}>{columnMeta.label}</th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
                     <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         <AreaIcon iconName={tableMeta?.rowData[6]} styles={{ fontSize: '36', display: 'flex', color: value }} />
@@ -337,6 +342,11 @@ const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
                 title: 'Mostrar Columnas',
                 titleAria: 'Mostrar/Ocultar Columnas',
             },
+            pagination: {
+                next: 'Siguiente',
+                previous: 'Anterior',
+                rowsPerPage: 'Por página:',
+              }
         },
         // onSearchChange: (searchText) => {
         //   console.log('onSearchChange', searchText);
@@ -359,7 +369,7 @@ const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
                     }
                 })
                 .catch((err: any) => console.log(err))
-                .finally(() => {loadingRef.current = false});
+                .finally(() => { loadingRef.current = false });
         }
     }, [unitActive, setAreasListState, lists.areasList, areaQueryLoad]);
 
