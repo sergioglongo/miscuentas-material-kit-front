@@ -153,7 +153,7 @@ const TransactionTable = ({ transactionsList, onDelete }: any) => {
                     </th>
                 },
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ width: '80px', padding: 0, height: '40px' }}>
+                    <th key="header-actions" style={{ width: '80px', padding: 0, height: '40px' }}>
                         {columnMeta.label}
                     </th>
                 )
@@ -165,7 +165,7 @@ const TransactionTable = ({ transactionsList, onDelete }: any) => {
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
+                    <th key={`header-${columnMeta.name}`} style={{ minWidth: '100px', textAlign: 'left' }}>
                         {columnMeta.label}
                     </th>
                 )
@@ -177,7 +177,7 @@ const TransactionTable = ({ transactionsList, onDelete }: any) => {
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
+                    <th key={`header-${columnMeta.name}`} style={{ minWidth: '100px', textAlign: 'left' }}>
                         {columnMeta.label}
                     </th>
                 ),
@@ -194,7 +194,7 @@ const TransactionTable = ({ transactionsList, onDelete }: any) => {
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
+                    <th key={`header-${columnMeta.name}`} style={{ minWidth: '100px', textAlign: 'left' }}>
                         {columnMeta.label}
                     </th>
                 ),
@@ -212,7 +212,7 @@ const TransactionTable = ({ transactionsList, onDelete }: any) => {
                 filter: true,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
+                    <th key={`header-${columnMeta.name}`} >
                         {columnMeta.label}
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
@@ -245,7 +245,7 @@ const TransactionTable = ({ transactionsList, onDelete }: any) => {
                 filter: true,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
+                    <th key={`header-${columnMeta.name}`} >
                         {columnMeta.label}
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
@@ -275,7 +275,7 @@ const TransactionTable = ({ transactionsList, onDelete }: any) => {
                 filter: false,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ textAlign: 'center' }}>
+                    <th key={`header-${columnMeta.name}`} style={{ textAlign: 'center' }}>
                         {columnMeta.label}
                     </th>
                 ),
@@ -293,7 +293,7 @@ const TransactionTable = ({ transactionsList, onDelete }: any) => {
                 filter: false,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ textAlign: 'center' }}>
+                    <th key={`header-${columnMeta.name}`} style={{ textAlign: 'center' }}>
                         {columnMeta.label}
                     </th>
                 ),

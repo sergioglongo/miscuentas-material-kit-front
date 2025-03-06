@@ -50,16 +50,16 @@ export function SimpleLayout({ sx, children, header, content }: SimpleLayoutProp
                 <Typography variant="h5">Mis Cuentas</Typography>
               </Box>
             ),
-            rightArea: (
-              <Link
-                href="#"
-                component={RouterLink}
-                color="inherit"
-                sx={{ typography: 'subtitle2' }}
-              >
-                Need help?
-              </Link>
-            ),
+            // rightArea: (
+            //   <Link
+            //     href="#"
+            //     component={RouterLink}
+            //     color="inherit"
+            //     sx={{ typography: 'subtitle2' }}
+            //   >
+            //     Need help?
+            //   </Link>
+            // ),
           }}
         />
       }

@@ -57,7 +57,7 @@ function TransferCreateEditForm({ handleEdit, transferData, accountsTransferList
     }, [transferData?.id])
 
     return (
-        <Box>
+        <Box sx={{ width: '100%' }}>
             <Form onSubmit={handleEdit} style={{ margin: '10px' }}>
                 <Grid container rowSpacing={1} rowGap={2} columnSpacing={2} display='flex' flexDirection='column' alignItems='flex-start'>
                     <Grid item xs={12} sm={12} style={{ width: '100%' }}>

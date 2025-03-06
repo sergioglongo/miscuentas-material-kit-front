@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 import { Box, Checkbox, IconButton, Tooltip } from '@mui/material';
@@ -373,7 +373,7 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
                 next: 'Siguiente',
                 previous: 'Anterior',
                 rowsPerPage: 'Por página:',
-              }
+            }
         },
         // onSearchChange: (searchText) => {
         //   console.log('onSearchChange', searchText);
@@ -381,27 +381,33 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
         // },
     };
 
-    const loadingRef = useRef(false);
+    const [isLoading, setIsLoading] = useState(false);
+    
+    const getSetCategoriesList = useCallback(async () => {
+        const data = {
+            unitId: unitActive?.id,
+            deleted: false
+        }
+        getAllCategoriesBody(data)
+            .then((categoriesResponse: any) => {
+                if (categoriesResponse?.success) {
+                    const categoriesWithArea = categoriesResponse.result.map((category: any) => ({ ...category, area: category.area.name, type: category.area.type, areaColor: category.area.color }));
+                    setCategoriesListState(categoriesWithArea);
+                } else {
+                    console.log("No se pudieron obtener las categories");
+                }
+            })
+            .catch((err: any) => console.log(err))
+    }, [unitActive?.id, setCategoriesListState]);
 
     useEffect(() => {
-        if (lists.categoriesList.length === 0 && !loadingRef.current) {
-            const data = {
-                unitId: unitActive?.id,
-                deleted: false
-            }
-            getAllCategoriesBody(data)
-                .then((categoriesResponse: any) => {
-                    if (categoriesResponse?.success) {
-                        const categoriesWithArea = categoriesResponse.result.map((category: any) => ({ ...category, area: category.area.name, type: category.area.type, areaColor: category.area.color }));
-                        setCategoriesListState(categoriesWithArea);
-                    } else {
-                        console.log("No se pudieron obtener las categories");
-                    }
-                })
-                .catch((err: any) => console.log(err));
+        if (!isLoading && unitActive?.id) {
+            setIsLoading(true);
+            getSetCategoriesList()
+                .finally(() => setIsLoading(false));
         }
-    }, [unitActive, lists.categoriesList, setCategoriesListState]);
-
+    }, [unitActive?.id, setCategoriesListState]); // eslint-disable-line react-hooks/exhaustive-deps
+    
     return (
         <ThemeProvider theme={getMuiTheme()}>
             <MUIDataTable

@@ -359,7 +359,6 @@ const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
         if (lists.areasList.length === 0 && !loadingRef.current) {
             // setAreaQueryLoad(true);
             loadingRef.current = true;
-            console.log("Obtengo areas del backend");
             getAllAreas(`?unitId=${unitActive?.id}`)
                 .then((areasResponse: any) => {
                     if (areasResponse?.success) {

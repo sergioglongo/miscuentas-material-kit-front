@@ -9,8 +9,6 @@ import { Iconify } from 'src/components/iconify';
 import { setUser } from 'src/redux/slices/user.slice';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { useTheme, Breakpoint } from '@mui/material/styles';
-import { setUnits } from 'src/redux/slices/units.slice';
-import { getUnitsByUserId } from 'src/services/api/modules/unit.module';
 import SectionCard from 'src/components/cards/sectionCard.tsx/sectionCard';
 import ProfileEditForm from './profile-edit-form';
 import ProfileUnitList from './profile-unit-list';
@@ -27,9 +25,7 @@ const ProfileEditView = ({ profileForm, user, userData, setUserData, init }: any
     useEffect(() => {
         if (userData) {
             init('profileForm', userData);
-            console.log("inicializacion de userData");
         }
-
     }, [userData, init])
 
     const handleSave = useMemo(() => (e: any) => {

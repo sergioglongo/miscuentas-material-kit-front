@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Box, Checkbox, IconButton, Tooltip } from '@mui/material';
+import { Box, Checkbox, CircularProgress, IconButton, Tooltip } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
 import { getAllPayMethodsByUnitId } from 'src/services/api/modules/payMethod.module';
@@ -11,12 +11,33 @@ import { grey, secondary } from 'src/theme/core';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { setPayMethodsList } from 'src/redux/slices/lists.slice';
 import { getMethodName, getPayMethodTypeName } from 'src/utils/list-translate';
+import {Spinner} from 'src/components/spinner/Spinner';
 
 const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethodsListState, setOpenmodalPayMethodEdit }: any) => {
-    const [payMethod, setPayMethod] = useState([]);
-
+    const [isLoading, setIsLoading] = useState(false);
     const rowsPerPage = 10;
-    const router = useRouter();
+
+    const getPayMethodsList = useCallback(async () =>
+        getAllPayMethodsByUnitId({ unitId: unitActive?.id, deleted: false })
+            .then((peyMethodsResponse: any) => {
+                if (peyMethodsResponse?.success) {
+                    const payMethodWithArea = peyMethodsResponse.result.map((category: any) => ({ ...category, accountName: category.account.name }));
+                    setPayMethodsListState(payMethodWithArea);
+                } else {
+                    console.log("No se pudieron obtener las payMethod");
+                }
+            })
+            .catch((err: any) => console.log(err))
+        , [unitActive?.id, setPayMethodsListState]);
+
+    useEffect(() => {
+        if (!isLoading && unitActive?.id) {
+            setIsLoading(true);
+            getPayMethodsList()
+                .finally(() =>  setIsLoading(false));
+        }
+    }, [unitActive?.id, getPayMethodsList]); // eslint-disable-line
+
     const onEdit = (payMethodData: any) => {
         console.log("presionado editar el metodo de pago ", payMethodData[0]);
         setPayMethodSelected(payMethodData[0]);
@@ -116,26 +137,16 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethods
             options: {
                 filter: false,
                 customBodyRender: (value: any, tableMeta: any) => (
-                    <th style={{ width: 80, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-                        {/* <Tooltip title="Ver detalle">
-                            <IconButton aria-label="Ver" onClick={() => { }}>
-                                <CommonIcon color='gray' iconName="View" />
-                            </IconButton>
-                        </Tooltip> */}
+                    <th key={`action-${value}`} style={{ width: 80, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                         <Tooltip title="Editar">
                             <IconButton aria-label="Ver" onClick={() => onEdit(tableMeta?.rowData)}>
                                 <CommonIcon color='gray' iconName="Edit" />
                             </IconButton>
                         </Tooltip>
-                        {/* <Tooltip title="Eliminar">
-                            <IconButton aria-label="Ver" onClick={() => { }}>
-                                <CommonIcon color='gray' iconName="Delete" />
-                            </IconButton>
-                        </Tooltip> */}
                     </th>
                 ),
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ width: '80px', padding: 0, height: '40px' }}>
+                    <th key={`header-${columnMeta.name}`} style={{ width: '80px', padding: 0, height: '40px' }}>
                         {columnMeta.label}
                     </th>
                 )
@@ -147,7 +158,7 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethods
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
+                    <th key={`header-${columnMeta.name}`} style={{ minWidth: '100px', textAlign: 'left' }}>
                         {columnMeta.label}
                     </th>
                 )
@@ -160,11 +171,11 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethods
                 filter: true,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
+                    <th key={`header-${columnMeta.name}`} style={{}}>
                         {columnMeta.label}
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
-                    <th style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <th key={`type-${tableMeta.rowIndex}`} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         <Tooltip title={`${getPayMethodTypeName(value)}`}>
                             <Box>
                                 {value === 'out' ?
@@ -194,7 +205,7 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethods
                 filter: true,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
+                    <th key={`header-${columnMeta.name}`} style={{}}>
                         {columnMeta.label}
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
@@ -222,7 +233,7 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethods
                 filter: false,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ textAlign: 'center' }}>
+                    <th key={`header-${columnMeta.name}`} style={{ textAlign: 'center' }}>
                         {columnMeta.label}
                     </th>
                 ),
@@ -240,7 +251,7 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethods
                 filter: true,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
+                    <th key={`header-${columnMeta.name}`} style={{}}>
                         {columnMeta.label}
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
@@ -307,7 +318,10 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethods
         }),
         textLabels: {
             body: {
-                noMatch: 'Sin datos para mostrar',
+                noMatch:
+                    isLoading ?
+                        <Spinner />
+                        : 'Sin datos para mostrar',
                 toolTip: 'Ordenar',
                 //   columnHeaderTooltip: column => `Sort for ${column.label}`
             },
@@ -331,31 +345,13 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethods
                 next: 'Siguiente',
                 previous: 'Anterior',
                 rowsPerPage: 'Por página:',
-              }
+            }
         },
         // onSearchChange: (searchText) => {
         //   console.log('onSearchChange', searchText);
         //   filterChoferes(searchText);
         // },
     };
-    const loadingRef = useRef(false);
-
-    useEffect(() => {
-        if (lists.payMethodsList.length === 0 && !loadingRef.current) {
-            const dataPayMethods = { unitId: unitActive?.id, deleted: false };
-            getAllPayMethodsByUnitId(dataPayMethods)
-                .then((peyMethodsResponse: any) => {
-                    console.log("peyMethodsResponse", peyMethodsResponse);
-                    if (peyMethodsResponse?.success) {
-                        const payMethodWithArea = peyMethodsResponse.result.map((category: any) => ({ ...category, accountName: category.account.name }));
-                        setPayMethodsListState(payMethodWithArea);
-                    } else {
-                        console.log("No se pudieron obtener las payMethod");
-                    }
-                })
-                .catch((err: any) => console.log(err));
-        }
-    }, [unitActive, lists.accountsList, lists.payMethodsList, setPayMethodsListState]);
 
     return (
         <ThemeProvider theme={getMuiTheme()}>

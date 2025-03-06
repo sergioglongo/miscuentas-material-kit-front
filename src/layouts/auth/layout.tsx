@@ -22,9 +22,10 @@ export type AuthLayoutProps = {
   header?: {
     sx?: SxProps<Theme>;
   };
+  cardWidth?: string;
 };
 
-export function AuthLayout({ sx, children, header }: AuthLayoutProps) {
+export function AuthLayout({ sx, children, header, cardWidth }: AuthLayoutProps) {
   const layoutQuery: Breakpoint = 'md';
 
   return (
@@ -59,9 +60,10 @@ export function AuthLayout({ sx, children, header }: AuthLayoutProps) {
             rightArea: (
               <Link
                 component={RouterLink}
-                href="#"
+                href="https://wa.me/5493816302170?text=Hola,%queria%20consultarte"
                 color="inherit"
                 sx={{ typography: 'subtitle2' }}
+                target='_blank'
               >
                 Necesitas ayuda?
               </Link>
@@ -76,7 +78,7 @@ export function AuthLayout({ sx, children, header }: AuthLayoutProps) {
       /** **************************************
        * Style
        *************************************** */
-      cssVars={{ '--layout-auth-content-width': '420px' }}
+      cssVars={{ '--layout-auth-content-width': cardWidth ?? '420px' }}
       sx={{
         '&::before': {
           width: 1,

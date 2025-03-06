@@ -30,7 +30,7 @@ const AreasLinesGraph = ({ categories, series, options, colors, title, subheader
 
     });
     useEffect(() => {
-        const empty = series[0].data.every((item: any) => item === 0);
+        const empty = series ? series[0]?.data?.every((item: any) => item === 0) : true;
         setIsEmpty(empty);
     }, [series]);
     return (
@@ -46,7 +46,7 @@ const AreasLinesGraph = ({ categories, series, options, colors, title, subheader
                     </Typography>
                 </Box>
                 <ChartLegends
-                    labels={series.map((item) => item.name)}
+                    labels={series?.map((item) => item.name)}
                     colors={chartOptions?.colors}
                     sx={{ p: 3, justifyContent: 'center' }}
                 />

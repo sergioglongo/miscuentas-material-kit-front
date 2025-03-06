@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense } from 'react';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
@@ -31,12 +31,11 @@ export const CategoryEdit = lazy(() => import('src/sections/category/CategoryCre
 
 export const TransactionPage = lazy(() => import('src/pages/transaction/TransactionPage'));
 export const TransactionEdit = lazy(() => import('src/sections/transaction/TransactionCreateEditView'));
-// export const PaymentEdit = lazy(() => import('src/sections/transaction/PaymentCreateEditView'));
-// export const IncomeEdit = lazy(() => import('src/sections/transaction/IncomeCreateEditView'));
 
 export const UserPage = lazy(() => import('src/pages/user'));
 export const SignInPage = lazy(() => import('src/pages/login/sign-in'));
 export const SignUpPage = lazy(() => import('src/pages/login/sign-up'));
+export const InitWizardPage = lazy(() => import('src/pages/login/InitWizard'));
 
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
@@ -58,17 +57,24 @@ const renderFallback = (
   </Box>
 );
 
-function RouterAutorized({user}:any) {
+function RouterAutorized({user, units}:any) {
   const isAuthorized = user?.isAuthorized;
+  const isInitialized = units?.unitMain?.initialized;
 
   return useRoutes([
     {
       element: isAuthorized ? (
-        <DashboardLayout>
-          <Suspense fallback={renderFallback}>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
+        isInitialized ? (
+          <DashboardLayout>
+            <Suspense fallback={renderFallback}>
+              <Outlet />
+            </Suspense>
+          </DashboardLayout>
+        ) : (
+          <AuthLayout cardWidth='90%'>
+            <InitWizardPage />
+          </AuthLayout>
+        )
       ) : (
         <Navigate to="/sign-in" replace />
       ),
@@ -91,8 +97,6 @@ function RouterAutorized({user}:any) {
         { path: 'accountTransactions', element: <AccountTransactions /> },
         { path: 'payMethodEdit', element: <PayMethodEdit /> },
         { path: 'transactionEdit', element: <TransactionEdit /> },
-        // { path: 'paymentEdit', element: <PaymentEdit /> },
-        // { path: 'incomeEdit', element: <IncomeEdit /> },
       ],
     },
     {
@@ -126,7 +130,8 @@ function RouterAutorized({user}:any) {
 
 const Router = connect(
   (state: any) => ({
-      user: state.user
+      user: state.user,
+      units: state.units
   }),
 )(RouterAutorized);
 

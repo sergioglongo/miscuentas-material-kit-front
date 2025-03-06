@@ -17,7 +17,8 @@ import {
     faReceipt,
     faRecycle, faRestroom, faRoad, faSchoolFlag, faScissors, faScrewdriverWrench, faShield, faShip,
     faShirt,
-    faShop, faSmoking, faSpider, faStapler, faStar, faStarOfLife, faStethoscope, faStore, faSyringe,
+    faShoePrints,
+    faShop, faSmoking, faSocks, faSpider, faStapler, faStar, faStarOfLife, faStethoscope, faStore, faSyringe,
     faTableTennis, faTaxi, faThumbsDown, faThumbsUp, faTowerCell, faTractor, faTrain, faTruck,
     faTruckPickup, faTv, faUmbrellaBeach, faUser, faUsers, faUserSecret, faUserShield, faUserTie,
     faUtensils, faWallet, faWheatAwn, faWheelchair, faWifi, faWineGlass
@@ -119,6 +120,12 @@ const CategoryIcon = ({ iconName, styles }: any) => {
             break;
         case 'Wear':
             iconLabel = faShirt;
+            break;
+        case 'Feet':
+            iconLabel = faShoePrints;
+            break;
+        case 'Shock':
+            iconLabel = faSocks;
             break;
         case 'Cloud':
             iconLabel = faCloud;
@@ -324,9 +331,6 @@ const CategoryIcon = ({ iconName, styles }: any) => {
         case 'Fish':
             iconLabel = faFishFins;
             break;
-        case 'Cow':
-            iconLabel = faCow;
-            break;
         case 'Hotel':
             iconLabel = faHotel;
             break;
@@ -399,6 +403,9 @@ const CategoryIcon = ({ iconName, styles }: any) => {
         case 'Vegetable':
             iconLabel = faCarrot;
             break;
+        case 'Cow':
+            iconLabel = faCow;
+            break;
         case 'Wheat':
             iconLabel = faWheatAwn;
             break;
@@ -456,9 +463,6 @@ const CategoryIcon = ({ iconName, styles }: any) => {
         case 'Spotify':
             iconLabel = faSpotify;
             break;
-        case 'Linkedin':
-            iconLabel = faLinkedin;
-            break;
         case 'Apple':
             iconLabel = faApple;
             break;
@@ -503,11 +507,7 @@ export const CategoryIconsList = [
     'Medic',
     'Heart',
     'Bank',
-    'Agriculture',
-    'Taxi',
-    'Bus',
     'Apartment',
-    'Flight',
     'Computer',
     'Laptop',
     'Docs',
@@ -519,6 +519,8 @@ export const CategoryIconsList = [
     'Calendar',
     'Gift',
     'Wear',
+    'Feet',
+    'Shock',
     'Birthday',
     'Party',
     'Baby',
@@ -530,7 +532,6 @@ export const CategoryIconsList = [
     'Dinner',
     'Burger',
     'Coffee',
-    'Subway',
     'Ship',
     'Done',
     'Time',
@@ -540,8 +541,15 @@ export const CategoryIconsList = [
     'Car',
     'Car2',
     'Car3',
+    'Agriculture',
+    'Taxi',
+    'Bus',
+    'Flight',
+    'Subway',
     'Truck',
     'Pickup',
+    'Motorcycle',
+    'Bike',
     'Gas',
     'CashRegister',
     'Electric',
@@ -590,7 +598,6 @@ export const CategoryIconsList = [
     'Horse',
     'Spider',
     'Fish',
-    'Cow',
     'Hotel',
     'Icecream',
     'Box',
@@ -615,6 +622,7 @@ export const CategoryIconsList = [
     'Wine',
     'Pizza',
     'Vegetable',
+    'Cow',
     'Wheat',
     'Fruit',
     'Soccer',
@@ -623,7 +631,6 @@ export const CategoryIconsList = [
     'Bowling',
     'Rugby',
     'Gym',
-    'Bike',
     'Swimming',
     'Tennis',
     'Star',
@@ -631,10 +638,8 @@ export const CategoryIconsList = [
     'Smoke',
     'ThumbUp',
     'ThumbDown',
-    'Motorcycle',
     'Youtube',
     'Spotify',
-    'Linkedin',
     'Apple',
     'Google',
     'PlayStation',

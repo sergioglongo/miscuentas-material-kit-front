@@ -58,7 +58,6 @@ function TransactionView({ unitActive, transactionsList, setTransactionsListStat
     }
     getAllTransactionsBody(data)
       .then((transactionsResponse: any) => {
-        console.log("transactionsResponse", transactionsResponse);
         if (transactionsResponse?.success) {
           const transactionWithCategoryPayMethod = transactionsResponse.result.map((transactionItem: any) => (
             {
@@ -70,8 +69,6 @@ function TransactionView({ unitActive, transactionsList, setTransactionsListStat
               key: transactionItem.id
             }
           ));
-          console.log("transactionWithCategoryPayMethod", transactionWithCategoryPayMethod);
-
           setTransactionsListState(transactionWithCategoryPayMethod);
         } else {
           setErrorMessage("No se pudieron obtener las transactiones");

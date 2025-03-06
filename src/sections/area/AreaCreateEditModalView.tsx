@@ -12,8 +12,9 @@ import AreaCreateEditModalForm from './AreaCreateEditModalForm';
 
 const getColors = () => {
     const colors = [];
-    for (let i = 1; i < 18; i += 1) {
-        colors.push(basePalette.listColors[i]);
+    const length = Object.keys(basePalette.listColors).length/2 + 1;
+    for (let i = 1; i < length; i += 1) {
+      colors.push(basePalette.listColors[i]);
     }
     return colors;
 }

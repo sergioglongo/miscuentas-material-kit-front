@@ -17,26 +17,6 @@ function TransferCreateEditView({ transferId, transferForm, init, unit, setTrans
     const [accountInSelected, setAccountInSelected] = useState(null);
     const [accountOutSelected, setAccountOutSelected] = useState<number | ''>('');
 
-    // useEffect(() => {
-    //     if (!loadingCategoryRef.current && transferId) {
-    //         console.log("transferId recibida", transferId);
-
-    //         loadingCategoryRef.current = true;
-    //         // getCategoryById(categoryId).then((resultCategory: any) => {
-    //         //     if (resultCategory?.success) {
-    //         //         init('transferForm', resultCategory?.result);
-    //         //         setIsNew(false);
-    //         //         setIcon(resultCategory?.result?.icon);
-    //         //         setIsActive(resultCategory?.result?.is_active);
-    //         //         console.log("resultCategory", resultCategory?.result);
-    //         //         // setCategoriesList(resultCategory?.result?.categories);
-    //         //     }
-    //         // })
-    //         //     .finally(() => {
-    //         //         loadingCategoryRef.current = false;
-    //         //     });
-    //     }
-    // }, [init, transferId]);
     useEffect(() => {
         const data = {
             is_active: true,
@@ -44,7 +24,6 @@ function TransferCreateEditView({ transferId, transferForm, init, unit, setTrans
         }
         getAllAccountsForTransfer(data)
             .then((resultAccounts: any) => {
-                console.log("resultAccounts", resultAccounts);
                 setAccountsTransferListIn(resultAccounts?.result?.listIn);
                 setAccountsTransferListOut(resultAccounts?.result?.listOut);
             })

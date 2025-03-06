@@ -24,7 +24,7 @@ const AreaIcon = ({ iconName, styles }: any) => {
     case 'City':
       iconLabel = faCity;
       break;   
-    case 'Healt':
+    case 'Health':
       iconLabel = faHeartPulse;
       break;   
     case 'Medic':
@@ -172,7 +172,7 @@ export const AreaIconsList = [
   'Home',
   'Building',
   'City',
-  'Healt',
+  'Health',
   'Medic',
   'Athletic',
   'Sport',

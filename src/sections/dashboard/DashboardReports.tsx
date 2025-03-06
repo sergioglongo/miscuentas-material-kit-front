@@ -5,11 +5,7 @@ import { _tasks, _posts, _timeline } from 'src/_mock';
 import AreaIcon from 'src/components/icon/AreaIcons';
 import { reportAccountsResumeByUnitId, reportAreasResumeByUnitId, reportAreasMonthToMonthByUnitId } from 'src/services/api/modules/reports.module';
 import { fCurrency } from 'src/utils/format-number';
-import CircularProgress from '@mui/material/CircularProgress';
-import { AreasTotalCards } from './cards/AreasTotalCards';
 import { AccountsTotalCards } from './cards/AccountsTotalCards';
-import { AreasPorcentualCircleGraph } from './cards/AreasPorcentualCircleGraph';
-import AreasCircleGraph from './cards/elements/AreasCircleGraph';
 import { AreasCards } from './cards/AreasCards';
 import AreasLinesGraph from './cards/elements/AreasLinesGraph';
 
@@ -90,20 +86,16 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
         const dataIn: any = [];
         const dataOut: any = [];
         areasMonthToMonthToProcess?.map((areaResume: any) => {
-            console.log("areaResume map", areaResume,);
             categories.push(`${areaResume.mes}`);
-            dataIn.push(Math.round(parseFloat(areaResume.report.in.total)));
-            dataOut.push(Math.round(parseFloat(areaResume.report.out.total)));
+            dataIn.push(areaResume?.report?.in ? Math.round(parseFloat(areaResume.report.in.total)) : 0);
+            dataOut.push(areaResume?.report?.out ? Math.round(parseFloat(areaResume.report.out.total)) : 0);
             return areaResume
         })
-
         const areasProcessed = {
             dataIn,
             dataOut,
             categories,
         }
-        console.log("areasProcessed", areasProcessed);
-
         return areasProcessed;
     }
     // item: { iconName: string; color: string; label: string; total: number };
@@ -188,8 +180,6 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
             .then((areasMonthToMonthInResponse: any) => {
                 if (areasMonthToMonthInResponse?.success) {
                     if (areasMonthToMonthInResponse.result.length > 0) {
-                        console.log("areasMonthToMonthInResponse.result", areasMonthToMonthInResponse.result);
-
                         const areasLineMonthtoMonthInFormated: any = processAreasMonthToMonthCards(areasMonthToMonthInResponse.result, 'in');
                         const series = {
                             categories: areasLineMonthtoMonthInFormated.categories,
@@ -198,8 +188,6 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
                                 { name: "Egresos", data: areasLineMonthtoMonthInFormated.dataOut },
                             ]
                         }
-                        console.log("series", series);
-
                         setAreasMonthToMonthCards(series);
                     }
                 } else {
@@ -214,7 +202,6 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
     }, [unitActive]);
 
     useEffect(() => {
-
         if (!loadingAccountsRef.current && unitActive?.id) {
             loadingAccountsRef.current = true;
             getAccountsReport();
@@ -225,14 +212,12 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
     useEffect(() => {
         if (!loadingAreasRef.current && unitActive?.id && periodo) {
             loadingAreasRef.current = true;
-            console.log("cambio unit o getareasreports o periodo");
             getAreasReports();
         }
         // setTransactionOptionSelected(transactionoptions[0].value); 
     }, [unitActive, getAreasReports, periodo]);
 
     useEffect(() => {
-
         if (!loadingMonthRef.current && unitActive?.id) {
             loadingMonthRef.current = true;
             getMonthToMonthReport();
@@ -271,16 +256,14 @@ const DashboardReports = ({ unitActive, periodo, hoy }: any) => {
                 </Box>
             </Grid>
             <Grid item xs={12} md={8} lg={8}>
-                {areasMonthToMonthCards?.categories?.length > 0 &&
-                    <AreasLinesGraph
-                        series={areasMonthToMonthCards.series}
-                        categories={areasMonthToMonthCards.categories}
-                        heightContent="428px"
-                        title='Transacciones mensuales'
-                        subheader='Últimos 6 meses'
-                        loading={loadingMonthly}
-                    />
-                }
+                <AreasLinesGraph
+                    series={areasMonthToMonthCards.series}
+                    categories={areasMonthToMonthCards.categories}
+                    heightContent="428px"
+                    title='Transacciones mensuales'
+                    subheader='Últimos 6 meses'
+                    loading={loadingMonthly}
+                />
             </Grid>
             <Grid item xs={12} md={4} lg={4}>
                 <AccountsTotalCards

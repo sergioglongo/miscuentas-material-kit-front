@@ -40,8 +40,8 @@ function AccountPayMethodsEditFrom({ title = '', subheader = '', type = 'bank', 
                 height: '100%'
             }}>
                 <Grid container spacing={2} sx={{ marginTop: '0px', }}>
-                    {methodsList.map((item) => (
-                        <Grid item xs={6} sm={4} md={3} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    {methodsList?.map((item) => (
+                        <Grid key={item.id} item xs={6} sm={4} md={3} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                             <Typography variant="h6">{item.name}</Typography>
                             <Checkbox
                                 size="large"

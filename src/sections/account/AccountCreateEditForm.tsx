@@ -134,61 +134,68 @@ function AccountCreateEditForm({ handleEdit, accountData, isNew, is_active, setI
                         </Grid>
                     </Grid>
                 </Grid>
-                <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                    <Typography variant="h6" style={{}}>Moneda:</Typography>
-                    <FormControl >
-                        <Field
-                            name="currency"
-                            component={SelectRedux}
-                            style={{ minWidth: '200px', marginLeft: '10px' }}
-                            variant="outlined"
-                            size='small'
-                            value={accountData?.currency}
-                        >
-                            {currencyLista.map((item, index) => (
-                                <MenuItem
-                                    value={item} key={index}
-                                // defaultValue={accountData?.currency === item ? accountData?.currency : ''}
-                                >
-                                    <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                                        <AccountIcon iconName={item} styles={{ fontSize: '20', display: 'flex', color: grey[700] }} />
-                                        {item}
-                                    </ListItemIcon>
-                                </MenuItem>
-                            ))}
-                        </Field>
-                    </FormControl>
-                    <Typography variant="h6" style={{ marginLeft: '16px' }}>Tipo de cuentas:</Typography>
-                    <FormControl >
-                        <Field
-                            name="type"
-                            component={SelectRedux}
-                            style={{ minWidth: '200px', marginLeft: '10px' }}
-                            variant="outlined"
-                            size='small'
-                            defaultValue='Efectivo'
-                        >
-                            {typesLista.map((item, index) => (
-                                <MenuItem
-                                    value={item.id} key={index}
-                                    defaultValue={accountData?.type === item.id ? accountData?.type : ''}
-                                >
-                                    <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                                        <AccountIcon iconName={item?.id} styles={{ fontSize: '25', display: 'flex', color: grey[700] }} />
-                                        {item?.name}
-                                    </ListItemIcon>
-                                </MenuItem>
-                            ))}
-                        </Field>
-                    </FormControl>
+                <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <Box gap={2} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center' }}>
+                        <Typography variant="h6" style={{}}>Moneda:</Typography>
+                        <FormControl >
+                            <Field
+                                name="currency"
+                                component={SelectRedux}
+                                style={{ minWidth: '200px', marginLeft: '10px' }}
+                                variant="outlined"
+                                size='small'
+                                value={accountData?.currency}
+                            >
+                                {currencyLista.map((item, index) => (
+                                    <MenuItem
+                                        value={item} key={index}
+                                    // defaultValue={accountData?.currency === item ? accountData?.currency : ''}
+                                    >
+                                        <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                                            <AccountIcon iconName={item} styles={{ fontSize: '20', display: 'flex', color: grey[700] }} />
+                                            {item}
+                                        </ListItemIcon>
+                                    </MenuItem>
+                                ))}
+                            </Field>
+                        </FormControl>
+                    </Box>
+                    <Box gap={2} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center' }}>
+                        <Typography variant="h6" style={{ marginLeft: '16px' }}>Tipo de cuentas:</Typography>
+                        <FormControl >
+                            <Field
+                                name="type"
+                                component={SelectRedux}
+                                style={{ minWidth: '200px', marginLeft: '10px' }}
+                                variant="outlined"
+                                size='small'
+                                defaultValue='Efectivo'
+                            >
+                                {typesLista.map((item, index) => (
+                                    <MenuItem
+                                        value={item.id} key={index}
+                                        defaultValue={accountData?.type === item.id ? accountData?.type : ''}
+                                    >
+                                        <ListItemIcon style={{ display: 'flex', gap: '10px', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                                            <AccountIcon iconName={item?.id} styles={{ fontSize: '25', display: 'flex', color: grey[700] }} />
+                                            {item?.name}
+                                        </ListItemIcon>
+                                    </MenuItem>
+                                ))}
+                            </Field>
+                        </FormControl>
+                    </Box>
                 </Grid>
-                <AccountPayMethodsEditFrom
-                    sx={{ width: '100%', boxShadow: 2 }}
-                    title='Metodos de Pago de esta cuenta'
-                    subheader='Seleccione los metodos que desea incorporar como medio de pago para esta cuenta'
-                    payMethodsSelected={payMethodsSelected}
-                    setPayMethodsSelected={setPayMethodsSelected}
-                />
+                {
+                    accountData?.type !== 'cash' &&
+                    <AccountPayMethodsEditFrom
+                        sx={{ width: '100%', boxShadow: 2 }}
+                        title='Metodos de Pago de esta cuenta'
+                        subheader='Seleccione los metodos que desea tener como medio de pago para esta cuenta'
+                        payMethodsSelected={payMethodsSelected}
+                        setPayMethodsSelected={setPayMethodsSelected}
+                    />
+                }
                 <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-arround' }}>
                     <Grid item xs={12} sm={6} style={{ width: '100%', marginTop: '10px' }}>
                         <Button fullWidth size="large" color="inherit" variant="contained" onClick={() => router.back()}>Cancelar</Button>

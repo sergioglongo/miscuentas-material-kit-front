@@ -35,7 +35,6 @@ const TransactionCreateEditView = ({ transactionForm, setTransactionsListState, 
         const data = { unitId: unit?.id, type, is_active: true };
         getAllAreasBody(data)
         .then((areasResponse: any) => {
-            console.log("areasResponse", areasResponse);
             if (areasResponse?.success) {
                 setareasList(areasResponse.result);
             } else {
@@ -79,7 +78,6 @@ const TransactionCreateEditView = ({ transactionForm, setTransactionsListState, 
         if (TransactionInitialData?.id) {
             getTransactionById(TransactionInitialData?.id).then((resultTransaction: any) => {
                 if (resultTransaction?.success) {
-                    console.log("transaction by Id", resultTransaction.result);
                     const dataToInit = { ...resultTransaction.result, date: utcToLocal(resultTransaction.result?.date) };
                     init('transactionForm', dataToInit);
                     setIsNew(false);
@@ -87,7 +85,6 @@ const TransactionCreateEditView = ({ transactionForm, setTransactionsListState, 
                 }
             })
         }
-        console.log("TransactionInitialData", TransactionInitialData);
     }, [init, TransactionInitialData]);
 
     const handleSave = useMemo(() => (e: any) => {

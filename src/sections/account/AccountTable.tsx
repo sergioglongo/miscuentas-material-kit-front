@@ -22,7 +22,7 @@ const AccountTable = ({ unitActive, lists, setAccountsListState, transferCreateE
     const [totalEuro, setTotalEuro] = useState(0);
     const [openmodalAdjust, setOpenmodalAdjust] = useState(false);
     const [accountDataSelected, setAccountDataSelected] = useState<any>(null);
-
+    const [isLoading, setIsLoading] = useState(false);
     const rowsPerPage = 10;
     const router = useRouter();
     const onEdit = (accountData: any) => {
@@ -135,31 +135,35 @@ const AccountTable = ({ unitActive, lists, setAccountsListState, transferCreateE
         },
     });
     const customFooter = () => (
-        <Grid container rowSpacing={1} rowGap={2} columnSpacing={2} display='flex' flexDirection='column' alignItems='center' margin={2}>
-            <Grid item xs={12} sm={12} gap={2} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                <Typography variant="h5" sx={{ color: 'text.secondary' }} >
-                    Totales:
-                </Typography>
-                <Box gap={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                    <AccountIcon iconName="Pesos" styles={{ fontSize: '30', display: 'flex', color: 'blue' }} />
-                    <Typography variant="h5" sx={{ color: 'text.primary' }} >
-                        {fNumber(totalPesos)}
-                    </Typography>
-                </Box>
-                <Box gap={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                    <AccountIcon iconName="Dolar" color="green" styles={{ dolarSize: 'xl', display: 'flex', dolarColor: 'green' }} />
-                    <Typography variant="h5" sx={{ color: 'text.primary' }} >
-                        {fNumber(totalDollar)}
-                    </Typography>
-                </Box>
-                <Box gap={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                    <AccountIcon iconName="Euro" styles={{ fontSize: '30', display: 'flex', color: 'black' }} />
-                    <Typography variant="h5" sx={{ color: 'text.primary' }} >
-                        {fNumber(totalEuro)}
-                    </Typography>
-                </Box>
-            </Grid>
-        </Grid>
+        <tfoot>
+            <tr>
+                <td colSpan={8} style={{ padding: '16px' }}>
+                    <Box display="flex" alignItems="center" justifyContent="center" gap={2}>
+                        <Typography variant="h5" sx={{ color: 'text.secondary' }}>
+                            Totales:
+                        </Typography>
+                        <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                            <AccountIcon iconName="Pesos" styles={{ fontSize: '30', display: 'flex', color: 'blue' }} />
+                            <Typography variant="h5" sx={{ color: 'text.primary' }}>
+                                {fNumber(totalPesos)}
+                            </Typography>
+                        </Box>
+                        <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                            <AccountIcon iconName="Dolar" color="green" styles={{ dolarSize: 'xl', display: 'flex', dolarColor: 'green' }} />
+                            <Typography variant="h5" sx={{ color: 'text.primary' }}>
+                                {fNumber(totalDollar)}
+                            </Typography>
+                        </Box>
+                        <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                            <AccountIcon iconName="Euro" styles={{ fontSize: '30', display: 'flex', color: 'black' }} />
+                            <Typography variant="h5" sx={{ color: 'text.primary' }}>
+                                {fNumber(totalEuro)}
+                            </Typography>
+                        </Box>
+                    </Box>
+                </td>
+            </tr>
+        </tfoot>
     );
     const columns: any = [
         {
@@ -195,7 +199,7 @@ const AccountTable = ({ unitActive, lists, setAccountsListState, transferCreateE
                     </th>
                 ),
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ width: '80px', padding: 0, height: '40px' }}>
+                    <th key={`header-${columnMeta.name}`} style={{ width: '80px', padding: 0, height: '40px' }}>
                         {columnMeta.label}
                     </th>
                 )
@@ -207,7 +211,7 @@ const AccountTable = ({ unitActive, lists, setAccountsListState, transferCreateE
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign: 'left' }} >
+                    <th key={`header-${columnMeta.name}`} style={{ minWidth: '100px', textAlign: 'left' }} >
                         {columnMeta.label}
                     </th>
                 ),
@@ -226,7 +230,7 @@ const AccountTable = ({ unitActive, lists, setAccountsListState, transferCreateE
             options: {
                 filter: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{ minWidth: '100px', textAlign: 'left' }}>
+                    <th key={`header-${columnMeta.name}`} style={{ minWidth: '100px', textAlign: 'left' }}>
                         {columnMeta.label}
                     </th>
                 ),
@@ -242,7 +246,7 @@ const AccountTable = ({ unitActive, lists, setAccountsListState, transferCreateE
                 filter: true,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
+                    <th key={`header-${columnMeta.name}`} style={{}}>
                         {columnMeta.label}
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
@@ -270,7 +274,7 @@ const AccountTable = ({ unitActive, lists, setAccountsListState, transferCreateE
                 filter: true,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
+                    <th key={`header-${columnMeta.name}`} style={{}}>
                         {columnMeta.label}
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
@@ -298,7 +302,7 @@ const AccountTable = ({ unitActive, lists, setAccountsListState, transferCreateE
                 filter: true,
                 sort: false,
                 customHeadRender: (columnMeta: any) => (
-                    <th style={{}}>
+                    <th key={`header-${columnMeta.name}`} style={{}}>
                         {columnMeta.label}
                     </th>
                 ), customBodyRender: (value: any, tableMeta: any) => () => (
@@ -395,7 +399,7 @@ const AccountTable = ({ unitActive, lists, setAccountsListState, transferCreateE
                 next: 'Siguiente',
                 previous: 'Anterior',
                 rowsPerPage: 'Por página:',
-              }
+            }
         },
         // onSearchChange: (searchText) => {
         //   console.log('onSearchChange', searchText);
@@ -424,29 +428,32 @@ const AccountTable = ({ unitActive, lists, setAccountsListState, transferCreateE
         setTotalPesos(totalPesosTemp);
         setTotalEuro(totalEuroTemp);
     }
-    const getAccountsList = useCallback(() => {
-        getAllAccountsByUnitId(unitActive?.id, null)
+    const getAccountsList = useCallback(async () => {
+        const data = {
+            
+        }
+        getAllAccountsByUnitId(unitActive?.id, data)
             .then((accountResponse: any) => {
-                // console.log("accountResponse", accountResponse);
                 if (accountResponse?.success) {
                     const categoriesWithArea = accountResponse.result.map((account: any) => ({ ...account, account: account.unit.name, description: account.unit.description, accountPhoto: account.unit.photo }));
                     setAccountsListState(categoriesWithArea);
                     totalCalc(categoriesWithArea);
-                    // console.log("totales", totalDolarTemp, totalPesosTemp, totalEuroTemp);
                 } else {
                     console.log("No se pudieron obtener las accounts");
                 }
             })
-            .catch((err: any) => console.log(err));
+            .catch((err: any) => console.log(err))
     }, [unitActive?.id, setAccountsListState]);
 
     useEffect(() => {
-        if (lists.accountsList.length === 0 && !loadingRef.current) {
-            getAccountsList();
-        } else {
-            totalCalc(lists.accountsList);
+        console.log("unitActive", unitActive, "isLoading", isLoading);
+        
+        if (!isLoading && unitActive?.id) {
+            setIsLoading(true);
+            getAccountsList()
+                .finally(() => setIsLoading(false));
         }
-    }, [lists.accountsList, getAccountsList, loadingRef]);
+    }, [unitActive?.id, getAccountsList]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <Box>

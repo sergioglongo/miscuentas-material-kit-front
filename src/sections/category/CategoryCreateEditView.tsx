@@ -31,8 +31,6 @@ const CategoryCreateEditView = ({ categoryForm, init, unit, lists, setAreasListS
                 .then((areasResponse: any) => {
                     if (areasResponse?.success) {
                         // setAreas(areasResponse.result);
-                        console.log("areasResponse", areasResponse);
-                        
                         setAreasListState(areasResponse.result);
                     } else {
                         console.log("No se pudieron obtener las areas");
@@ -42,17 +40,7 @@ const CategoryCreateEditView = ({ categoryForm, init, unit, lists, setAreasListS
         }
     }, [unit?.id, categoryInitialData, lists.areasList, setAreasListState]);
 
-    // useEffect(() => {
-    //     if (categoryInitialData) {
-    //         init('categoryForm', categoryInitialData);
-    //         console.log("categoryInitialData", categoryInitialData);
-    //         setIsNew(false);
-    //         setAreaSelected(categoryInitialData?.areaId);
-    //         setColor(categoryInitialData?.areaColor);
-    //         setIsActive(categoryInitialData?.is_active);
-    //     }
 
-    // }, [init, categoryInitialData]);
     useEffect(() => {
         if (!loadingCategoryRef.current && categoryInitialData?.id) {
             loadingCategoryRef.current = true;
@@ -73,10 +61,9 @@ const CategoryCreateEditView = ({ categoryForm, init, unit, lists, setAreasListS
                 });
         }
     }, [init, categoryInitialData]);
+
     useEffect(() => {
         const colorDefined = lists.areasList.find((areaItem: any) => areaItem.id === areaSelected)?.color;
-        console.log("areaselected", areaSelected, colorDefined);
-        
         setColor(colorDefined);
     }, [areaSelected, lists.areasList]);
 

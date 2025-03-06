@@ -9,14 +9,14 @@ import { useRouter } from 'src/routes/hooks';
 import { Iconify } from 'src/components/iconify';
 import { reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
-import { setUnitActive, setUnits } from 'src/redux/slices/units.slice';
+import { setUnitActive, setUnitMain, setUnits } from 'src/redux/slices/units.slice';
 import { signIn } from 'src/services/api/modules/user.module';
 import { setUser } from 'src/redux/slices/user.slice';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { setUnitsList } from 'src/redux/slices/lists.slice';
 import SignInForm from './sign-in-form';
 
-const SignInView = ({ signInForm, setUserData, setUnitsData, setUnitActiveData, setUnitsListData }: any) => {
+const SignInView = ({ signInForm, setUserData, setUnitsData, setUnitMainData, setUnitActiveData, setUnitsListData }: any) => {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState('');
   const [errorShow, setErrorShow] = useState<boolean>(false);
@@ -29,12 +29,13 @@ const SignInView = ({ signInForm, setUserData, setUnitsData, setUnitActiveData, 
       .then((res) => {
         if (res?.success) {
           const user = res?.user?.user;
-          const unitMain = res?.user?.unitMain
-          const { units, ...userWithoutUnits } = user;
-          setUserData({ userData: userWithoutUnits, isAuthorized: true, accessToken: res?.user?.accessToken });
+          const units = res?.user?.units;
+          const mainUnit = res?.user?.main_unit;
+          setUserData({ userData: user, isAuthorized: true, accessToken: res?.user?.accessToken });
           setUnitsData(units);
+          setUnitMainData(mainUnit);
+          setUnitActiveData(mainUnit);
           setUnitsListData(units);
-          // setUnitActiveData(unitMain);
           router.push('/');
         } else {
           setErrorMessage(res?.message);
@@ -49,7 +50,7 @@ const SignInView = ({ signInForm, setUserData, setUnitsData, setUnitActiveData, 
         console.log("error catch", err)
       });
 
-  }, [setUnitsData, signInForm, router, setUserData, setUnitsListData]);
+  }, [setUnitsData, signInForm, router, setUserData, setUnitsListData, setUnitMainData, setUnitActiveData]);
 
 
   return (
@@ -100,6 +101,7 @@ const mapDispatchToProps = (dispatch: any) => ({
   setUnitsData: bindActionCreators(setUnits, dispatch),
   setUnitsListData: bindActionCreators(setUnitsList, dispatch),
   setUnitActiveData: bindActionCreators(setUnitActive, dispatch),
+  setUnitMainData: bindActionCreators(setUnitMain, dispatch),
 });
 
 const SignInViewForm = connect(
