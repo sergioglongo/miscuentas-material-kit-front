@@ -59,7 +59,7 @@ const renderFallback = (
 
 function RouterAutorized({user, units}:any) {
   const isAuthorized = user?.isAuthorized;
-  const isInitialized = units?.unitMain?.initialized;
+  const isInitialized = user?.initialized;
 
   return useRoutes([
     {

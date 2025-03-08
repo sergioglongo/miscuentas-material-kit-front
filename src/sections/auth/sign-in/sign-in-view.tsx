@@ -31,7 +31,8 @@ const SignInView = ({ signInForm, setUserData, setUnitsData, setUnitMainData, se
           const user = res?.user?.user;
           const units = res?.user?.units;
           const mainUnit = res?.user?.main_unit;
-          setUserData({ userData: user, isAuthorized: true, accessToken: res?.user?.accessToken });
+          const initialized = mainUnit?.initialized;
+          setUserData({ userData: user, isAuthorized: true, initialized, accessToken: res?.user?.accessToken });
           setUnitsData(units);
           setUnitMainData(mainUnit);
           setUnitActiveData(mainUnit);

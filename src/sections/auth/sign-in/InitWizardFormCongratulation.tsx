@@ -3,16 +3,16 @@ import { Box, Button, Typography } from '@mui/material'
 import { useRouter } from 'src/routes/hooks';
 import { connect } from 'react-redux';
 import { bindActionCreators } from '@reduxjs/toolkit';
+import { setUser } from 'src/redux/slices/user.slice';
 import { setUnitMain, setUnits } from 'src/redux/slices/units.slice';
 import styles from './signIn.module.css';
 
-const InitWizardFormCongratulation = ({ unitMain, setUnitMainData, setUnitsListData }: any) => {
+const InitWizardFormCongratulation = ({ unitMain, setUnitMainData, setUnitsListData, user, setUserData }: any) => {
     const router = useRouter();
 
     const onClickStart = () => {
-        const unitInicialized = {...unitMain, initialized: true};
-        setUnitMainData(unitInicialized);
-        setUnitsListData([unitInicialized]);
+        const userInitialized = { ...user, initialized: true };
+        setUserData(userInitialized);
         router.push('/dashboard')
     }
 
@@ -42,11 +42,13 @@ const InitWizardFormCongratulation = ({ unitMain, setUnitMainData, setUnitsListD
 const mapDispatchToProps = (dispatch: any) => ({
     setUnitMainData: bindActionCreators(setUnitMain, dispatch),
     setUnitsListData: bindActionCreators(setUnits, dispatch),
+    setUserData: bindActionCreators(setUser, dispatch),
 });
 
 export default connect(
     (state: any) => ({
         unitMain: state.units.unitMain,
+        user: state.user
     }),
     mapDispatchToProps
 )(InitWizardFormCongratulation);

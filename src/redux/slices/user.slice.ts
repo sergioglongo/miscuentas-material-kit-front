@@ -5,6 +5,7 @@ export const userSlice = createSlice({
   initialState: {
     userData: {},
     isAuthorized: false,
+    initialized: false,
     accessToken: '',
     uiState:{},
     params:{},
