@@ -80,7 +80,7 @@ function UnitEditForm({ handleSave, unitData, icon, setIcon }: any) {
                         />
                     </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                <Grid item xs={12} sm={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', flexWrap: 'wrap', rowGap: '16px' }}>
                     <Box style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                         <Typography variant="h6" width='200px'>Unidad principal:</Typography>
                         <FormControl fullWidth>

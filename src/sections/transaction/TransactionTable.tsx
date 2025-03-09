@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Box, Checkbox, IconButton, Snackbar, Tooltip } from '@mui/material';
+import { Box, Checkbox, IconButton, Snackbar, Tooltip, useMediaQuery } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
 import { deleteTransaction, getAllTransactionsBody } from 'src/services/api/modules/transaction.module';
@@ -27,6 +27,7 @@ const methodsList = [
 const TransactionTable = ({ transactionsList, onDelete }: any) => {
     const rowsPerPage = 10;
     const router = useRouter();
+    const isMdDown = useMediaQuery((theme: any) => theme.breakpoints.down('md'));
 
     const onEdit = (value: any) => {
         // console.log("Elegido editar id: ", value);
@@ -345,7 +346,7 @@ const TransactionTable = ({ transactionsList, onDelete }: any) => {
         filterType: 'multiselect',
         responsive: 'vertical',
         selectableRows: 'none',
-        searchAlwaysOpen: true,
+        searchAlwaysOpen: !isMdDown,
         searchPlaceholder: 'Busque por nombre o descripción',
         caseSensitive: false,
         print: false,

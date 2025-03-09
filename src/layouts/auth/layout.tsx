@@ -60,7 +60,7 @@ export function AuthLayout({ sx, children, header, cardWidth }: AuthLayoutProps)
             rightArea: (
               <Link
                 component={RouterLink}
-                href="https://wa.me/5493816302170?text=Hola,%queria%20consultarte"
+                href="https://wa.me/5493816302170?text=Hola,%20queria%20consultarte"
                 color="inherit"
                 sx={{ typography: 'subtitle2' }}
                 target='_blank'

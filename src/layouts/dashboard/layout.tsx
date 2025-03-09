@@ -28,6 +28,7 @@ import { HeaderSection } from '../core/header-section';
 import { AccountPopover } from '../components/account-popover';
 import { LanguagePopover } from '../components/language-popover';
 import { NotificationsPopover } from '../components/notifications-popover';
+import { UnitActiveItem } from './unitActive';
 
 // ----------------------------------------------------------------------
 
@@ -110,6 +111,7 @@ function DashboardLayoutReduxed({ sx, children, header, units, setUnitActiveData
                 {/* <Searchbar /> */}
                 {/* <LanguagePopover data={_langs} /> */}
                 {/* <NotificationsPopover data={_notifications} /> */}
+                <UnitActiveItem />
                 <AccountPopover
                   menuData={[
                     {

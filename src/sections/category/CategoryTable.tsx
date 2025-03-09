@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
-import { Box, Checkbox, IconButton, Tooltip } from '@mui/material';
+import { Box, Checkbox, IconButton, Tooltip, useMediaQuery } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
 import { getAllCategoriesBody } from 'src/services/api/modules/category.module';
@@ -14,6 +14,8 @@ import { getPayMethodTypeName } from 'src/utils/list-translate';
 
 const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
     const [categories, setCategories] = useState([]);
+      const isMdDown = useMediaQuery((theme: any) => theme.breakpoints.down('md'));
+    
     const rowsPerPage = 10;
     const theme = useTheme();
     const router = useRouter();
@@ -324,7 +326,7 @@ const CategoryTable = ({ unitActive, lists, setCategoriesListState }: any) => {
         filterType: 'multiselect',
         responsive: 'vertical',
         selectableRows: 'none',
-        searchAlwaysOpen: true,
+        searchAlwaysOpen: !isMdDown,
         searchPlaceholder: 'Busque por nombre o descripción',
         caseSensitive: false,
         print: false,

@@ -14,12 +14,14 @@ import { signIn } from 'src/services/api/modules/user.module';
 import { setUser } from 'src/redux/slices/user.slice';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { setUnitsList } from 'src/redux/slices/lists.slice';
+import { useMediaQuery } from '@mui/material';
 import SignInForm from './sign-in-form';
 
 const SignInView = ({ signInForm, setUserData, setUnitsData, setUnitMainData, setUnitActiveData, setUnitsListData }: any) => {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState('');
   const [errorShow, setErrorShow] = useState<boolean>(false);
+  const isMdDown = useMediaQuery((theme: any) => theme.breakpoints.down('md'));
 
 
   const handleSignIn = useMemo(() => (e: any) => {
@@ -56,17 +58,17 @@ const SignInView = ({ signInForm, setUserData, setUnitsData, setUnitMainData, se
 
   return (
     <>
-      <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
-        <Typography variant="h5">Inicia sesión</Typography>
-        <Typography variant="body2" color="text.secondary">
-          auú no tienes cuenta?
-          <Link href="/sign-up" variant="subtitle2" sx={{ ml: 0.5 }}>
-            Crea una aqui..
-          </Link>
+      <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }} rowGap={1}>
+        <Typography fontWeight='bold' fontSize={isMdDown ? '32px' : '24px'}>Inicia sesión</Typography>
+        <Typography variant="body2" fontSize={isMdDown ? '24px' : '16px'} color="text.secondary">
+          aún no tienes cuenta?
         </Typography>
+        <Link href="/sign-up" variant="subtitle2" fontSize={isMdDown ? '24px' : '16px'} sx={{ ml: 0.5 }}>
+          Crea una aqui..
+        </Link>
       </Box>
 
-      <SignInForm handleSignIn={handleSignIn} errorMessage={errorMessage} errorShow={errorShow} setErrorShow={setErrorShow}/>
+      <SignInForm handleSignIn={handleSignIn} errorMessage={errorMessage} errorShow={errorShow} setErrorShow={setErrorShow} />
 
       <Divider sx={{ my: 3, '&::before, &::after': { borderTopStyle: 'dashed' } }}>
         <Typography

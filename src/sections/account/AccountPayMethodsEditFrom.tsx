@@ -22,26 +22,29 @@ const methodsList = [
     { id: 'debit', name: 'Tarjeta Debito' },
     { id: 'credit', name: 'Tarjeta Credito' },
     { id: 'transfer', name: 'Transferencia' },
-    { id: 'other', name: 'Otro' },
+    // { id: 'other', name: 'Otro' },
 ]
 
 function AccountPayMethodsEditFrom({ title = '', subheader = '', type = 'bank', payMethodsSelected, setPayMethodsSelected, sx, ...other }: Props) {
 
     return (
         <Card sx={sx} {...other}>
-            <CardHeader title={title} subheader={subheader} sx={{backgroundColor:grey[100]}} />
+            <CardHeader title={title} subheader={subheader} sx={{ backgroundColor: grey[100] }} />
             {/* <Box display="grid" gap={2} gridTemplateColumns="repeat(2, 1fr)" sx={{ p: 3 }}> */}
-            <CardContent sx={{
+            <CardContent
+            sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'flex-start',
                 alignItems: 'center',
-                backgroundColor:grey[100],
+                backgroundColor: grey[100],
                 height: '100%'
             }}>
-                <Grid container spacing={2} sx={{ marginTop: '0px', }}>
+                <Grid container spacing={2} marginTop='0px' justifyContent='center'>
                     {methodsList?.map((item) => (
-                        <Grid key={item.id} item xs={6} sm={4} md={3} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        <Grid key={item.id} item xs={6} sm={4} md={3}
+                            width='100%' display='flex' flexDirection='row'
+                            alignItems='center' justifyContent='center'>
                             <Typography variant="h6">{item.name}</Typography>
                             <Checkbox
                                 size="large"

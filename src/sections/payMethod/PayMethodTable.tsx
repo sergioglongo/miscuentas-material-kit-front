@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Box, Checkbox, CircularProgress, IconButton, Tooltip } from '@mui/material';
+import { Box, Checkbox, CircularProgress, IconButton, Tooltip, useMediaQuery } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
 import { getAllPayMethodsByUnitId } from 'src/services/api/modules/payMethod.module';
@@ -16,6 +16,7 @@ import {Spinner} from 'src/components/spinner/Spinner';
 const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethodsListState, setOpenmodalPayMethodEdit }: any) => {
     const [isLoading, setIsLoading] = useState(false);
     const rowsPerPage = 10;
+    const isMdDown = useMediaQuery((theme: any) => theme.breakpoints.down('md'));
 
     const getPayMethodsList = useCallback(async () =>
         getAllPayMethodsByUnitId({ unitId: unitActive?.id, deleted: false })
@@ -293,7 +294,7 @@ const PayMethodTable = ({ unitActive, lists, setPayMethodSelected, setPayMethods
         filterType: 'multiselect',
         responsive: 'vertical',
         selectableRows: 'none',
-        searchAlwaysOpen: true,
+        searchAlwaysOpen: !isMdDown,
         searchPlaceholder: 'Busque por nombre o descripción',
         caseSensitive: false,
         print: false,

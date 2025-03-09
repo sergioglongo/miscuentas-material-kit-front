@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 import { getAllAreas } from 'src/services/api/modules/area.module';
-import { Box, Checkbox, Icon, IconButton, Tooltip } from '@mui/material';
+import { Box, Checkbox, Icon, IconButton, Tooltip, useMediaQuery } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import AreaIcon from 'src/components/icon/AreaIcons';
 import CommonIcon from 'src/components/icon/CommonIcons';
@@ -13,7 +13,7 @@ import { grey } from 'src/theme/core';
 import { getPayMethodTypeName } from 'src/utils/list-translate';
 
 const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
-    const [areaQueryLoad, setAreaQueryLoad] = useState(false);
+    const isMdDown = useMediaQuery((theme: any) => theme.breakpoints.down('md'));
     const rowsPerPage = 10;
     const router = useRouter();
     const onEdit = (areaData: any) => {
@@ -297,7 +297,7 @@ const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
         filterType: 'multiselect',
         responsive: 'vertical',
         selectableRows: 'none',
-        searchAlwaysOpen: true,
+        searchAlwaysOpen: !isMdDown,
         searchPlaceholder: 'Busque por nombre o descripción',
         caseSensitive: false,
         viewColumns: false,
@@ -370,13 +370,13 @@ const AreaTable = ({ unitActive, setAreasListState, lists }: any) => {
                 .catch((err: any) => console.log(err))
                 .finally(() => { loadingRef.current = false });
         }
-    }, [unitActive, setAreasListState, lists.areasList, areaQueryLoad]);
+    }, [unitActive, setAreasListState, lists.areasList]);
 
 
     return (
         <ThemeProvider theme={getMuiTheme()}>
             <MUIDataTable
-                title='Areas'
+                title='Areas de la unidad'
                 data={lists.areasList}
                 columns={columns}
                 options={options}

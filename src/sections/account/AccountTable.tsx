@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Box, Checkbox, Grid, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, Checkbox, Grid, IconButton, Tooltip, Typography, useMediaQuery } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
 import { getAllAccountsByUnitId } from 'src/services/api/modules/account.module';
@@ -23,6 +23,7 @@ const AccountTable = ({ unitActive, lists, setAccountsListState, transferCreateE
     const [openmodalAdjust, setOpenmodalAdjust] = useState(false);
     const [accountDataSelected, setAccountDataSelected] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const isMdDown = useMediaQuery((theme: any) => theme.breakpoints.down('md'));
     const rowsPerPage = 10;
     const router = useRouter();
     const onEdit = (accountData: any) => {
@@ -344,7 +345,7 @@ const AccountTable = ({ unitActive, lists, setAccountsListState, transferCreateE
         filterType: 'multiselect',
         responsive: 'vertical',
         selectableRows: 'none',
-        searchAlwaysOpen: true,
+        searchAlwaysOpen: !isMdDown,
         searchPlaceholder: 'Busque por nombre o balance',
         caseSensitive: false,
         print: false,

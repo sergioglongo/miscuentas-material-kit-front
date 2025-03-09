@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Box, Grid, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, Grid, IconButton, Tooltip, Typography, useMediaQuery } from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import MUIDataTable from 'mui-datatables';
 import PayMethodIcon from 'src/components/icon/paymethod-icons';
@@ -13,6 +13,7 @@ import { fCurrency, fNumber } from 'src/utils/format-number';
 const AccountTransactionsTable = ({ transactions, totalIn, totalOut, totalBalance, account }: any) => {
     const rowsPerPage = 10;
     const router = useRouter();
+    const isMdDown = useMediaQuery((theme: any) => theme.breakpoints.down('md'));
     const onEdit = (value: any) => {
         // console.log("Elegido editar id: ", value);
         router.navigateState('/transactionEdit', { id: value, });
@@ -384,7 +385,7 @@ const AccountTransactionsTable = ({ transactions, totalIn, totalOut, totalBalanc
         filterType: 'multiselect',
         responsive: 'vertical',
         selectableRows: 'none',
-        searchAlwaysOpen: true,
+        searchAlwaysOpen: !isMdDown,
         searchPlaceholder: 'Busque por nombre o descripción',
         caseSensitive: false,
         print: false,
