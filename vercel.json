@@ -6,6 +6,7 @@
     }
   ],
   "buildCommand": "npm run build",
+  "installCommand": "yarn install",
   "outputDirectory": "dist",
   "framework": "vite"
 }
